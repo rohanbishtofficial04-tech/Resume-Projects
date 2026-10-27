@@ -4,8 +4,14 @@ A cinematic, atmospheric discovery platform for horror video games. Built as a p
 React application on top of the [RAWG Video Games API](https://rawg.io/apidocs). Inspired by
 Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 
-> Two visual themes shipped: **Fog** (Silent Hill palette) and **Blood** (Resident Evil palette).
-> Toggle from the top-right of the navbar.
+> Three visual themes are available: **Fog**, **Blood**, and **Eldritch**. Cycle through them
+> from the top-right of the navbar.
+
+## Updates
+
+- Added the dark-purple **Eldritch** theme and a subtle ambient background glow that follows the active theme.
+- Improved search behavior and the responsive mobile experience.
+- Published a cleaned DreadVault project snapshot.
 
 ---
 
@@ -20,7 +26,7 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 - **Collections** — user-made lists (create, rename, delete), stored locally
 - **Compare Games** — side-by-side spec table
 - **Random Horror Generator** — "Dare to Play" roulette with cinematic build-up
-- **Theme Customization** — Fog / Blood toggle
+- **Theme Customization** — Fog / Blood / Eldritch theme toggle
 - **404, offline detection, missing-API-key demo mode**
 - **Accessibility** — semantic HTML, keyboard nav, ARIA labels, `prefers-reduced-motion`
 - **Performance** — `React.lazy` code splitting, lazy-loaded images, memoized providers, debounced input
@@ -58,7 +64,7 @@ frontend/
     ├── components/
     │   ├── Navbar.jsx                # Sticky glassmorphic nav
     │   ├── Footer.jsx
-    │   ├── ThemeToggle.jsx           # Fog ↔ Blood switch
+    │   ├── ThemeToggle.jsx           # Cycles through Fog, Blood, and Eldritch
     │   ├── SearchOverlay.jsx         # ⌘K live search modal
     │   ├── GameCard.jsx
     │   ├── GameGrid.jsx
@@ -72,7 +78,7 @@ frontend/
     ├── constants/
     │   └── testIds.js                # Central registry of data-testid values
     ├── context/
-    │   ├── ThemeContext.jsx          # Fog / Blood
+    │   ├── ThemeContext.jsx          # Fog / Blood / Eldritch
     │   └── LibraryContext.jsx        # Favorites + recent + collections
     ├── hooks/
     │   ├── useDebounce.js
