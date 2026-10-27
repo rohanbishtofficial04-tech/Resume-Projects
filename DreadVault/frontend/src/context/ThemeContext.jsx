@@ -3,11 +3,13 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 const ThemeContext = createContext({ theme: "fog", setTheme: () => {}, toggleTheme: () => {} });
 
 const KEY = "nightfall:theme";
+const THEMES = ["fog", "blood", "eldritch"];
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setThemeState] = useState(() => {
     if (typeof window === "undefined") return "fog";
-    return localStorage.getItem(KEY) === "blood" ? "blood" : "fog";
+    const savedTheme = localStorage.getItem(KEY);
+    return THEMES.includes(savedTheme) ? savedTheme : "fog";
   });
 
   useEffect(() => {
@@ -15,9 +17,11 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem(KEY, theme);
   }, [theme]);
 
-  const setTheme = useCallback((t) => setThemeState(t === "blood" ? "blood" : "fog"), []);
+  const setTheme = useCallback((t) => {
+    setThemeState(THEMES.includes(t) ? t : "fog");
+  }, []);
   const toggleTheme = useCallback(
-    () => setThemeState((t) => (t === "fog" ? "blood" : "fog")),
+    () => setThemeState((t) => THEMES[(THEMES.indexOf(t) + 1) % THEMES.length]),
     []
   );
 

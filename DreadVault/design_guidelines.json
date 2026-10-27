@@ -58,6 +58,19 @@
       "accent_glow": "rgba(197, 31, 32, 0.25)",
       "danger": "#DC2626"
     },
+    "eldritch_theme": {
+      "name": "Eldritch",
+      "background": "#09070D",
+      "surface": "#120C1C",
+      "surface_hover": "#1C1129",
+      "border": "#30243F",
+      "text_primary": "#FFFFFF",
+      "text_secondary": "#A1A1AA",
+      "accent": "#7E22CE",
+      "button_accent": "#581C87",
+      "accent_glow": "rgba(126, 34, 206, 0.22)",
+      "danger": "#DC2626"
+    },
     "rules": [
       "No pure black (#000000) or pure gray (#808080). Tint neutrals with themes.",
       "Never use full-screen gradients. Use solid dark colors with noise/grain.",
@@ -88,7 +101,7 @@
     "parallax": "Use on the Hero section background to create depth."
   },
   "components": {
-    "navigation": "Sticky, Glassmorphic (Crystal variant). Includes logo, primary links, Search icon, and Theme Customization toggle (Fog/Blood).",
+    "navigation": "Sticky, Glassmorphic (Crystal variant). Includes logo, primary links, Search icon, and Theme Customization toggle (Fog/Blood/Eldritch).",
     "game_card": "Vertical poster aspect ratio (3:4 or 2:3). Image takes up 80% of card, info at the bottom. Hover reveals metadata.",
     "buttons": "Sharp-edged, pill or rectangle. In Blood theme: dark red with subtle glow. In Fog theme: muted zinc with white text. Minimal padding but impactful.",
     "filters": "Sidebar or top-bar using Shadcn UI select/checkboxes, styled aggressively dark with no generic white backgrounds.",
@@ -156,7 +169,7 @@
   },
   "instructions_to_main_agent": [
     "Integrate RAWG API for fetching horror games. Filter by tags like 'horror', 'survival-horror', 'psychological'.",
-    "Implement theme toggling (Fog vs Blood) via React Context and Tailwind classes.",
+    "Implement theme toggling (Fog, Blood, and Eldritch) via React Context and Tailwind classes.",
     "Use Framer Motion for page transitions and hover effects.",
     "Store favorites and recently viewed in localStorage.",
     "Keep Shadcn UI components heavily customized to fit the brutalist/cinematic horror aesthetic. Strip out all default Vercel-style aesthetics.",

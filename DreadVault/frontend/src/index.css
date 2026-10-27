@@ -47,6 +47,20 @@
     --nf-danger: #dc2626;
   }
 
+  [data-theme="eldritch"] {
+    --nf-bg: #09070d;
+    --nf-surface: #120c1c;
+    --nf-surface-hover: #1c1129;
+    --nf-border: #30243f;
+    --nf-text: #ffffff;
+    --nf-text-dim: #a1a1aa;
+    --nf-accent: #7e22ce;
+    --nf-accent-strong: #ffffff;
+    --nf-accent-glow: rgba(126, 34, 206, 0.22);
+    --nf-button-accent: #581c87;
+    --nf-danger: #dc2626;
+  }
+
   html {
     background: var(--nf-bg);
   }
@@ -159,13 +173,13 @@
 }
 
 .nf-btn-primary {
-  background-color: var(--nf-accent);
-  border-color: var(--nf-accent);
+  background-color: var(--nf-button-accent, var(--nf-accent));
+  border-color: var(--nf-button-accent, var(--nf-accent));
   color: var(--nf-text);
 }
 
 .nf-btn-primary:hover {
-  background-color: var(--nf-accent);
+  background-color: var(--nf-button-accent, var(--nf-accent));
   border-color: var(--nf-accent-strong, var(--nf-accent));
   box-shadow: 0 0 28px var(--nf-accent-glow);
 }
