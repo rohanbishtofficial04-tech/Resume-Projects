@@ -11,7 +11,6 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 
 - Added the dark-purple **Eldritch** theme and a subtle ambient background glow that follows the active theme.
 - Improved search behavior and the responsive mobile experience.
-- Published a cleaned DreadVault project snapshot.
 
 ---
 
