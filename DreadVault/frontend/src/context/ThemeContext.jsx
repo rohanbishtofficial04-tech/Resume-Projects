@@ -7,7 +7,7 @@ const KEY = "nightfall:theme";
 export const ThemeProvider = ({ children }) => {
   const [theme, setThemeState] = useState(() => {
     if (typeof window === "undefined") return "fog";
-    return localStorage.getItem(KEY) || "fog";
+    return localStorage.getItem(KEY) === "blood" ? "blood" : "fog";
   });
 
   useEffect(() => {
