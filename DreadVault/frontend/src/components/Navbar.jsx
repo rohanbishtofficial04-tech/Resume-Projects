@@ -43,8 +43,8 @@ export const Navbar = () => {
     <>
       <header
         data-testid={TID.navRoot}
-        className={`fixed top-0 inset-x-0 z-40 transition-colors duration-500 ${
-          scrolled ? "bg-black/70 backdrop-blur-2xl border-b border-white/5" : "bg-transparent"
+        className={`fixed top-0 inset-x-0 z-40 transition-colors duration-500 max-md:transition-none ${
+          scrolled ? "nf-mobile-glass bg-black/70 backdrop-blur-2xl border-b border-white/5" : "bg-transparent"
         }`}
       >
         <div className="max-w-[1440px] mx-auto px-6 md:px-10 h-16 flex items-center justify-between gap-6">

@@ -25,19 +25,18 @@ const Hero = ({ game }) => {
       data-testid={TID.heroBanner}
       className="relative min-h-[90vh] w-full overflow-hidden"
     >
-      <motion.img
-        initial={{ scale: 1.08, opacity: 0.7 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 2, ease: [0.25, 0.46, 0.45, 0.94] }}
+      <img
         src={game.background_image}
         alt={game.name}
+        fetchpriority="high"
+        decoding="async"
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 nf-hero-fade" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
       <div className="nf-fog" />
 
-      <div className="relative z-10 max-w-[1440px] mx-auto px-6 md:px-10 min-h-[90vh] flex flex-col justify-end pb-16 md:pb-24">
+      <div className="relative z-10 max-w-[1440px] mx-auto px-5 sm:px-6 md:px-10 min-h-[90vh] min-h-[90svh] flex flex-col justify-end pb-12 sm:pb-16 md:pb-24">
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -50,7 +49,7 @@ const Hero = ({ game }) => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.7 }}
-          className="font-display nf-hero-title text-5xl sm:text-6xl md:text-7xl lg:text-[7rem] mt-4 max-w-4xl leading-[0.82]"
+          className="font-display nf-hero-title text-[clamp(2.75rem,12vw,4rem)] sm:text-6xl md:text-7xl lg:text-[7rem] mt-4 max-w-4xl leading-[0.9] sm:leading-[0.82]"
         >
           {game.name}
         </motion.h1>
@@ -137,6 +136,8 @@ const FeaturedCollection = ({ games }) => {
           <img
             src={pick[0].background_image}
             alt={pick[0].name}
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-[700ms] ease-out"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
@@ -155,6 +156,8 @@ const FeaturedCollection = ({ games }) => {
               <img
                 src={g.background_image}
                 alt={g.name}
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-[700ms] ease-out"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />

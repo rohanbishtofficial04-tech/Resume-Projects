@@ -5,7 +5,7 @@ import { TID } from "@/constants/testIds";
 export const GameGrid = ({ games, loading, skeletonCount = 10, emptyLabel = "No games found." }) => {
   if (loading && (!games || games.length === 0)) {
     return (
-      <div data-testid={TID.gameGrid} className="grid grid-cols-1 min-[360px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+      <div data-testid={TID.gameGrid} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
         {Array.from({ length: skeletonCount }).map((_, i) => (
           <SkeletonCard key={i} />
         ))}
@@ -22,9 +22,9 @@ export const GameGrid = ({ games, loading, skeletonCount = 10, emptyLabel = "No 
   }
 
   return (
-    <div data-testid={TID.gameGrid} className="grid grid-cols-1 min-[360px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
-      {games.map((g, i) => (
-        <GameCard key={g.id} game={g} index={i} />
+    <div data-testid={TID.gameGrid} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-5">
+      {games.map((g) => (
+        <GameCard key={g.id} game={g} />
       ))}
       {loading &&
         Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={`s-${i}`} />)}

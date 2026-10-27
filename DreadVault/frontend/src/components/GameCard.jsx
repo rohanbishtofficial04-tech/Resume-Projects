@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { TID } from "@/constants/testIds";
 import { useLibrary } from "@/context/LibraryContext";
@@ -7,17 +6,13 @@ import { RatingBadge } from "./RatingBadge";
 import { PlatformBadges } from "./PlatformBadges";
 import { formatYear } from "@/utils/format";
 
-export const GameCard = ({ game, index = 0, priority = false }) => {
+export const GameCard = ({ game, priority = false }) => {
   const { isFavorite, toggleFavorite } = useLibrary();
   const fav = isFavorite(game.id);
 
   return (
-    <motion.article
+    <article
       data-testid={TID.gameCard}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.5, delay: Math.min(index * 0.04, 0.4) }}
       className="group relative border border-[color:var(--nf-border)] bg-[color:var(--nf-surface)] nf-card-hover"
     >
       <Link to={`/game/${game.slug}`} className="block">
@@ -27,6 +22,8 @@ export const GameCard = ({ game, index = 0, priority = false }) => {
               src={game.background_image}
               alt={game.name}
               loading={priority ? "eager" : "lazy"}
+              fetchpriority={priority ? "high" : "auto"}
+              decoding="async"
               className="h-full w-full object-cover grayscale-[15%] group-hover:grayscale-0 group-hover:scale-105 transition-[transform,filter] duration-[600ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
             />
           ) : (
@@ -53,14 +50,14 @@ export const GameCard = ({ game, index = 0, priority = false }) => {
           </button>
         </div>
 
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
           <div className="flex items-center justify-between gap-2">
             <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">
               {formatYear(game.released)}
             </p>
             <PlatformBadges platforms={game.parent_platforms} max={4} />
           </div>
-          <h3 className="mt-2 font-display text-xl leading-tight tracking-tight text-[color:var(--nf-text)] group-hover:text-[color:var(--nf-accent-strong)] transition-colors">
+          <h3 className="mt-2 font-display text-base sm:text-xl leading-tight tracking-tight text-[color:var(--nf-text)] group-hover:text-[color:var(--nf-accent-strong)] transition-colors">
             {game.name}
           </h3>
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -72,6 +69,6 @@ export const GameCard = ({ game, index = 0, priority = false }) => {
           </div>
         </div>
       </Link>
-    </motion.article>
+    </article>
   );
 };

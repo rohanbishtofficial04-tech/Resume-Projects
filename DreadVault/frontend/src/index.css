@@ -376,3 +376,33 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+@media (max-width: 767px) {
+  header.nf-mobile-glass {
+    background-color: rgba(0, 0, 0, 0.75) !important;
+    -webkit-backdrop-filter: blur(22px) !important;
+    backdrop-filter: blur(22px) !important;
+  }
+
+  .nf-grain::before {
+    display: none;
+  }
+
+  .nf-vignette::after {
+    display: none;
+  }
+
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-md {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .nf-card-hover:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}

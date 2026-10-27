@@ -42,6 +42,7 @@ const games = [
   g(10, "the-medium", "The Medium", "2021-01-28", 3.7, 71, IMG.fog, ["Horror", "Adventure"], ["PC", "PlayStation", "Xbox"]),
   g(11, "visage", "Visage", "2020-10-30", 4.2, 78, IMG.corridor, ["Horror", "Indie"], ["PC", "PlayStation", "Xbox"]),
   g(12, "signalis", "SIGNALIS", "2022-10-27", 4.5, 84, IMG.abstract, ["Horror", "Indie"], ["PC", "PlayStation", "Xbox"]),
+  g(13, "silent-hill-2-2024", "Silent Hill 2 Remake", "2024-10-08", 4.6, 86, IMG.fog, ["Horror", "Adventure"], ["PC", "PlayStation"]),
 ];
 
 const listResp = (arr) => ({ count: arr.length, next: null, previous: null, results: arr });

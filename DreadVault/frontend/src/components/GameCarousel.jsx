@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GameCard } from "./GameCard";
@@ -49,23 +48,23 @@ export const GameCarousel = ({ title, subtitle, games, loading, tid, viewAllTo }
           </button>
         </div>
       </div>
-      <motion.div
+      <div
         ref={scrollerRef}
-        className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 md:mx-0 md:px-0"
+        className="flex gap-3 sm:gap-5 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 md:mx-0 md:px-0"
         style={{ scrollbarWidth: "thin" }}
       >
         {loading && (!games || games.length === 0)
           ? Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="min-w-[220px] snap-start">
+              <div key={i} className="w-[72vw] max-w-[220px] shrink-0 snap-start sm:w-[220px]">
                 <SkeletonCard />
               </div>
             ))
-          : (games || []).map((g, i) => (
-              <div key={g.id} className="min-w-[220px] snap-start">
-                <GameCard game={g} index={i} />
+          : (games || []).map((g) => (
+              <div key={g.id} className="w-[72vw] max-w-[220px] shrink-0 snap-start sm:w-[220px]">
+                <GameCard game={g} />
               </div>
             ))}
-      </motion.div>
+      </div>
     </section>
   );
 };
