@@ -24,8 +24,28 @@ export const getRecent = (p) =>
   safe(() => rawg.fetchRecent(p), () => MOCK.recent());
 export const getUpcoming = (p) =>
   safe(() => rawg.fetchUpcoming(p), () => MOCK.upcoming());
+
+const SPORTS_NAME_PATTERN = /\b(?:efootball|fifa|football|soccer|foosball|basketball|baseball|hockey|tennis|golf|rugby|wrestling|motorsport|racing|formula [1-9]|pes)\b/i;
+
+const removeSportsGames = (data) => {
+  const results = (data?.results || []).filter((game) => {
+    const genres = [...(game.genres || []), ...(game.tags || [])];
+    const hasSportsCategory = genres.some((item) =>
+      [item?.slug, item?.name].some((value) =>
+        String(value || "").toLowerCase().includes("sport")
+      )
+    );
+    return !hasSportsCategory && !SPORTS_NAME_PATTERN.test(game.name || "");
+  });
+
+  return { ...(data || {}), count: results.length, results };
+};
+
 export const getSearch = (p) =>
-  safe(() => rawg.searchGames(p), () => MOCK.browse({ search: p.query }));
+  safe(
+    () => rawg.searchGames(p).then(removeSportsGames),
+    () => removeSportsGames(MOCK.browse({ search: p.query }))
+  );
 export const getBrowse = (p) =>
   safe(() => rawg.browseGames(p), () => MOCK.browse(p));
 export const getDetails = (slug) =>
