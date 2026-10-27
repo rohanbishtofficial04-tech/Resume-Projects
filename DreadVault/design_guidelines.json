@@ -1,0 +1,181 @@
+{
+  "theme_name": "DreadVault - Premium Horror Game Database",
+  "app_type": "hybrid_fullstack",
+  "emotional_tone": "Cinematic, immersive, psychological dread, premium luxury gaming, atmospheric, oppressive.",
+  "typography": {
+    "headings": {
+      "font_family": "Cormorant Garamond, serif",
+      "weights": [400, 600, 700],
+      "usage": "H1, H2, hero titles, game titles, cinematic quotes. Must use tracking-tighter for impact.",
+      "scales": {
+        "h1": "text-5xl sm:text-6xl md:text-7xl",
+        "h2": "text-3xl sm:text-4xl md:text-5xl",
+        "h3": "text-2xl sm:text-3xl"
+      }
+    },
+    "subheadings": {
+      "font_family": "Oswald, sans-serif",
+      "weights": [400, 500],
+      "usage": "Overlines, labels, tags, technical game stats, section markers. Must be uppercase with tracking-[0.2em].",
+      "scales": {
+        "overline": "text-xs sm:text-sm tracking-[0.2em] uppercase"
+      }
+    },
+    "body": {
+      "font_family": "IBM Plex Sans, sans-serif",
+      "weights": [300, 400, 500],
+      "usage": "Paragraphs, game descriptions, UI elements, standard text.",
+      "scales": {
+        "large": "text-lg leading-relaxed",
+        "base": "text-base leading-relaxed",
+        "small": "text-sm text-muted-foreground"
+      }
+    },
+    "anti_patterns": "DO NOT use Inter, Roboto, or Space Grotesk. Avoid geometric sans for headings."
+  },
+  "colors": {
+    "silent_hill_theme": {
+      "name": "Fog & Ash (Psychological Horror)",
+      "background": "#09090B",
+      "surface": "#121214",
+      "surface_hover": "#1A1A1D",
+      "border": "#27272A",
+      "text_primary": "#F4F4F5",
+      "text_secondary": "#A1A1AA",
+      "accent": "#52525B",
+      "accent_glow": "rgba(161, 161, 170, 0.15)",
+      "danger": "#7F1D1D"
+    },
+    "resident_evil_theme": {
+      "name": "Blood & Shadows (Survival Horror)",
+      "background": "#050505",
+      "surface": "#0F0505",
+      "surface_hover": "#1A0A0A",
+      "border": "#3F1515",
+      "text_primary": "#FFFFFF",
+      "text_secondary": "#9CA3AF",
+      "accent": "#C51F20",
+      "accent_glow": "rgba(197, 31, 32, 0.25)",
+      "danger": "#DC2626"
+    },
+    "rules": [
+      "No pure black (#000000) or pure gray (#808080). Tint neutrals with themes.",
+      "Never use full-screen gradients. Use solid dark colors with noise/grain.",
+      "Use high contrast for text (APCA standards)."
+    ]
+  },
+  "visual_enhancers": {
+    "textures": "Apply a subtle film grain overlay (mix-blend-overlay or opacity-5) across the entire application to avoid a sterile digital look.",
+    "glassmorphism": "Used for sticky headers and tooltips: bg-black/60 with backdrop-blur-2xl and a delicate border-white/5 inner stroke. No muddy grays.",
+    "borders": "Expose the grid in specific technical sections using 1px border-white/5. Avoid thick borders.",
+    "shadows": "Minimal outer shadows. Emphasize inner glows and deep ambient drop shadows for hover states.",
+    "vignette": "Use a radial gradient at the page edges (from transparent to black) to focus attention and create a claustrophobic feel."
+  },
+  "grids": {
+    "bento_grid": "Mode A: Asymmetrical grid-cols-1 md:grid-cols-12 gap-6. Mix hero items (col-span-8 row-span-2) with tall items (col-span-4 row-span-2). Never fill perfectly.",
+    "game_catalog": "High-density grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 or gap-6 for browsing."
+  },
+  "layouts": {
+    "general": "Generous Spacing Philosophy. Use p-8 to p-16 for main sections. Dark cinematic margins.",
+    "cards": "Sharp edges (rounded-none) or extremely minimal rounding (rounded-sm max 4px). No bubbly cards.",
+    "hero": "Full-height (min-h-[90vh]) with heavy bg-black/50 overlay (or gradient to black) over cinematic imagery."
+  },
+  "motion": {
+    "philosophy": "Slow, deliberate, eerie.",
+    "transitions": "Use transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease.",
+    "hover": "Subtle scale-up (scale-105) for game covers with brightness increase and shadow reveal. Text color shifts to white.",
+    "entrance": "Staggered fade-in and slight y-axis slide for game grids.",
+    "parallax": "Use on the Hero section background to create depth."
+  },
+  "components": {
+    "navigation": "Sticky, Glassmorphic (Crystal variant). Includes logo, primary links, Search icon, and Theme Customization toggle (Fog/Blood).",
+    "game_card": "Vertical poster aspect ratio (3:4 or 2:3). Image takes up 80% of card, info at the bottom. Hover reveals metadata.",
+    "buttons": "Sharp-edged, pill or rectangle. In Blood theme: dark red with subtle glow. In Fog theme: muted zinc with white text. Minimal padding but impactful.",
+    "filters": "Sidebar or top-bar using Shadcn UI select/checkboxes, styled aggressively dark with no generic white backgrounds.",
+    "search": "Full-screen modal overlay with huge typography (Oswald) and live search results appearing as a dense list."
+  },
+  "page_composition": {
+    "home": {
+      "hero": "Massive cinematic game cover. Title in Cormorant Garamond (text-7xl). CTA: 'View Details'. Overlay: heavy vignette.",
+      "trending": "Horizontal scrolling carousel of game covers. Sharp, borderless cards.",
+      "featured_collection": "Bento grid layout highlighting a curated list (e.g., 'Masters of Survival Horror').",
+      "genres": "Minimalist text-based links or small stark icons, not colorful pills."
+    },
+    "browse": "Sidebar for filters (Genres, Platforms, Rating, Year). Main content: Dense grid of game cards. Infinite scroll or pagination.",
+    "game_details": "Immersive hero image bleeding into header. Content below: Metacritic score, RAWG rating prominently displayed in imposing typography. Screenshots in a masonry or asymmetrical grid.",
+    "favorites": "Clean, high-density grid showing saved games.",
+    "compare_games": "Side-by-side data table, brutalist tech aesthetic.",
+    "random_generator": "A full-screen interactive experience. 'Dare to play' button with tense build-up animation before revealing a random horror game."
+  },
+  "accessibility": {
+    "contrast": "Ensure APCA/WCAG AA compliance. Use text-shadow on text placed over images.",
+    "motion": "Respect prefers-reduced-motion media query.",
+    "testing": "All interactive elements MUST include data-testid attribute (e.g., data-testid='theme-toggle-button')."
+  },
+  "media": {
+    "images": "High-contrast, desaturated, or deeply saturated reds/blues. Avoid bright, sunny, or cartoonish imagery."
+  },
+  "3d_libraries": "Framer Motion for complex layout transitions. Consider TSParticles for subtle floating 'ash' or 'fog' effects on the home page (if within scope, otherwise keep to CSS/Framer).",
+  "image_urls": {
+    "hero_backgrounds": [
+      {
+        "url": "https://images.pexels.com/photos/16166873/pexels-photo-16166873.jpeg",
+        "category": "hero",
+        "description": "Misty mountains, perfect for Silent Hill fog aesthetic"
+      },
+      {
+        "url": "https://images.pexels.com/photos/29287033/pexels-photo-29287033.jpeg",
+        "category": "hero",
+        "description": "Dark forest path illuminated by moonlight, spooky vibe"
+      }
+    ],
+    "game_collections": [
+      {
+        "url": "https://images.pexels.com/photos/27015942/pexels-photo-27015942.jpeg",
+        "category": "collection_cover",
+        "description": "Abandoned corridor for 'Asylum/Hospital' horror collection"
+      },
+      {
+        "url": "https://images.pexels.com/photos/29547573/pexels-photo-29547573.jpeg",
+        "category": "collection_cover",
+        "description": "Foggy forest road for 'Lost in the Woods' collection"
+      }
+    ],
+    "textures": [
+      {
+        "url": "https://images.pexels.com/photos/16851158/pexels-photo-16851158.jpeg",
+        "category": "texture_overlay",
+        "description": "Dark abstract texture for backgrounds or container overlays"
+      },
+      {
+        "url": "https://images.pexels.com/photos/18599094/pexels-photo-18599094.jpeg",
+        "category": "grain_overlay",
+        "description": "Grainy abstract texture for cinematic film grain effect"
+      }
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Integrate RAWG API for fetching horror games. Filter by tags like 'horror', 'survival-horror', 'psychological'.",
+    "Implement theme toggling (Fog vs Blood) via React Context and Tailwind classes.",
+    "Use Framer Motion for page transitions and hover effects.",
+    "Store favorites and recently viewed in localStorage.",
+    "Keep Shadcn UI components heavily customized to fit the brutalist/cinematic horror aesthetic. Strip out all default Vercel-style aesthetics.",
+    "DO NOT use transparent headers; use glassmorphism with dark backgrounds."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "You tend to converge toward generic, 'on distribution' outputs. Make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: transition: all. Always add transitions for specific interactive elements.",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file.",
+    "Always use modern button styles (sharp or subtle rounding) with interaction animations & color relevant to the app style.",
+    "NEVER use AI assistant Emoji characters.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations separate good from extraordinary.",
+    "All interactive and key informational elements MUST include a data-testid attribute.",
+    "Use sonner for toasts from /app/src/components/ui/sonner.jsx."
+  ]
+}

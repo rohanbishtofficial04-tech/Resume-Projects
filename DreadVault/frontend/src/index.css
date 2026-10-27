@@ -1,0 +1,378 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   DREADVAULT DESIGN TOKENS
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* Fog & Ash */
+    --nf-bg: #09090b;
+    --nf-surface: #121214;
+    --nf-surface-hover: #1a1a1d;
+    --nf-border: #27272a;
+    --nf-text: #f4f4f5;
+    --nf-text-dim: #a1a1aa;
+    --nf-accent: #52525b;
+    --nf-accent-strong: #e4e4e7;
+    --nf-accent-glow: rgba(161, 161, 170, 0.15);
+    --nf-danger: #7f1d1d;
+  }
+
+  [data-theme="fog"] {
+    --nf-bg: #09090b;
+    --nf-surface: #121214;
+    --nf-surface-hover: #1a1a1d;
+    --nf-border: #27272a;
+    --nf-text: #f4f4f5;
+    --nf-text-dim: #a1a1aa;
+    --nf-accent: #52525b;
+    --nf-accent-strong: #e4e4e7;
+    --nf-accent-glow: rgba(161, 161, 170, 0.15);
+    --nf-danger: #7f1d1d;
+  }
+
+  [data-theme="blood"] {
+    --nf-bg: #050505;
+    --nf-surface: #0f0505;
+    --nf-surface-hover: #1a0a0a;
+    --nf-border: #3f1515;
+    --nf-text: #ffffff;
+    --nf-text-dim: #9ca3af;
+    --nf-accent: #c51f20;
+    --nf-accent-strong: #e03031;
+    --nf-accent-glow: rgba(197, 31, 32, 0.25);
+    --nf-danger: #dc2626;
+  }
+
+  html {
+    background: var(--nf-bg);
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--nf-bg);
+    color: var(--nf-text);
+    font-family: "IBM Plex Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  a,
+  button,
+  span,
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--nf-accent);
+    color: var(--nf-text);
+  }
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+
+.font-display {
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 600;
+  letter-spacing: -0.06em;
+  line-height: 0.82;
+  text-rendering: optimizeLegibility;
+}
+
+.font-brand {
+  font-family: "Oswald", sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.nf-hero-title {
+  font-weight: 600;
+  letter-spacing: -0.065em;
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.38);
+}
+
+.nf-overline {
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.nf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  padding: 0.65rem 1.35rem;
+
+  border: 1px solid var(--nf-border);
+  border-radius: 0.125rem;
+
+  background: transparent;
+  color: var(--nf-text);
+
+  font-family: "Oswald", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  text-decoration: none;
+
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.nf-btn:hover {
+  border-color: var(--nf-accent);
+  color: var(--nf-text);
+  box-shadow: 0 0 24px var(--nf-accent-glow);
+  transform: translateY(-1px);
+}
+
+.nf-btn-primary {
+  background-color: var(--nf-accent);
+  border-color: var(--nf-accent);
+  color: var(--nf-text);
+}
+
+.nf-btn-primary:hover {
+  background-color: var(--nf-accent);
+  border-color: var(--nf-accent-strong, var(--nf-accent));
+  box-shadow: 0 0 28px var(--nf-accent-glow);
+}
+
+/* ============================================================
+   CHIPS
+   ============================================================ */
+
+.nf-chip {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0.4rem 0.9rem;
+
+  border: 1px solid var(--nf-border);
+  border-radius: 999px;
+
+  color: var(--nf-text-dim);
+
+  font-family: "Oswald", sans-serif;
+  font-size: 0.8rem;
+  text-decoration: none;
+
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.nf-chip:hover {
+  border-color: var(--nf-accent);
+  color: var(--nf-text);
+}
+
+.nf-chip[data-active="true"] {
+  border-color: var(--nf-accent-strong);
+  background-color: var(--nf-accent-glow);
+  color: var(--nf-text);
+}
+
+/* ============================================================
+   GAME CARD HOVER
+   ============================================================ */
+
+.nf-card-hover {
+  transition:
+    transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color 0.4s ease,
+    box-shadow 0.4s ease,
+    background-color 0.4s ease;
+}
+
+.nf-card-hover:hover {
+  transform: translateY(-4px);
+  border-color: var(--nf-accent);
+  background-color: var(--nf-surface-hover);
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.45),
+    0 0 25px var(--nf-accent-glow);
+}
+
+/* ============================================================
+   GRAIN
+   ============================================================ */
+
+.nf-grain {
+  position: relative;
+  isolation: isolate;
+
+  min-height: 100vh;
+
+  background-color: var(--nf-bg);
+  color: var(--nf-text);
+}
+
+.nf-grain::before {
+  content: "";
+
+  position: fixed;
+  inset: 0;
+
+  pointer-events: none;
+  z-index: 9999;
+
+  opacity: 0.045;
+
+  background-image:
+    url("https://images.pexels.com/photos/18599094/pexels-photo-18599094.jpeg");
+
+  background-size: cover;
+  background-position: center;
+
+  mix-blend-mode: overlay;
+}
+
+/* ============================================================
+   VIGNETTE
+   ============================================================ */
+
+.nf-vignette::after {
+  content: "";
+
+  position: fixed;
+  inset: 0;
+
+  pointer-events: none;
+  z-index: 9998;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 45%,
+      rgba(0, 0, 0, 0.35) 100%
+    );
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+
+.nf-hero-fade {
+  background:
+    linear-gradient(
+      to top,
+      var(--nf-bg) 0%,
+      transparent 45%
+    );
+}
+
+.nf-fog {
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse at bottom left,
+      rgba(0, 0, 0, 0.55),
+      transparent 60%
+    );
+}
+
+/* ============================================================
+   LOADING SKELETON
+   ============================================================ */
+
+.nf-skeleton {
+  position: relative;
+  overflow: hidden;
+
+  background-color: var(--nf-surface);
+}
+
+.nf-skeleton::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.04),
+      transparent
+    );
+
+  animation: nf-shimmer 1.6s infinite;
+}
+
+@keyframes nf-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--nf-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--nf-border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nf-accent);
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
