@@ -44,6 +44,7 @@
       "text_secondary": "#A1A1AA",
       "accent": "#52525B",
       "accent_glow": "rgba(161, 161, 170, 0.15)",
+      "ambient_glow": "rgba(113, 113, 122, 0.12)",
       "danger": "#7F1D1D"
     },
     "resident_evil_theme": {
@@ -56,6 +57,7 @@
       "text_secondary": "#9CA3AF",
       "accent": "#C51F20",
       "accent_glow": "rgba(197, 31, 32, 0.25)",
+      "ambient_glow": "rgba(197, 31, 32, 0.18)",
       "danger": "#DC2626"
     },
     "eldritch_theme": {
@@ -69,6 +71,7 @@
       "accent": "#7E22CE",
       "button_accent": "#581C87",
       "accent_glow": "rgba(126, 34, 206, 0.22)",
+      "ambient_glow": "rgba(126, 34, 206, 0.17)",
       "danger": "#DC2626"
     },
     "rules": [

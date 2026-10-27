@@ -18,6 +18,7 @@
     --nf-accent: #52525b;
     --nf-accent-strong: #e4e4e7;
     --nf-accent-glow: rgba(161, 161, 170, 0.15);
+    --nf-ambient: rgba(113, 113, 122, 0.12);
     --nf-danger: #7f1d1d;
   }
 
@@ -31,6 +32,7 @@
     --nf-accent: #52525b;
     --nf-accent-strong: #e4e4e7;
     --nf-accent-glow: rgba(161, 161, 170, 0.15);
+    --nf-ambient: rgba(113, 113, 122, 0.12);
     --nf-danger: #7f1d1d;
   }
 
@@ -44,6 +46,7 @@
     --nf-accent: #c51f20;
     --nf-accent-strong: #e03031;
     --nf-accent-glow: rgba(197, 31, 32, 0.25);
+    --nf-ambient: rgba(197, 31, 32, 0.18);
     --nf-danger: #dc2626;
   }
 
@@ -57,6 +60,7 @@
     --nf-accent: #7e22ce;
     --nf-accent-strong: #ffffff;
     --nf-accent-glow: rgba(126, 34, 206, 0.22);
+    --nf-ambient: rgba(126, 34, 206, 0.17);
     --nf-button-accent: #581c87;
     --nf-danger: #dc2626;
   }
@@ -252,6 +256,12 @@
   min-height: 100vh;
 
   background-color: var(--nf-bg);
+  background-image:
+    radial-gradient(
+      ellipse 48% 42% at 78% 86%,
+      var(--nf-ambient),
+      transparent 100%
+    );
   color: var(--nf-text);
 }
 
