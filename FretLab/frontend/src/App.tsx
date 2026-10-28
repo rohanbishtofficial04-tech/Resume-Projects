@@ -6,6 +6,7 @@ import Metronome from "@/pages/Metronome";
 import CircleOfFifths from "@/pages/CircleOfFifths";
 import ScaleLibrary from "@/pages/ScaleLibrary";
 import ChordLibrary from "@/pages/ChordLibrary";
+import About from "@/pages/About";
 
 // One <Route> per page in src/pages; BrowserRouter already wraps this in main.tsx.
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/circle-of-fifths" element={<CircleOfFifths />} />
           <Route path="/scales" element={<ScaleLibrary />} />
           <Route path="/chords" element={<ChordLibrary />} />
+          <Route path="/about" element={<About />} />
           <Route path="*" element={<Navigate to="/tuner" replace />} />
         </Route>
       </Routes>

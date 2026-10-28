@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import { Gauge, Timer, Library, Music2, CircleDot, Palette } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { THEMES, useTheme } from "@/context/ThemeProvider";
@@ -112,9 +112,18 @@ export default function FretLabShell() {
       </main>
 
       <footer className="relative z-10 border-t border-border px-4 py-5 sm:px-6">
-        <p className="mx-auto max-w-6xl text-xs text-muted-foreground">
-          FretLab runs entirely in your browser — microphone audio and preferences stay on this device.
-        </p>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground">
+            FretLab runs entirely in your browser — microphone audio and preferences stay on this device.
+          </p>
+          <Link
+            to="/about"
+            data-testid="app-footer-about"
+            className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+          >
+            About FretLab
+          </Link>
+        </div>
       </footer>
 
       <Toaster position="bottom-right" richColors />
