@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
@@ -15,7 +15,56 @@ import { PlatformBadges } from "@/components/PlatformBadges";
 import { GameCard } from "@/components/GameCard";
 import { formatDate, stripHtml } from "@/utils/format";
 import { TID } from "@/constants/testIds";
-import { Heart, Share2, ExternalLink, Play, Globe, ArrowLeft, FolderPlus } from "lucide-react";
+import {
+  Heart,
+  Share2,
+  ExternalLink,
+  Play,
+  Globe,
+  ArrowLeft,
+  FolderPlus,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+
+const TrailerVideo = ({ src, poster, autoPlay = false, className = "" }) => {
+  const videoRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+
+  const play = () => {
+    videoRef.current?.play().catch(() => toast("Unable to play trailer."));
+  };
+
+  return (
+    <div className={`relative aspect-video overflow-hidden bg-black ${className}`} onClick={(event) => event.stopPropagation()}>
+      <video
+        ref={videoRef}
+        src={src}
+        poster={poster}
+        controls={playing}
+        autoPlay={autoPlay}
+        preload="metadata"
+        className="h-full w-full border border-[color:var(--nf-border)] object-contain"
+        aria-label="Game trailer"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)}
+      />
+      {!playing && (
+        <button
+          type="button"
+          onClick={play}
+          className="absolute inset-0 grid place-items-center bg-black/25 text-white transition-colors hover:bg-black/40"
+          aria-label="Play trailer"
+        >
+          <span className="grid h-16 w-16 place-items-center rounded-full border border-white/70 bg-black/60 backdrop-blur-sm">
+            <Play className="h-6 w-6 fill-current" />
+          </span>
+        </button>
+      )}
+    </div>
+  );
+};
 
 export default function GameDetails() {
   const { slug } = useParams();
@@ -32,6 +81,7 @@ export default function GameDetails() {
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [collectionOpen, setCollectionOpen] = useState(false);
   const [collectionName, setCollectionName] = useState("");
+  const visibleScreens = screens.slice(0, 6);
 
   useEffect(() => {
     let mounted = true;
@@ -72,6 +122,23 @@ export default function GameDetails() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
+
+  useEffect(() => {
+    if (lightbox === null) return undefined;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "ArrowLeft" && visibleScreens.length > 1) {
+        setLightbox((index) => (index - 1 + visibleScreens.length) % visibleScreens.length);
+      }
+      if (event.key === "ArrowRight" && visibleScreens.length > 1) {
+        setLightbox((index) => (index + 1) % visibleScreens.length);
+      }
+      if (event.key === "Escape") setLightbox(null);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightbox, visibleScreens.length]);
 
   if (loading || !game) {
     return (
@@ -142,6 +209,13 @@ export default function GameDetails() {
   };
 
   const trailer = movies[0]?.data?.max || movies[0]?.data?.["480"];
+
+  const showPreviousScreenshot = () => {
+    setLightbox((index) => (index - 1 + visibleScreens.length) % visibleScreens.length);
+  };
+  const showNextScreenshot = () => {
+    setLightbox((index) => (index + 1) % visibleScreens.length);
+  };
 
   return (
     <div data-testid={TID.detailsPage}>
@@ -299,13 +373,10 @@ export default function GameDetails() {
         <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Game Trailer</p>
         <h2 className="font-display text-3xl md:text-4xl mt-1">{game.name}</h2>
         {trailer ? (
-          <video
+          <TrailerVideo
             src={trailer}
-            controls
-            preload="metadata"
             poster={game.background_image}
-            className="mt-6 w-full aspect-video border border-[color:var(--nf-border)] bg-black object-contain"
-            aria-label={`${game.name} trailer`}
+            className="mt-6 w-full"
           />
         ) : (
           <p className="mt-6 border border-[color:var(--nf-border)] p-5 text-sm text-[color:var(--nf-text-dim)]">
@@ -320,10 +391,10 @@ export default function GameDetails() {
           <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Screenshots</p>
           <h2 className="font-display text-3xl md:text-4xl mt-1">Fragments</h2>
           <div className="mt-6 grid gap-3 grid-cols-2 md:grid-cols-3">
-            {screens.slice(0, 6).map((s, i) => (
+            {visibleScreens.map((s, i) => (
               <button
                 key={s.id}
-                onClick={() => setLightbox(s.image)}
+                onClick={() => setLightbox(i)}
                 className={`relative overflow-hidden border border-[color:var(--nf-border)] group ${
                   i === 0 ? "md:col-span-2 md:row-span-2" : ""
                 }`}
@@ -430,12 +501,49 @@ export default function GameDetails() {
       </AnimatePresence>
 
       {/* Lightbox */}
-      {lightbox && (
+      {lightbox !== null && visibleScreens[lightbox] && (
         <div
           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl grid place-items-center p-6"
           onClick={() => setLightbox(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Screenshot viewer"
         >
-          <img src={lightbox} alt="Screenshot" className="max-h-[90vh] max-w-full object-contain" />
+          <img
+            src={visibleScreens[lightbox].image}
+            alt={`Screenshot ${lightbox + 1} of ${visibleScreens.length}`}
+            className="max-h-[90vh] max-w-full object-contain"
+            onClick={(event) => event.stopPropagation()}
+          />
+          {visibleScreens.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  showPreviousScreenshot();
+                }}
+                className="absolute left-4 md:left-8 grid h-11 w-11 place-items-center border border-white/20 bg-black/70 text-white hover:bg-black"
+                aria-label="Previous screenshot"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  showNextScreenshot();
+                }}
+                className="absolute right-4 md:right-8 grid h-11 w-11 place-items-center border border-white/20 bg-black/70 text-white hover:bg-black"
+                aria-label="Next screenshot"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+              <p className="absolute bottom-4 left-1/2 -translate-x-1/2 font-brand text-xs tracking-[0.2em] text-white">
+                {lightbox + 1} / {visibleScreens.length}
+              </p>
+            </>
+          )}
         </div>
       )}
 
@@ -445,12 +553,11 @@ export default function GameDetails() {
           className="fixed inset-0 z-50 bg-black/95 grid place-items-center p-6"
           onClick={() => setTrailerOpen(false)}
         >
-          <video
+          <TrailerVideo
             src={trailer}
-            controls
+            poster={game.background_image}
             autoPlay
-            className="max-h-[90vh] max-w-full"
-            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-5xl max-h-[90vh]"
           />
         </div>
       )}
