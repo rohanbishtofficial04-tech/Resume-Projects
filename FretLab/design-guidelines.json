@@ -1,0 +1,220 @@
+{
+  "theme_strategy": {
+    "default_mode": "dark",
+    "active_theme_default": "midnight",
+    "theme_options": [
+      {
+        "id": "midnight",
+        "name": "Midnight",
+        "base": "#0E1117",
+        "accent": "#F59E0B",
+        "accent_muted": "rgba(245, 158, 11, 0.15)",
+        "accent_hover": "#D97706",
+        "accent_glow": "rgba(245, 158, 11, 0.35)",
+        "description": "Charcoal obsidian backdrop with glowing studio amber & brass highlights"
+      },
+      {
+        "id": "studio",
+        "name": "Studio",
+        "base": "#12161A",
+        "accent": "#84CC16",
+        "accent_muted": "rgba(132, 204, 22, 0.15)",
+        "accent_hover": "#65A30D",
+        "accent_glow": "rgba(132, 204, 22, 0.35)",
+        "description": "Deep anodized gray aluminum with electric precision lime accents"
+      }
+    ],
+    "philosophy": "Tactical Hardware Minimalism meets high-end audio engineering. Matte dark panels with subtle grain, tactile fret wire borders, crisp typography, and high-visibility illuminated readout indicators."
+  },
+  "colors": {
+    "surfaces": [
+      {
+        "name": "page",
+        "kind": "solid",
+        "bg": "#0B0E14",
+        "on_bg": "#F8FAFC",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "link": "#F59E0B",
+          "error": "#EF4444",
+          "success": "#10B981",
+          "warning": "#F59E0B",
+          "border": "#1E293B"
+        }
+      },
+      {
+        "name": "panel",
+        "kind": "solid",
+        "bg": "#131822",
+        "on_bg": "#F8FAFC",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "border": "#27354A",
+          "highlight": "#38BDF8",
+          "accent_amber": "#F59E0B",
+          "accent_lime": "#84CC16"
+        }
+      },
+      {
+        "name": "panel_elevated",
+        "kind": "solid",
+        "bg": "#1A2230",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#CBD5E1",
+        "roles": {
+          "border": "#334155",
+          "active": "#F59E0B"
+        }
+      },
+      {
+        "name": "fretboard_surface",
+        "kind": "solid",
+        "bg": "#161D27",
+        "on_bg": "#F1F5F9",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "fret_wire": "#475569",
+          "fret_marker": "#64748B",
+          "string_active": "#F59E0B",
+          "string_inactive": "#334155",
+          "finger_dot": "#F59E0B",
+          "finger_text": "#0F172A",
+          "open_string": "#10B981",
+          "muted_string": "#EF4444"
+        }
+      },
+      {
+        "name": "dial_gauge_surface",
+        "kind": "solid",
+        "bg": "#0D131C",
+        "on_bg": "#FFFFFF",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "in_tune_center": "#10B981",
+          "flat_needle": "#EF4444",
+          "sharp_needle": "#F59E0B",
+          "tick_mark": "#334155",
+          "tick_major": "#64748B"
+        }
+      },
+      {
+        "name": "glass_header",
+        "kind": "glass",
+        "contrast_against": "#0B0E14",
+        "guarantee": "backdrop-blur-xl bg-[#0B0E14]/85 border-b border-[#1E293B]",
+        "on_bg": "#F8FAFC",
+        "on_bg_muted": "#94A3B8",
+        "roles": {
+          "brand_badge": "#F59E0B"
+        }
+      },
+      {
+        "name": "inverse",
+        "kind": "solid",
+        "bg": "#F8FAFC",
+        "on_bg": "#0B0E14",
+        "on_bg_muted": "#475569"
+      }
+    ],
+    "accent": "#F59E0B",
+    "on_accent": "#0F172A"
+  },
+  "typography": {
+    "font_family_heading": "Outfit Variable, sans-serif",
+    "font_family_body": "DM Sans Variable, sans-serif",
+    "font_family_mono": "JetBrains Mono Variable, monospace",
+    "scale_px": {
+      "display": 56,
+      "h1": 44,
+      "h2": 32,
+      "h3": 24,
+      "h4": 20,
+      "body": 16,
+      "caption": 14
+    },
+    "rules": {
+      "headings": "Outfit Variable font-bold tracking-tight text-white",
+      "numerical_meters": "JetBrains Mono Variable font-medium tracking-normal for Hz, Cents, BPM, Fret numbers",
+      "labels": "uppercase tracking-[0.18em] text-xs font-semibold text-slate-400"
+    }
+  },
+  "entry_surfaces": {
+    "/": "FretLab tactical command interface — top glass bar with live feature tabs & theme switch, dominant main display utility panel with visual hardware cues"
+  },
+  "grids_and_layouts": {
+    "app_shell": "min-h-screen bg-[#0B0E14] text-slate-100 flex flex-col selection:bg-amber-500/20 selection:text-amber-300 font-sans antialiased",
+    "header": "sticky top-0 z-50 backdrop-blur-xl bg-[#0B0E14]/90 border-b border-[#1E293B] px-4 sm:px-8 py-3.5 flex items-center justify-between",
+    "main_container": "max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10 flex-1 flex flex-col gap-8",
+    "feature_tabs": "flex items-center gap-2 p-1 bg-[#131822] border border-[#27354A] rounded-xl w-fit",
+    "feature_tab_item": "flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 data-[state=active]:bg-amber-500 data-[state=active]:text-slate-950 text-slate-300 hover:text-white hover:bg-slate-800/60"
+  },
+  "feature_specifications": {
+    "guitar_tuner": {
+      "purpose": "Precision chromatic pitch detection with Web Audio AnalyserNode (Autocorrelation / YIN pitch estimation algorithm), cents gauge deviation, standard and alternate tuning profiles, plus pure reference tone generator.",
+      "components": [
+        "PitchDetectionController: Live mic stream handler, audio context setup, permission management, error state banner (denied mic / unreadable)",
+        "CentsGaugeDisplay: Curved visual arc meter / tactile linear gauge from -50 cents (flat) to +50 cents (sharp) with glowing center lock at 0 (green / in-tune)",
+        "NoteReadout: Massive hero note indicator with octave (e.g., 'E2', 'A2', 'D3', 'G3', 'B3', 'E4') and exact frequency in Hz (e.g. 110.0 Hz)",
+        "TuningProfileSelector: Standard (E A D G B E), Drop D (D A D G B E), Half-step Down / Eb (Eb Ab Db Gb Bb Eb), DADGAD (D A D G A D), Open D, Open G",
+        "StringPillsRow: Interactive 6-string peg row showing current target string status, with click-to-play Reference Sine Wave Tone"
+      ]
+    },
+    "metronome": {
+      "purpose": "Rock-solid Web Audio API lookahead scheduler timing engine with 30-300 BPM, dynamic tap tempo, time signatures, per-beat accent matrix, subdivisions, and visual pendulum/pulse track.",
+      "components": [
+        "BpmDisplay: Giant tactile numeric BPM control with +/- buttons, smooth slider, and rapid tap tempo button averaging last 4 taps",
+        "VisualBeatTracker: Row of illuminated LED dots representing measure beats (accented beat 1 colored differently), pulsing in sync with Web Audio scheduler",
+        "SubdivisionSelector: Quarter notes (1/4), Eighth notes (1/8), Sixteenth notes (1/16), Triplets (1/8T) with crisp audio clicks (synthesized oscillator clicks)",
+        "TimeSignatureGrid: 2/4, 3/4, 4/4, 5/4, 6/8, 7/8 with editable per-beat accent toggles (High Pitch / Standard / Muted)",
+        "PlayVolumeControls: High-contrast large Play/Pause trigger button with Spacebar shortcut and volume slider"
+      ]
+    },
+    "chord_library": {
+      "purpose": "Rich searchable guitar chord database covering all 12 roots across standard and extended chord qualities, interactive SVG fretboards, multiple voicings, and LocalStorage favorites.",
+      "chords_dataset": [
+        "Major (maj), Minor (min), Dominant 7th (7), Major 7th (maj7), Minor 7th (min7)",
+        "Suspended (sus2, sus4), Diminished (dim, dim7), Augmented (aug)",
+        "Extended: 9, maj9, min9, 6, min6, add9, m7b5 (half-diminished), 11th, 13th",
+        "All 12 roots: C, C#, D, D#, E, F, F#, G, G#, A, A#, B",
+        "Multiple voicings per chord with barre position indicators, finger numbering (1=Index, 2=Middle, 3=Ring, 4=Pinky, T=Thumb), and open/muted string indicators (O / X)"
+      ],
+      "components": [
+        "RootQualityFilter: Visual 12-key root wheel/selector + Quality pills (All, Maj, Min, 7ths, Suspended, Dim/Aug, Extended)",
+        "SearchBar: Instant search query matching chord name, aliases (e.g., 'Cmaj7', 'C#m', 'Ddim')",
+        "FretboardDiagramSVG: Vector rendered 6-string x 5-fret interactive diagram with customizable start fret, mute/open dots, finger badge markers, and audio chord strum preview button",
+        "VoicingCarousel: Tabbed alternative voicings (Position 1 Open, Position 2 Barre, Position 3 High voicing)",
+        "FavoritesDrawer: One-click heart toggle saving favorites to LocalStorage with instant filter tab for saved chords"
+      ]
+    }
+  },
+  "visual_enhancers": {
+    "fretboard_motif": "Subtle vertical string lines (#334155) and horizontal fret wires (#475569) used as background accents or section dividers with pearl inlay dot markers at 3rd, 5th, 7th, 9th, and 12th double-dots.",
+    "led_glow": "High-intensity pulse shadows (drop-shadow(0 0 12px rgba(245, 158, 11, 0.6))) on in-tune needles, active beat LEDs, and selected strings.",
+    "tactile_controls": "Rotary/pill sliders with fine border strokes, textured knurled borders, and micro-press transitions."
+  },
+  "motion": {
+    "pendulum_animation": "Smooth CSS / Framer motion swinging needle during metronome playback",
+    "beat_flash": "Instant 80ms luminous flash on active beat counter with ease-out dissipation",
+    "needle_spring": "Spring-physics needle movement in tuner for organic pitch responsiveness (damping: 25, stiffness: 300)",
+    "fretboard_strum_cascade": "Staggered 40ms audio/visual string ring on chord playback"
+  },
+  "accessibility": {
+    "wcag_compliance": "All critical readout text adheres to 4.5:1+ APCA/WCAG contrast against charcoal dark background",
+    "keyboard_navigation": "Spacebar toggles Metronome and Tuner mute; Left/Right arrows navigate chord voicings",
+    "aria_labels": "All SVG fretboards, beat indicators, and gauge needles provide descriptive aria-live and aria-valuenow properties",
+    "test_ids": "Strict kebab-case data-testid on every interactive button, input, tab, selector, and status readout"
+  },
+  "media": {
+    "images_needed": false,
+    "note": "FretLab is a precision audio utility app. Visuals are 100% bespoke SVG fretboards, Web Audio synthesized tone engines, and vector instrument dials. No external raster stock photos required."
+  },
+  "instructions_to_main_agent": [
+    "1. Mount FretLab in /app/frontend/src/ as a pure client-side, zero-backend, fully working React 19 + TypeScript app.",
+    "2. Ensure Web Audio API components (Tuner pitch detector using Autocorrelation/YIN on mic stream, Metronome lookahead scheduler, and Chord audio synthesizer/strummer) are genuinely functional with proper audio resource cleanup on unmount.",
+    "3. Support the 2 built-in themes (Midnight charcoal+amber and Studio dark-gray+lime) via a top-bar theme selector that sets CSS variables or Tailwind class states, defaulting to Midnight.",
+    "4. Implement the full chord database spanning all 12 roots with Major, Minor, 7, maj7, min7, sus2, sus4, dim, aug, 9, add9, m7b5 voicings, rendered as custom SVG fretboards with finger markings and barre indicators.",
+    "5. Store Chord Favorites and User Preferences (BPM, Tuning Profile, Theme) in LocalStorage with immediate hydration.",
+    "6. Include complete data-testid attributes on all buttons, tabs, inputs, and indicators (e.g. data-testid=\"tuner-start-mic-button\", data-testid=\"metronome-play-toggle\", data-testid=\"chord-search-input\", data-testid=\"theme-toggle\").",
+    "7. Cleanly structure components into @/components/tuner/, @/components/metronome/, @/components/chord-library/, and @/lib/audio/."
+  ]
+}

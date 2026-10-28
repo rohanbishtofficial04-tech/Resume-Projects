@@ -1,0 +1,308 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/dm-sans";
+@import "@fontsource-variable/outfit";
+@import "@fontsource-variable/jetbrains-mono";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-sans: 'DM Sans Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-heading: 'Outfit Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+    --color-surface: var(--surface);
+    --color-surface-raised: var(--surface-raised);
+    --color-in-tune: var(--in-tune);
+    --color-flat: var(--flat);
+    --color-sharp: var(--sharp);
+    --color-fret-wire: var(--fret-wire);
+    --color-string-line: var(--string-line);
+
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ---------- Midnight (default): charcoal obsidian + studio amber ---------- */
+:root {
+    --radius: 0.75rem;
+
+    --background: #0B0E14;
+    --foreground: #F8FAFC;
+    --card: #131822;
+    --card-foreground: #F8FAFC;
+    --popover: #172033;
+    --popover-foreground: #F8FAFC;
+    --primary: #F59E0B;
+    --primary-foreground: #16120A;
+    --secondary: #1A2230;
+    --secondary-foreground: #F8FAFC;
+    --muted: #1A2230;
+    --muted-foreground: #94A3B8;
+    --accent: #1F2A3A;
+    --accent-foreground: #F8FAFC;
+    --destructive: #EF4444;
+    --border: #27354A;
+    --input: #27354A;
+    --ring: #F59E0B;
+
+    --surface: #10151F;
+    --surface-raised: #1A2230;
+    --in-tune: #10B981;
+    --flat: #EF4444;
+    --sharp: #F59E0B;
+    --fret-wire: #475569;
+    --string-line: #334155;
+
+    --chart-1: #F59E0B;
+    --chart-2: #94A3B8;
+    --chart-3: #64748B;
+    --chart-4: #475569;
+    --chart-5: #334155;
+    --sidebar: #10151F;
+    --sidebar-foreground: #F8FAFC;
+    --sidebar-primary: #F59E0B;
+    --sidebar-primary-foreground: #16120A;
+    --sidebar-accent: #1A2230;
+    --sidebar-accent-foreground: #F8FAFC;
+    --sidebar-border: #27354A;
+    --sidebar-ring: #F59E0B;
+}
+
+/* ---------- Studio: anodized gray + electric lime ---------- */
+:root[data-theme="studio"] {
+    --background: #0C1114;
+    --foreground: #F1F5F9;
+    --card: #121A1E;
+    --card-foreground: #F1F5F9;
+    --popover: #16211F;
+    --popover-foreground: #F1F5F9;
+    --primary: #84CC16;
+    --primary-foreground: #0B1206;
+    --secondary: #1A2427;
+    --secondary-foreground: #F1F5F9;
+    --muted: #1A2427;
+    --muted-foreground: #93A5A0;
+    --accent: #1F2C2E;
+    --accent-foreground: #F1F5F9;
+    --destructive: #F43F5E;
+    --border: #26343A;
+    --input: #26343A;
+    --ring: #84CC16;
+
+    --surface: #101A1D;
+    --surface-raised: #18262A;
+    --in-tune: #22D3EE;
+    --flat: #F43F5E;
+    --sharp: #84CC16;
+    --fret-wire: #4B6170;
+    --string-line: #354750;
+
+    --chart-1: #84CC16;
+    --chart-2: #93A5A0;
+    --chart-3: #5A7176;
+    --chart-4: #3E5157;
+    --chart-5: #2A383C;
+    --sidebar: #101A1D;
+    --sidebar-primary: #84CC16;
+    --sidebar-primary-foreground: #0B1206;
+    --sidebar-border: #26343A;
+    --sidebar-ring: #84CC16;
+}
+
+/* ---------- Amethyst: deep violet + soft lavender ---------- */
+:root[data-theme="amethyst"] {
+    --background: #100D1A;
+    --foreground: #F5F3FF;
+    --card: #191427;
+    --card-foreground: #F5F3FF;
+    --popover: #211A35;
+    --popover-foreground: #F5F3FF;
+    --primary: #A78BFA;
+    --primary-foreground: #160D2B;
+    --secondary: #251E38;
+    --secondary-foreground: #F5F3FF;
+    --muted: #251E38;
+    --muted-foreground: #B5ACC9;
+    --accent: #302544;
+    --accent-foreground: #F5F3FF;
+    --destructive: #FB7185;
+    --border: #3B3152;
+    --input: #3B3152;
+    --ring: #A78BFA;
+
+    --surface: #151122;
+    --surface-raised: #211A35;
+    --in-tune: #34D399;
+    --flat: #FB7185;
+    --sharp: #A78BFA;
+    --fret-wire: #665A7D;
+    --string-line: #493D60;
+
+    --chart-1: #A78BFA;
+    --chart-2: #C4B5FD;
+    --chart-3: #8B7AAE;
+    --chart-4: #65577F;
+    --chart-5: #443957;
+    --sidebar: #151122;
+    --sidebar-foreground: #F5F3FF;
+    --sidebar-primary: #A78BFA;
+    --sidebar-primary-foreground: #160D2B;
+    --sidebar-accent: #251E38;
+    --sidebar-accent-foreground: #F5F3FF;
+    --sidebar-border: #3B3152;
+    --sidebar-ring: #A78BFA;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+  h1, h2, h3, h4 {
+    @apply font-heading;
+    }
+}
+
+@keyframes fl-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fl-beat-flash {
+  0% { transform: scale(1.22); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.55; }
+}
+
+@keyframes fl-glow-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes fl-string-ring {
+  0% { opacity: 1; transform: scaleY(1.06); }
+  100% { opacity: 0.55; transform: scaleY(1); }
+}
+
+.fl-rise { animation: fl-rise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+.fl-rise-1 { animation-delay: 0.05s; }
+.fl-rise-2 { animation-delay: 0.1s; }
+.fl-rise-3 { animation-delay: 0.15s; }
+.fl-beat { animation: fl-beat-flash 220ms ease-out both; }
+.fl-glow { animation: fl-glow-pulse 1.4s ease-in-out infinite; }
+.fl-ring { animation: fl-string-ring 320ms ease-out both; }
+
+/* tactile fretboard motif used behind hero panels */
+.fl-fret-motif {
+  background-image:
+    repeating-linear-gradient(90deg, color-mix(in oklab, var(--string-line) 60%, transparent) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(0deg, color-mix(in oklab, var(--fret-wire) 45%, transparent) 0 1px, transparent 1px 72px);
+}
+
+.scale-fretboard-scroll,
+.fretlab-nav-scroll,
+.tuner-tuning-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scale-fretboard-scroll::-webkit-scrollbar,
+.fretlab-nav-scroll::-webkit-scrollbar,
+.tuner-tuning-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.scale-fretboard-svg {
+  min-width: var(--board-width);
+}
+
+.fl-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.fl-range::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary) var(--fl-fill, 50%), var(--surface-raised) var(--fl-fill, 50%), var(--surface-raised) 100%);
+  border: 1px solid var(--border);
+}
+.fl-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -7px;
+  height: 22px;
+  width: 22px;
+  border-radius: 999px;
+  background: var(--primary);
+  border: 2px solid var(--background);
+  box-shadow: 0 0 14px color-mix(in oklab, var(--primary) 55%, transparent);
+  transition: transform 140ms ease;
+}
+.fl-range:active::-webkit-slider-thumb { transform: scale(1.12); }
+.fl-range::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+}
+.fl-range::-moz-range-progress {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--primary);
+}
+.fl-range::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 999px;
+  background: var(--primary);
+  border: 2px solid var(--background);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fl-rise, .fl-rise-1, .fl-rise-2, .fl-rise-3, .fl-beat, .fl-glow, .fl-ring {
+    animation: none !important;
+  }
+}

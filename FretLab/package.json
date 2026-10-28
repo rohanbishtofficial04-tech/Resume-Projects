@@ -1,0 +1,7 @@
+{
+  "name": "fretlab",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix frontend start"
+  }
+}
