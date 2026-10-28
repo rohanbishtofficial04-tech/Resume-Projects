@@ -13,7 +13,7 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 
 - **Home** — hero banner, trending / top-rated / recent / upcoming carousels, genre & platform strips, featured collection bento grid
 - **Browse** — genre / platform / release-year / rating filters, sorting, "load more" pagination
-- **Game Details** — hero, screenshots gallery with lightbox, trailer player, related games, stores, official website
+- **Game Details** — responsive hero with back navigation, rating and platform details, rating count, playtime, ESRB rating, trailer player, screenshots gallery with lightbox, related games, stores, and official website
 - **Live Search** — debounced RAWG queries, keyboard-driven modal (⌘/Ctrl+K), highlighted matches
 - **Favorites** — hearts on every card, persisted in `localStorage`
 - **Recently Viewed** — auto-tracked as you explore
@@ -105,13 +105,13 @@ frontend/
 
 ### Prerequisites
 - Node 18+
-- Yarn (this project uses yarn workspaces)
+- npm (included with Node.js)
 
 ### 1. Clone & install
 ```bash
 git clone <your-repo-url> dreadvault
 cd dreadvault/frontend
-yarn install
+npm install
 ```
 
 ### 2. Configure your RAWG API key
@@ -131,13 +131,13 @@ REACT_APP_RAWG_API_KEY=your_rawg_api_key_here
 
 ### 3. Run locally
 ```bash
-yarn start
+npm start
 ```
 The app is served on [http://localhost:3000](http://localhost:3000).
 
 ### 4. Production build
 ```bash
-yarn build
+npm run build
 ```
 Bundles the app into `frontend/build/`.
 
@@ -153,7 +153,7 @@ DreadVault is deployed on Vercel and built with React.
 - **Platform:** Vercel
 - **Framework:** Create React App
 - **Root Directory:** `frontend`
-- **Build Command:** `yarn build`
+- **Build Command:** `npm run build`
 - **Output Directory:** `build`
 - **Environment Variable:** `REACT_APP_RAWG_API_KEY`
 
