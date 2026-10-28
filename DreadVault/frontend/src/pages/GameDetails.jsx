@@ -166,8 +166,8 @@ export default function GameDetails() {
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </button>
         </div>
-        <div className="relative z-10 max-w-[1440px] mx-auto px-6 md:px-10 min-h-[75vh] flex items-end pb-2 sm:pb-4 md:pb-6">
-          <div className="max-w-4xl -translate-y-8 sm:translate-y-0">
+        <div className="relative z-10 max-w-[1440px] mx-auto px-6 md:px-10 min-h-[75vh] flex items-end pt-28 pb-2 sm:pt-0 sm:pb-4 md:pb-6">
+          <div className="max-w-4xl">
             <p className="font-brand text-[11px] tracking-[0.3em] text-[color:var(--nf-accent)]">
               {(game.genres || []).slice(0, 3).map((g) => g.name).join(" · ")}
             </p>
@@ -175,18 +175,18 @@ export default function GameDetails() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="font-display text-5xl sm:text-6xl md:text-7xl tracking-tight leading-[0.95] mt-4"
+              className="font-display text-4xl sm:text-6xl md:text-7xl tracking-tight leading-[0.95] mt-2 sm:mt-4"
             >
               {game.name}
             </motion.h1>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-3 sm:mt-6 flex flex-wrap items-center gap-3">
               <RatingBadge value={game.rating} metacritic={game.metacritic} />
               <PlatformBadges platforms={game.parent_platforms} max={6} />
               <span className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">
                 Released {formatDate(game.released)}
               </span>
             </div>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-4 sm:mt-8 flex flex-wrap gap-2 sm:gap-3">
               <button
                 data-testid={TID.detailsFavorite}
                 onClick={() => toggleFavorite(game)}
