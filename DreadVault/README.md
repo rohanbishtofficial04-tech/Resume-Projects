@@ -148,16 +148,28 @@ Bundles the app into `frontend/build/`.
 
 ---
 
-## ▲ Deploying to Vercel
+## ▲ DreadVault — Live Deployment
 
-1. Push this repository to GitHub.
-2. Import the repo into [Vercel](https://vercel.com/new).
-3. Set the **Root Directory** to `frontend`.
-4. Framework preset: **Create React App**.
-5. Add environment variable `REACT_APP_RAWG_API_KEY` in Vercel → Project → Settings → Environment Variables.
-6. Deploy.
+**Live Website:** https://dreadvault.vercel.app
 
-A `vercel.json` at the repo root also handles SPA routing (rewrites everything to `index.html`).
+DreadVault is deployed on Vercel and built with React.
+
+### Deployment Configuration
+- **Platform:** Vercel
+- **Framework:** Create React App
+- **Root Directory:** `frontend`
+- **Build Command:** `yarn build`
+- **Output Directory:** `build`
+- **Environment Variable:** `REACT_APP_RAWG_API_KEY`
+
+### Local Development
+1. Clone the repository.
+2. Navigate to the frontend directory.
+3. Install dependencies.
+4. Configure your RAWG API key in the environment file.
+5. Start the development server.
+
+The RAWG API key should not be committed to the repository.
 
 ---
 
