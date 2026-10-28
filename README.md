@@ -150,8 +150,6 @@ Bundles the app into `frontend/build/`.
 
 ---
 
-## ▲ Deploying to Vercel
-
 ## ▲ DreadVault — Live Deployment
 
 **Live Website:** https://dreadvault.vercel.app
