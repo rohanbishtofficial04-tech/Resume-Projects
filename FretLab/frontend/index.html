@@ -9,6 +9,16 @@
       name="description"
       content="Guitar Utility Tool."
     />
+    <script>
+      try {
+        const savedTheme = window.localStorage.getItem("fretlab.theme");
+        if (savedTheme === '"studio"' || savedTheme === '"amethyst"') {
+          document.documentElement.dataset.theme = JSON.parse(savedTheme);
+        }
+      } catch {
+        // Keep the default theme when browser storage is unavailable or invalid.
+      }
+    </script>
     <title>FretLab</title>
   </head>
   <body>

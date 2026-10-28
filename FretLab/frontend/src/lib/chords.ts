@@ -275,6 +275,7 @@ export function voicingFrequencies(frets: number[]): number[] {
 /** Chord tones voiced from the same octave as the Circle of Fifths previews. */
 export function chordToneFrequencies(chord: Pick<Chord, "rootPc" | "qualityId">): number[] {
   const quality = CHORD_QUALITIES.find(({ id }) => id === chord.qualityId);
-  if (!quality) throw new Error(`Unknown chord quality: ${chord.qualityId}`);
-  return quality.intervals.map((interval) => freqFromMidi(60 + chord.rootPc + interval));
+  const intervals = quality?.intervals ?? (chord.qualityId === "power" ? [0, 7] : null);
+  if (!intervals) throw new Error(`Unknown chord quality: ${chord.qualityId}`);
+  return intervals.map((interval) => freqFromMidi(60 + chord.rootPc + interval));
 }

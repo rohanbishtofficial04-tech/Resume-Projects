@@ -7,6 +7,9 @@ import CircleOfFifths from "@/pages/CircleOfFifths";
 import ScaleLibrary from "@/pages/ScaleLibrary";
 import ChordLibrary from "@/pages/ChordLibrary";
 import About from "@/pages/About";
+import Home from "@/pages/Home";
+import Games from "@/pages/Games";
+import ChordGuess from "@/pages/ChordGuess";
 
 // One <Route> per page in src/pages; BrowserRouter already wraps this in main.tsx.
 export default function App() {
@@ -14,14 +17,16 @@ export default function App() {
     <ThemeProvider>
       <Routes>
         <Route element={<FretLabShell />}>
-          <Route path="/" element={<Navigate to="/tuner" replace />} />
+          <Route path="/" element={<Home />} />
           <Route path="/tuner" element={<Tuner />} />
           <Route path="/metronome" element={<Metronome />} />
           <Route path="/circle-of-fifths" element={<CircleOfFifths />} />
           <Route path="/scales" element={<ScaleLibrary />} />
           <Route path="/chords" element={<ChordLibrary />} />
+          <Route path="/games" element={<Games />} />
+          <Route path="/games/chord-guess" element={<ChordGuess />} />
           <Route path="/about" element={<About />} />
-          <Route path="*" element={<Navigate to="/tuner" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
     </ThemeProvider>

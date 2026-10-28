@@ -1,4 +1,4 @@
-import { Code2, ExternalLink, Guitar, Headphones, ShieldCheck, Waves } from "lucide-react";
+import { Code2, ExternalLink, Gamepad2, Guitar, Headphones, Waves } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const FEATURES = [
@@ -18,9 +18,9 @@ const FEATURES = [
     description: "Use the metronome and explore chord voicings with clear guitar diagrams.",
   },
   {
-    icon: ShieldCheck,
-    title: "Private by design",
-    description: "Audio and microphone processing happen in your browser; preferences stay on this device.",
+    icon: Gamepad2,
+    title: "Games",
+    description: "Practice your musical ear with Chord Guess levels covering open chords, power chords, sevenths, and more.",
   },
 ];
 

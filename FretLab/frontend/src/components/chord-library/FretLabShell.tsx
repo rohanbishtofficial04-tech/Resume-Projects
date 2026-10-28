@@ -1,15 +1,17 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { Gauge, Timer, Library, Music2, CircleDot, Palette } from "lucide-react";
+import { Gauge, Timer, Library, Music2, CircleDot, House, Gamepad2, Palette, Info } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { THEMES, useTheme } from "@/context/ThemeProvider";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { to: "/tuner", label: "Tuner", icon: Gauge, testId: "app-nav-tuner" },
-  { to: "/metronome", label: "Metronome", icon: Timer, testId: "app-nav-metronome" },
-  { to: "/circle-of-fifths", label: "Circle of Fifths", icon: CircleDot, testId: "app-nav-circle" },
-  { to: "/scales", label: "Scale Library", icon: Music2, testId: "app-nav-scales" },
-  { to: "/chords", label: "Chord Library", icon: Library, testId: "app-nav-chords" },
+  { to: "/", label: "Home", icon: House, testId: "app-nav-home", end: true },
+  { to: "/tuner", label: "Tuner", icon: Gauge, testId: "app-nav-tuner", end: false },
+  { to: "/metronome", label: "Metronome", icon: Timer, testId: "app-nav-metronome", end: false },
+  { to: "/circle-of-fifths", label: "Circle of Fifths", icon: CircleDot, testId: "app-nav-circle", end: false },
+  { to: "/scales", label: "Scale Library", icon: Music2, testId: "app-nav-scales", end: false },
+  { to: "/chords", label: "Chord Library", icon: Library, testId: "app-nav-chords", end: false },
+  { to: "/games", label: "Games", icon: Gamepad2, testId: "app-nav-games", end: false },
 ];
 
 function BrandMark() {
@@ -47,7 +49,7 @@ export default function FretLabShell() {
       <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-6">
           <NavLink
-            to="/tuner"
+            to="/"
             data-testid="app-brand"
             className="flex items-center gap-2.5 transition-transform duration-150 hover:scale-[1.02]"
           >
@@ -64,11 +66,12 @@ export default function FretLabShell() {
             aria-label="FretLab features"
             className="fretlab-nav-scroll order-3 flex w-full items-center gap-1 overflow-x-auto rounded-xl border border-border bg-card p-1 sm:order-none sm:ml-4 sm:w-auto"
           >
-            {NAV_ITEMS.map(({ to, label, icon: Icon, testId }) => (
+            {NAV_ITEMS.map(({ to, label, icon: Icon, testId, end }) => (
               <NavLink
                 key={to}
                 to={to}
                 data-testid={testId}
+                end={end}
                 className={({ isActive }) =>
                   cn(
                     "flex flex-none items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors duration-150",
@@ -119,8 +122,9 @@ export default function FretLabShell() {
           <Link
             to="/about"
             data-testid="app-footer-about"
-            className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
+            <Info className="h-4 w-4" aria-hidden="true" />
             About FretLab
           </Link>
         </div>
