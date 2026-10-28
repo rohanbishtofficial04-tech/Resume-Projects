@@ -19,6 +19,9 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 - Added trailers for select supported games.
 - Improved responsiveness across desktop and mobile devices for a smoother browsing experience on different screen sizes.
 - Added more information to the Game Details section for a more comprehensive game overview.
+- Added navigation buttons to browse through game screenshots more easily.
+-  Improved button responsiveness for smoother and more consistent interactions across devices.
+-  ixed search filtering to display only horror games, preventing results from unrelated genres such as sports.
 
  ---
 
