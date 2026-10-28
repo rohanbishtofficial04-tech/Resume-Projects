@@ -76,7 +76,7 @@ export const fetchUpcoming = ({ page = 1, page_size = 12 } = {}) => {
 export const searchGames = ({ query, page = 1, page_size = 20 }) =>
   client
     .get("/games", {
-      params: withHorror({ search: query, page, page_size }),
+      params: { search: query, page, page_size, key: KEY },
     })
     .then((r) => r.data);
 

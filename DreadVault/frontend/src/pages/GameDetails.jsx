@@ -42,12 +42,12 @@ export default function GameDetails() {
     setRelated([]);
     (async () => {
       try {
-        const [g, s, m, r] = await Promise.all([
+        const [g, s, m] = await Promise.all([
           getDetails(slug),
           getScreenshots(slug),
           getMovies(slug),
-          getRelated(slug),
         ]);
+        const r = await getRelated(slug, g);
         if (!mounted) return;
         setGame(g);
         setScreens(s?.results || []);

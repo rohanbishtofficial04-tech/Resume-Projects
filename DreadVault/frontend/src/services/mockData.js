@@ -43,6 +43,7 @@ const games = [
   g(11, "visage", "Visage", "2020-10-30", 4.2, 78, IMG.corridor, ["Horror", "Indie"], ["PC", "PlayStation", "Xbox"]),
   g(12, "signalis", "SIGNALIS", "2022-10-27", 4.5, 84, IMG.abstract, ["Horror", "Indie"], ["PC", "PlayStation", "Xbox"]),
   g(13, "silent-hill-2-2024", "Silent Hill 2 Remake", "2024-10-08", 4.6, 86, IMG.fog, ["Horror", "Adventure"], ["PC", "PlayStation"]),
+  g(14, "eternal-darkness-sanitys-requiem", "Eternal Darkness: Sanity's Requiem", "2002-06-21", 4.5, 92, IMG.fog, ["Horror", "Adventure"], ["Nintendo GameCube"]),
 ];
 
 const listResp = (arr) => ({ count: arr.length, next: null, previous: null, results: arr });
@@ -55,7 +56,10 @@ export default {
   upcoming: () => listResp(games.slice(0, 6)),
   browse: (params = {}) => {
     let arr = [...games];
-    if (params.search) arr = arr.filter((x) => x.name.toLowerCase().includes(params.search.toLowerCase()));
+    if (params.search) {
+      const search = params.search.toLowerCase();
+      arr = arr.filter((x) => x.name.toLowerCase().includes(search));
+    }
     if (params.genres) arr = arr.filter((x) => x.genres.some((gg) => gg.slug === params.genres));
     if (params.platforms) {
       const platformSlugs = {
@@ -116,7 +120,22 @@ export default {
     return listResp(found.short_screenshots);
   },
   movies: () => listResp([]),
-  related: () => listResp(games.slice(0, 6)),
+  related: (game) => {
+    const targetGenres = new Set((game?.genres || []).map((genre) => genre.slug || genre.name));
+    const targetPlatforms = new Set((game?.parent_platforms || game?.platforms || []).map((entry) =>
+      entry.platform?.slug || entry.platform?.name || entry.slug || entry.name
+    ).filter(Boolean));
+    const related = games
+      .filter((item) => item.id !== game?.id && item.slug !== game?.slug)
+      .map((item) => {
+        const genreMatches = item.genres.filter((genre) => targetGenres.has(genre.slug)).length;
+        const platformMatches = item.platforms.filter(({ platform }) => targetPlatforms.has(platform.slug)).length;
+        return { item, score: genreMatches * 10 + platformMatches * 3 };
+      })
+      .sort((a, b) => b.score - a.score || b.item.rating - a.item.rating)
+      .map(({ item }) => item);
+    return listResp(related);
+  },
   genres: () =>
     listResp([
       { id: "horror", slug: "horror", name: "Horror" },

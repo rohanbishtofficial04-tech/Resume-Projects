@@ -26,7 +26,7 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
     }
     let cancel = false;
     setLoading(true);
-    getSearch({ query: debounced, page_size: 10 })
+    getSearch({ query: debounced, page_size: 30 })
       .then((data) => {
         if (!cancel) setResults(data?.results || []);
       })
