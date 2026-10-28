@@ -12,6 +12,8 @@
 
 FretLab is a browser-based guitar practice toolkit built with React and Vite. It includes a real-time chromatic tuner, metronome, Circle of Fifths, scale library, and chord library. Audio playback and microphone input run in the browser.
 
+**Live site:** [fretlab-taupe.vercel.app](https://fretlab-taupe.vercel.app)
+
 ## Features
 
 - **Tuner** — detects pitch through the microphone and provides reference tones for the selected tuning.
