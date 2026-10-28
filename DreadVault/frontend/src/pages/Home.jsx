@@ -72,8 +72,7 @@ const Hero = ({ game }) => {
           transition={{ delay: 0.75, duration: 0.6 }}
           className="mt-6 max-w-2xl text-base md:text-lg text-[color:var(--nf-text-dim)] leading-relaxed"
         >
-          {clampText(stripHtml(game.description_raw || ""), 220) ||
-            "Descend into a curated vault of horror titles — each one a doorway into dread."}
+          Descend into a curated vault of horror titles - each one a doorway into dread.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
