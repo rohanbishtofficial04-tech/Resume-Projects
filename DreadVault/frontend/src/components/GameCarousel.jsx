@@ -51,7 +51,6 @@ export const GameCarousel = ({ title, subtitle, games, loading, tid, viewAllTo }
       <div
         ref={scrollerRef}
         className="flex gap-3 sm:gap-5 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 md:mx-0 md:px-0"
-        style={{ scrollbarWidth: "thin" }}
       >
         {loading && (!games || games.length === 0)
           ? Array.from({ length: 8 }).map((_, i) => (

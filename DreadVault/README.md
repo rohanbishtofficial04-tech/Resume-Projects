@@ -11,14 +11,14 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 
 ##  Features
 
-- **Home** — hero banner, trending / top-rated / recent / upcoming carousels, genre & platform strips, featured collection bento grid
+- **Home** — Outlast 2 featured hero, trending / top-rated / recent / upcoming carousels, genre & platform strips, featured collection bento grid
 - **Browse** — genre / platform / release-year / rating filters, sorting, "load more" pagination
 - **Game Details** — responsive hero with back navigation, rating and platform details, rating count, playtime, ESRB rating, trailer player, screenshots gallery with lightbox, related games, stores, and official website
 - **Live Search** — debounced RAWG queries, keyboard-driven modal (⌘/Ctrl+K), highlighted matches
 - **Favorites** — hearts on every card, persisted in `localStorage`
 - **Recently Viewed** — auto-tracked as you explore
 - **Collections** — user-made lists (create, rename, delete), stored locally
-- **Compare Games** — side-by-side spec table
+- **Compare Games** — side-by-side ratings, release date, rating count, average playtime, ESRB rating, genres, platforms, Metacritic score, developers, and publishers
 - **Random Horror Generator** — "Dare to Play" roulette with cinematic build-up
 - **Theme Customization** — Fog / Blood / Eldritch theme toggle
 - **404, offline detection, missing-API-key demo mode**
@@ -26,6 +26,15 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 - **Performance** — `React.lazy` code splitting, lazy-loaded images, memoized providers, debounced input
 - **Motion** — Framer Motion page transitions, staggered card reveals, hover parallax
 - **Data-testid coverage** — every interactive & informational element is wired for automated QA
+
+---
+
+## Recent Updates
+
+- Featured **Outlast 2** in the homepage hero with a fixed DreadVault tagline.
+- Expanded game comparisons with rating counts, average playtime, ESRB ratings, developers, and publishers.
+- Hid scrollbar visuals across the app while preserving mouse, touch, and keyboard scrolling.
+- Improved the responsive game details hero and back-navigation layout.
 
 ---
 

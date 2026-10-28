@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getSearch, getBrowse } from "@/services/games";
+import { getDetails, getSearch, getBrowse } from "@/services/games";
 import { useDebounce } from "@/hooks/useDebounce";
 import { TID } from "@/constants/testIds";
 import { formatYear } from "@/utils/format";
@@ -111,10 +111,21 @@ const Row = ({ label, a, b }) => (
 
 const gen = (g) => (g?.genres || []).map((x) => x.name).join(", ") || "—";
 const pl = (g) => (g?.parent_platforms || g?.platforms || []).map((p) => p.platform?.name || p.name).join(", ") || "—";
+const ratingCount = (g) => g?.ratings_count > 0 ? new Intl.NumberFormat("en-US").format(g.ratings_count) : "—";
+const playtime = (g) => g?.playtime > 0 ? `${g.playtime} hr${g.playtime === 1 ? "" : "s"}` : "—";
+const esrbRating = (g) =>
+  typeof g?.esrb_rating === "string" ? g.esrb_rating : g?.esrb_rating?.name || "—";
+const names = (items) => items?.map((item) => item.name).filter(Boolean).join(", ") || "—";
 
 export default function Compare() {
   const [a, setA] = useState(null);
   const [b, setB] = useState(null);
+
+  const selectGame = async (slot, game) => {
+    const details = await getDetails(game.slug);
+    const selected = { ...game, ...details };
+    (slot === "A" ? setA : setB)(selected);
+  };
 
   return (
     <div data-testid={TID.comparePage} className="max-w-[1440px] mx-auto px-6 md:px-10 pt-14 pb-24">
@@ -127,8 +138,8 @@ export default function Compare() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Picker slot={SLOTS[0]} selected={a} onPick={setA} onClear={() => setA(null)} testId={TID.compareSelectA} />
-        <Picker slot={SLOTS[1]} selected={b} onPick={setB} onClear={() => setB(null)} testId={TID.compareSelectB} />
+        <Picker slot={SLOTS[0]} selected={a} onPick={(game) => selectGame(SLOTS[0], game)} onClear={() => setA(null)} testId={TID.compareSelectA} />
+        <Picker slot={SLOTS[1]} selected={b} onPick={(game) => selectGame(SLOTS[1], game)} onClear={() => setB(null)} testId={TID.compareSelectB} />
       </div>
 
       {(a || b) && (
@@ -140,9 +151,14 @@ export default function Compare() {
           />
           <Row label="Rating" a={a ? <RatingBadge value={a.rating} metacritic={a.metacritic} compact /> : "—"} b={b ? <RatingBadge value={b.rating} metacritic={b.metacritic} compact /> : "—"} />
           <Row label="Released" a={a?.released || "—"} b={b?.released || "—"} />
+          <Row label="Rating Count" a={ratingCount(a)} b={ratingCount(b)} />
+          <Row label="Average Playtime" a={playtime(a)} b={playtime(b)} />
+          <Row label="ESRB Rating" a={esrbRating(a)} b={esrbRating(b)} />
           <Row label="Genres" a={gen(a)} b={gen(b)} />
           <Row label="Platforms" a={pl(a)} b={pl(b)} />
           <Row label="Metacritic" a={a?.metacritic || "—"} b={b?.metacritic || "—"} />
+          <Row label="Developers" a={names(a?.developers)} b={names(b?.developers)} />
+          <Row label="Publishers" a={names(a?.publishers)} b={names(b?.publishers)} />
         </section>
       )}
     </div>
