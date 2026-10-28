@@ -1,4 +1,4 @@
-# DreadVault — Premium Horror Game Database
+# DreadVault — Horror Game Database
 
 A cinematic, atmospheric discovery platform for horror video games. Built as a portfolio-grade
 React application on top of the [RAWG Video Games API](https://rawg.io/apidocs). Inspired by
