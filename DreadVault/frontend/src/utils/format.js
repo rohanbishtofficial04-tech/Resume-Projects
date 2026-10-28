@@ -22,7 +22,8 @@ export const clampText = (str, n = 220) => {
   return t.length > n ? `${t.slice(0, n).trim()}…` : t;
 };
 
-export const stripHtml = (html) => (html ? html.replace(/<[^>]+>/g, "") : "");
+export const stripHtml = (html) =>
+  html ? html.replace(/<[^>]+>/g, "").replace(/^\s{0,3}#{1,6}\s*/gm, "") : "";
 
 export const ratingColor = (rating) => {
   if (rating >= 4.5) return "var(--nf-accent-strong)";

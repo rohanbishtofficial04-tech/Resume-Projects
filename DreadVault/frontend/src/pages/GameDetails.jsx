@@ -86,6 +86,22 @@ export default function GameDetails() {
     );
   }
 
+  const formatRatingCount = (value) => {
+    if (value == null || Number(value) <= 0) return "—";
+    return new Intl.NumberFormat("en-US").format(Number(value));
+  };
+
+  const formatPlaytime = (value) => {
+    if (value == null || Number(value) <= 0) return "—";
+    return `${Number(value)} hr${Number(value) === 1 ? "" : "s"}`;
+  };
+
+  const formatEsrb = (value) => {
+    if (!value) return "Not available";
+    if (typeof value === "string") return value;
+    return value.name || "Not available";
+  };
+
   const fav = isFavorite(game.id);
   const share = async () => {
     const shareData = {
@@ -138,18 +154,20 @@ export default function GameDetails() {
         />
         <div className="absolute inset-0 nf-hero-fade" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent" />
-        <button
-          type="button"
-          onClick={() =>
-            navigate(location.key === "default" ? "/browse" : -1)
-          }
-          className="absolute top-4 left-6 md:left-10 z-20 nf-btn"
-          aria-label="Back to browse"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Back
-        </button>
-        <div className="relative z-10 max-w-[1440px] mx-auto px-6 md:px-10 min-h-[75vh] flex items-end pb-14">
-          <div className="max-w-4xl">
+        <div className="absolute z-20 top-16 left-1/2 -translate-x-1/2 w-full max-w-[1440px] px-4 sm:px-6 md:px-10">
+          <button
+            type="button"
+            onClick={() =>
+              navigate(location.key === "default" ? "/browse" : -1)
+            }
+            className="nf-btn min-h-11 min-w-11 px-3 sm:px-5 bg-[color:var(--nf-bg)]/90 backdrop-blur-md shadow-lg"
+            aria-label="Back to browse"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Back
+          </button>
+        </div>
+        <div className="relative z-10 max-w-[1440px] mx-auto px-6 md:px-10 min-h-[75vh] flex items-end pb-2 sm:pb-4 md:pb-6">
+          <div className="max-w-4xl -translate-y-8 sm:translate-y-0">
             <p className="font-brand text-[11px] tracking-[0.3em] text-[color:var(--nf-accent)]">
               {(game.genres || []).slice(0, 3).map((g) => g.name).join(" · ")}
             </p>
@@ -241,6 +259,18 @@ export default function GameDetails() {
               {(game.platforms || []).map((p) => p.platform?.name || p.name).join(", ") || "—"}
             </p>
           </div>
+          <div className="border border-[color:var(--nf-border)] p-5">
+            <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Rating Count</p>
+            <p className="mt-1 text-sm">{formatRatingCount(game.ratings_count)}</p>
+          </div>
+          <div className="border border-[color:var(--nf-border)] p-5">
+            <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Playtime</p>
+            <p className="mt-1 text-sm">{formatPlaytime(game.playtime)}</p>
+          </div>
+          <div className="border border-[color:var(--nf-border)] p-5">
+            <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">ESRB Rating</p>
+            <p className="mt-1 text-sm">{formatEsrb(game.esrb_rating)}</p>
+          </div>
           {game.stores?.length ? (
             <div className="border border-[color:var(--nf-border)] p-5">
               <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)] mb-3">
@@ -262,6 +292,26 @@ export default function GameDetails() {
             </div>
           ) : null}
         </aside>
+      </section>
+
+      {/* Trailer */}
+      <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-20">
+        <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Game Trailer</p>
+        <h2 className="font-display text-3xl md:text-4xl mt-1">{game.name}</h2>
+        {trailer ? (
+          <video
+            src={trailer}
+            controls
+            preload="metadata"
+            poster={game.background_image}
+            className="mt-6 w-full aspect-video border border-[color:var(--nf-border)] bg-black object-contain"
+            aria-label={`${game.name} trailer`}
+          />
+        ) : (
+          <p className="mt-6 border border-[color:var(--nf-border)] p-5 text-sm text-[color:var(--nf-text-dim)]">
+            Not available
+          </p>
+        )}
       </section>
 
       {/* Screenshots */}
