@@ -53,6 +53,7 @@ export const TID = {
   detailsPage: "game-details-page",
   detailsShare: "details-share",
   detailsFavorite: "details-favorite",
+  detailsCollection: "details-collection",
   detailsTrailer: "details-trailer",
   detailsScreenshots: "details-screenshots",
   detailsRelated: "details-related",

@@ -67,7 +67,7 @@ export default function Collections() {
         <div className="border border-dashed border-[color:var(--nf-border)] p-16 text-center">
           <p className="font-display text-3xl">Empty shelves.</p>
           <p className="mt-2 text-sm text-[color:var(--nf-text-dim)]">
-            Create your first collection above. Add games from any card via the heart, then re-organize into lists later.
+            Create your first collection above, then open any game and use Add to Collection to save it here.
           </p>
         </div>
       ) : (
