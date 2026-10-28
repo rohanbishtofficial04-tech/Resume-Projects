@@ -8,7 +8,7 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 > from the top-right of the navbar.
 
 ## Updates
-
+## October 2026
 - Added the dark-purple **Eldritch** theme and a subtle ambient background glow that follows the active theme.
 - Improved search behavior and the responsive mobile experience.
 - Published a cleaned DreadVault project snapshot.
