@@ -13,6 +13,8 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 - Improved search behavior and the responsive mobile experience.
 - Published a cleaned DreadVault project snapshot.
 - Fixed Search bar (Prevent sports results in horror search)
+- Added trailer support to game details pages.
+- Added estimated playtime, rating count, and ESRB age ratings in game details.
 
 ---
 
