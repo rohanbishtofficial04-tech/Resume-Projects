@@ -9,6 +9,19 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 
 ---
 
+## Recent Updates
+
+- Featured **Outlast 2** in the homepage hero with a fixed DreadVault tagline.
+- Expanded game comparisons with rating counts, average playtime, ESRB ratings, developers, and publishers.
+- Hid scrollbar visuals across the app while preserving mouse, touch, and keyboard scrolling.
+- Improved the responsive game details hero and back-navigation layout.
+- Added A New Theme (Elditch)
+- Added trailers for select supported games.
+- Improved responsiveness across desktop and mobile devices for a smoother browsing experience on different screen sizes.
+- Added more information to the Game Details section for a more comprehensive game overview.
+
+ ---
+
 ##  Features
 
 - **Home** — Outlast 2 featured hero, trending / top-rated / recent / upcoming carousels, genre & platform strips, featured collection bento grid
@@ -26,15 +39,6 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 - **Performance** — `React.lazy` code splitting, lazy-loaded images, memoized providers, debounced input
 - **Motion** — Framer Motion page transitions, staggered card reveals, hover parallax
 - **Data-testid coverage** — every interactive & informational element is wired for automated QA
-
----
-
-## Recent Updates
-
-- Featured **Outlast 2** in the homepage hero with a fixed DreadVault tagline.
-- Expanded game comparisons with rating counts, average playtime, ESRB ratings, developers, and publishers.
-- Hid scrollbar visuals across the app while preserving mouse, touch, and keyboard scrolling.
-- Improved the responsive game details hero and back-navigation layout.
 
 ---
 
