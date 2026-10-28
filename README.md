@@ -17,7 +17,7 @@ A cinematic horror game discovery library powered by the RAWG Video Games API. B
 A guitar practice toolkit with an in-browser tuner, metronome, Circle of Fifths, scale library, and playable chord library. Audio playback and microphone pitch detection use browser APIs.
 
 - **Stack:** React 18, TypeScript, Vite, Tailwind CSS, Web Audio API
-- **Live site:** [fretlab-taupe.vercel.app](https://fretlab-taupe.vercel.app)
+- **Live site:** [fretlab.vercel.app](https://fretlab.vercel.app)
 - **Project guide:** [FretLab README](./FretLab/README.md)
 
 ## Running a project
