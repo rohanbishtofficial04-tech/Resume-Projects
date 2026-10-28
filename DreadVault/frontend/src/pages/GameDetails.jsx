@@ -220,7 +220,7 @@ export default function GameDetails() {
   return (
     <div data-testid={TID.detailsPage}>
       {/* Hero */}
-      <section className="relative min-h-[75vh]">
+      <section className="relative flex min-h-[75vh] flex-col overflow-hidden">
         <img
           src={game.background_image}
           alt={game.name}
@@ -228,19 +228,20 @@ export default function GameDetails() {
         />
         <div className="absolute inset-0 nf-hero-fade" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent" />
-        <div className="absolute z-20 top-16 left-1/2 -translate-x-1/2 w-full max-w-[1440px] px-4 sm:px-6 md:px-10">
+        <div className="relative z-20 mx-auto w-full max-w-[1440px] px-4 pt-4 sm:px-6 md:px-10">
           <button
             type="button"
             onClick={() =>
               navigate(location.key === "default" ? "/browse" : -1)
             }
-            className="nf-btn min-h-11 min-w-11 px-3 sm:px-5 bg-[color:var(--nf-bg)]/90 backdrop-blur-md shadow-lg"
+            className="nf-btn min-h-11 min-w-11 px-3 sm:px-5 shadow-lg"
+            style={{ backgroundColor: "var(--nf-bg)" }}
             aria-label="Back to browse"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </button>
         </div>
-        <div className="relative z-10 max-w-[1440px] mx-auto px-6 md:px-10 min-h-[75vh] flex items-end pt-28 pb-2 sm:pt-0 sm:pb-4 md:pb-6">
+        <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 items-end px-6 pt-8 pb-2 sm:px-6 sm:pt-4 sm:pb-4 md:px-10 md:pb-6">
           <div className="max-w-4xl">
             <p className="font-brand text-[11px] tracking-[0.3em] text-[color:var(--nf-accent)]">
               {(game.genres || []).slice(0, 3).map((g) => g.name).join(" · ")}
