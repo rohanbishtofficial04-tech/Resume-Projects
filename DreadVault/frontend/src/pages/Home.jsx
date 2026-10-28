@@ -9,6 +9,7 @@ import {
   getUpcoming,
   getGenres,
   getPlatforms,
+  getDetails,
 } from "@/services/games";
 import { GameCarousel } from "@/components/GameCarousel";
 import { RatingBadge } from "@/components/RatingBadge";
@@ -179,19 +180,21 @@ export default function Home() {
   const [upcoming, setUpcoming] = useState([]);
   const [genres, setGenres] = useState([]);
   const [platforms, setPlatforms] = useState([]);
+  const [heroGame, setHeroGame] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const [tr, tp, rc, up, gn, pf] = await Promise.all([
+        const [tr, tp, rc, up, gn, pf, featured] = await Promise.all([
           getTrending({ page_size: 12 }),
           getTopRated({ page_size: 12 }),
           getRecent({ page_size: 12 }),
           getUpcoming({ page_size: 12 }),
           getGenres(),
           getPlatforms(),
+          getDetails("outlast-2"),
         ]);
         if (!mounted) return;
         setTrending(tr?.results || []);
@@ -200,6 +203,7 @@ export default function Home() {
         setUpcoming(up?.results || []);
         setGenres(gn?.results || []);
         setPlatforms(pf?.results || []);
+        setHeroGame(featured);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -209,7 +213,7 @@ export default function Home() {
     };
   }, []);
 
-  const hero = top[0] || trending[0];
+  const hero = heroGame || top[0] || trending[0];
 
   return (
     <div data-testid={TID.home}>
