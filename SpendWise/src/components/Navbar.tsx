@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Bell, Moon, Sun, UserRound } from "lucide-react";
+import { Bell, Moon, Sun, UserRound, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -27,21 +27,24 @@ export default function Navbar() {
   const pathname = usePathname();
   const [accountPopoverOpen, setAccountPopoverOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { data } = useSpendWise();
+  const { data, dismissedBudgetAlerts, dismissBudgetAlert, dismissBudgetAlerts } = useSpendWise();
   const hydrated = useFinanceHydrated();
   const accountName = data.settings.displayName.trim() || "Personal account";
-  const budgetAlerts = data.budgets.flatMap((budget) => {
+  const allBudgetAlerts = data.budgets.flatMap((budget) => {
     const spent = getBudgetSpent(data.transactions, budget.categoryId);
     const percent = spent / budget.limit * 100;
     if (percent < data.settings.budgetAlertThreshold) return [];
+    const level = percent > 100 ? "exceeded" : percent === 100 ? "reached" : "approaching";
     return [{
-      id: budget.id,
+      id: `${budget.id}:${budget.limit}:${data.settings.budgetAlertThreshold}:${level}`,
       categoryName: getCategory(data, budget.categoryId)?.name ?? "Category",
       spent,
       limit: budget.limit,
       percent,
+      level,
     }];
   });
+  const budgetAlerts = allBudgetAlerts.filter((alert) => !dismissedBudgetAlerts.includes(alert.id));
   const formatAmount = (amount: number) => formatCurrency(amount, data.settings.currency, data.settings.fractionDigits);
   return <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-7">
     <div className="flex items-center gap-3"><SidebarTrigger /><span className="text-sm font-medium">{titles[pathname] ?? "SpendWise"}</span></div>
@@ -59,12 +62,37 @@ export default function Navbar() {
               <h2 className="font-semibold">Notifications</h2>
               <p className="mt-1 text-xs text-muted-foreground">Alerts start at {data.settings.budgetAlertThreshold}% of a monthly limit</p>
             </div>
-            {budgetAlerts.length > 0 && <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">{budgetAlerts.length}</span>}
+            {budgetAlerts.length > 0 && <div className="flex items-center gap-2">
+              <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">{budgetAlerts.length}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={() => dismissBudgetAlerts(budgetAlerts.map((alert) => alert.id))}
+              >
+                Clear notifications
+              </Button>
+            </div>}
           </div>
           {!hydrated ? <FinancePageLoading /> : budgetAlerts.length ? <ul className="mt-4 max-h-72 space-y-3 overflow-y-auto">
             {budgetAlerts.map((alert) => <li key={alert.id} className="rounded-lg border p-3">
-              <p className="text-sm font-medium">{alert.categoryName} budget {alert.percent > 100 ? "exceeded" : alert.percent === 100 ? "reached" : "approaching its limit"}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{formatAmount(alert.spent)} of {formatAmount(alert.limit)} ({Math.round(alert.percent)}%)</p>
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm font-medium">{alert.categoryName} budget {alert.level === "approaching" ? "approaching its limit" : alert.level}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{formatAmount(alert.spent)} of {formatAmount(alert.limit)} ({Math.round(alert.percent)}%)</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-7 shrink-0"
+                  aria-label={`Dismiss ${alert.categoryName} budget notification`}
+                  onClick={() => dismissBudgetAlert(alert.id)}
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
             </li>)}
           </ul> : <p className="mt-4 rounded-lg bg-muted p-3 text-sm text-muted-foreground">No budget alerts this month.</p>}
           <Button asChild variant="link" className="mt-3 h-auto p-0 text-sm">

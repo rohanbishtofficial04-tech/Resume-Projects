@@ -1,16 +1,18 @@
 "use client";
 
-import { Info } from "lucide-react";
+import { Info, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useSpendWise } from "@/components/spendwise/SpendWiseProvider";
 
 export default function DemoModeBanner() {
   const pathname = usePathname();
   const { ready, isDemoMode } = useSpendWise();
+  const [dismissed, setDismissed] = useState(false);
 
-  if (!ready || !isDemoMode || pathname === "/settings" || pathname === "/about") return null;
+  if (!ready || !isDemoMode || dismissed || pathname === "/settings" || pathname === "/about") return null;
 
   return (
     <div
@@ -24,9 +26,21 @@ export default function DemoModeBanner() {
           sample data. Clear it to start fresh with your own.
         </p>
       </div>
-      <Button asChild size="sm" variant="outline">
-        <Link href="/settings">Go to Settings</Link>
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button asChild size="sm" variant="outline">
+          <Link href="/settings">Go to Settings</Link>
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="size-8"
+          aria-label="Close demo mode banner"
+          onClick={() => setDismissed(true)}
+        >
+          <X className="size-4" />
+        </Button>
+      </div>
     </div>
   );
 }

@@ -17,6 +17,7 @@ type SpendWiseContextValue = {
   data: FinanceData;
   ready: boolean;
   isDemoMode: boolean;
+  dismissedBudgetAlerts: string[];
   storageError: string | null;
   saveTransaction: (transaction: Transaction) => void;
   deleteTransaction: (id: string) => void;
@@ -27,21 +28,36 @@ type SpendWiseContextValue = {
   updateSettings: (settings: Partial<FinanceSettings>) => void;
   loadDemoData: () => void;
   clearFinancialData: () => void;
+  dismissBudgetAlert: (id: string) => void;
+  dismissBudgetAlerts: (ids: string[]) => void;
 };
 
 const SpendWiseContext = createContext<SpendWiseContextValue | null>(null);
 const DEMO_MODE_KEY = `${STORAGE_KEY}-demo-mode`;
+const DISMISSED_BUDGET_ALERTS_KEY = `${STORAGE_KEY}-dismissed-budget-alerts`;
 
 export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<FinanceData>(() => createEmptyData());
   const [ready, setReady] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [dismissedBudgetAlerts, setDismissedBudgetAlerts] = useState<string[]>([]);
   const [storageError, setStorageError] = useState<string | null>(null);
   const [persistAllowed, setPersistAllowed] = useState(false);
 
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
+      const savedDismissedAlerts = window.localStorage.getItem(DISMISSED_BUDGET_ALERTS_KEY);
+      if (savedDismissedAlerts) {
+        const parsedDismissedAlerts: unknown = JSON.parse(savedDismissedAlerts);
+        if (Array.isArray(parsedDismissedAlerts) && parsedDismissedAlerts.every((id) => typeof id === "string")) {
+          setDismissedBudgetAlerts(parsedDismissedAlerts);
+        } else {
+          console.error("Saved dismissed budget alerts have an invalid format.");
+          setStorageError("Saved notification preferences are invalid and could not be restored.");
+        }
+      }
+
       if (saved === null) {
         setData(createDemoData());
         setIsDemoMode(true);
@@ -72,12 +88,13 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       window.localStorage.setItem(DEMO_MODE_KEY, String(isDemoMode));
+      window.localStorage.setItem(DISMISSED_BUDGET_ALERTS_KEY, JSON.stringify(dismissedBudgetAlerts));
       setStorageError(null);
     } catch (error) {
       console.error("Could not save SpendWise data to local storage.", error);
       setStorageError("Changes could not be saved to this browser. Check available storage space.");
     }
-  }, [data, isDemoMode, persistAllowed, ready]);
+  }, [data, dismissedBudgetAlerts, isDemoMode, persistAllowed, ready]);
 
   const update = useCallback((updater: (current: FinanceData) => FinanceData) => {
     setData((current) => updater(current));
@@ -87,6 +104,7 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
     data,
     ready,
     isDemoMode,
+    dismissedBudgetAlerts,
     storageError,
     saveTransaction: (transaction) => update((current) => ({
       ...current,
@@ -122,16 +140,24 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
     loadDemoData: () => {
       setData((current) => createDemoData(current));
       setIsDemoMode(true);
+      setDismissedBudgetAlerts([]);
       setPersistAllowed(true);
       setStorageError(null);
     },
     clearFinancialData: () => {
       setData(createEmptyData());
       setIsDemoMode(false);
+      setDismissedBudgetAlerts([]);
       setPersistAllowed(true);
       setStorageError(null);
     },
-  }), [data, isDemoMode, ready, storageError, update]);
+    dismissBudgetAlert: (id) => setDismissedBudgetAlerts((current) => (
+      current.includes(id) ? current : [...current, id]
+    )),
+    dismissBudgetAlerts: (ids) => setDismissedBudgetAlerts((current) => (
+      [...new Set([...current, ...ids])]
+    )),
+  }), [data, dismissedBudgetAlerts, isDemoMode, ready, storageError, update]);
 
   return <SpendWiseContext.Provider value={value}>{children}</SpendWiseContext.Provider>;
 }
