@@ -25,7 +25,7 @@ A guitar practice toolkit with an in-browser tuner, metronome, Circle of Fifths,
 A personal finance dashboard for tracking income and expenses, managing monthly budgets, and reviewing spending trends. Includes budget alerts, analytics, profile settings, and local browser storage.
 
 - **Stack:** Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, Recharts
-- **Live site:** [spendwise.vercel.app](https://spendwise.vercel.app)
+- **Live site:** [spendwise-beta-steel.vercel.app](https://spendwise-beta-steel.vercel.app/)
 - **Project guide:** [SpendWise README](./SpendWise/README.md)
 
 ## Running a project
