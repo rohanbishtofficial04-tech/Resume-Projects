@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import FretLabShell from "@/components/FretLabShell";
 import Tuner from "@/pages/Tuner";
@@ -13,6 +14,12 @@ import ChordGuess from "@/pages/ChordGuess";
 
 // One <Route> per page in src/pages; BrowserRouter already wraps this in main.tsx.
 export default function App() {
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <ThemeProvider>
       <Routes>
