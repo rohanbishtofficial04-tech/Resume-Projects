@@ -124,6 +124,14 @@
   text-transform: uppercase;
 }
 
+.nf-card-title {
+  display: -webkit-box;
+  min-height: 2.5em;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .nf-hero-title {
   font-weight: 600;
   letter-spacing: -0.065em;

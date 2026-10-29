@@ -15,7 +15,7 @@ export const GameCard = ({ game, priority = false }) => {
       data-testid={TID.gameCard}
       className="group relative border border-[color:var(--nf-border)] bg-[color:var(--nf-surface)] nf-card-hover"
     >
-      <Link to={`/game/${game.slug}`} className="block">
+      <Link to={`/game/${game.slug}`} className="flex h-full flex-col">
         <div className="relative aspect-[3/4] overflow-hidden bg-black">
           {game.background_image ? (
             <img
@@ -50,19 +50,19 @@ export const GameCard = ({ game, priority = false }) => {
           </button>
         </div>
 
-        <div className="p-3 sm:p-4">
+        <div className="flex flex-1 flex-col p-3 sm:p-4">
           <div className="flex items-center justify-between gap-2">
             <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">
               {formatYear(game.released)}
             </p>
             <PlatformBadges platforms={game.parent_platforms} max={4} />
           </div>
-          <h3 className="mt-2 font-display text-base sm:text-xl leading-tight tracking-tight text-[color:var(--nf-text)] group-hover:text-[color:var(--nf-accent-strong)] transition-colors">
+          <h3 className="nf-card-title mt-2 font-display text-base sm:text-xl leading-tight tracking-tight text-[color:var(--nf-text)] group-hover:text-[color:var(--nf-accent-strong)] transition-colors">
             {game.name}
           </h3>
-          <div className="mt-2 flex flex-wrap gap-1.5">
+          <div className="mt-2 flex h-6 flex-wrap content-start gap-x-1.5 overflow-hidden">
             {(game.genres || []).slice(0, 2).map((g) => (
-              <span key={g.id} className="text-[10px] font-brand tracking-[0.18em] text-[color:var(--nf-text-dim)]">
+              <span key={g.id} className="text-[10px] font-brand leading-3 tracking-[0.18em] text-[color:var(--nf-text-dim)]">
                 {g.name}
               </span>
             ))}
