@@ -77,6 +77,17 @@ export function createEmptyData(): FinanceData {
   };
 }
 
+export function withDemoProfileSettings(settings: FinanceSettings): FinanceSettings {
+  return {
+    ...settings,
+    displayName: settings.displayName.trim() || "Alex Morgan",
+    email: settings.email.trim() || "alex.morgan@example.com",
+    phone: settings.phone.trim() || "+91 98765 43210",
+    location: settings.location.trim() || "Bengaluru, India",
+    occupation: settings.occupation.trim() || "Product designer",
+  };
+}
+
 function dateInMonth(monthOffset: number, day: number) {
   const date = new Date();
   date.setDate(1);
@@ -91,6 +102,7 @@ export function createDemoData(baseData: FinanceData = createEmptyData()): Finan
   )];
   return {
     ...baseData,
+    settings: withDemoProfileSettings(baseData.settings),
     categories: demoCategories,
     transactions: [
       { id: "demo-salary-7", name: "Monthly salary", amount: 60000, categoryId: "salary", date: dateInMonth(-6, 1), paymentMethod: "Bank transfer", type: "income" },

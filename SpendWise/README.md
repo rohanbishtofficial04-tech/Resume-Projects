@@ -7,9 +7,11 @@ SpendWise is a personal finance dashboard for tracking income and expenses, mana
 ## Updates
 
 - **First-run demo experience:** New users start with sample transactions and budgets in Indian rupees (INR). The sample history covers the current month and the six preceding months, and sample food spending exceeds its budget to demonstrate the notification bell.
+- **Demo profile:** Sample mode includes example name, email, phone, location, and occupation details in the account menu. Existing profile details are preserved when demo data is loaded.
 - **Refreshable sample data:** Use **Settings → Load demo data** to replace transactions and budgets with the sample dataset. Existing categories, preferences, and profile details are preserved. Confirm before loading.
 - **Dashboard and analytics:** The dashboard includes a seven-month cash-flow chart, category charts, recent transactions, balances, and budget progress. Analytics opens to the current month and six preceding months, with editable date filters.
-- **Profile and greeting:** Add a display name and optional contact details on the separate Profile page. A saved name appears in the homepage greeting and account menu. Profile edits require **Save changes**.
+- **Profile and account menu:** Add a display name and optional contact details on the separate Profile page. The account menu shows each entered detail, keeps the profile icon aligned with the name, and uses the saved name in the homepage greeting. Profile edits require **Save changes**.
+- **Mobile navigation:** Selecting a page from the mobile sidebar closes the navigation drawer.
 - **Budget notifications:** The header bell displays the number of current-month budget alerts. Each alert identifies the category, amount spent, limit, and percentage. Alerts begin at a configurable threshold (default 80%) and distinguish approaching, reached (100%), and exceeded (over 100%) budgets. Notifications are in-app only.
 - **About page:** A project colophon describes SpendWise, its privacy approach, and its technology stack.
 - **Settings and data controls:** Preferences live in Settings, separate from personal profile details. The confirmed **Clear data** action removes financial records and resets financial settings.

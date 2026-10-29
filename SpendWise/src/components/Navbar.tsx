@@ -30,6 +30,12 @@ export default function Navbar() {
   const { data, dismissedBudgetAlerts, dismissBudgetAlert, dismissBudgetAlerts } = useSpendWise();
   const hydrated = useFinanceHydrated();
   const accountName = data.settings.displayName.trim() || "Personal account";
+  const profileDetails = [
+    { label: "Email", value: data.settings.email.trim() },
+    { label: "Phone", value: data.settings.phone.trim() },
+    { label: "Location", value: data.settings.location.trim() },
+    { label: "Occupation", value: data.settings.occupation.trim() },
+  ].filter((detail) => detail.value);
   const allBudgetAlerts = data.budgets.flatMap((budget) => {
     const spent = getBudgetSpent(data.transactions, budget.categoryId);
     const percent = spent / budget.limit * 100;
@@ -120,9 +126,20 @@ export default function Navbar() {
               <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary"><UserRound className="size-5" /></span>
               <div className="min-w-0">
                 <p className="truncate font-semibold">{accountName}</p>
-                <p className="truncate text-sm text-muted-foreground">{data.settings.email || "Personal SpendWise account"}</p>
               </div>
             </div>
+            {profileDetails.length > 0 ? (
+              <dl className="mt-3 space-y-1.5 text-sm">
+                {profileDetails.map((detail) => (
+                  <div key={detail.label} className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2">
+                    <dt className="text-muted-foreground">{detail.label}</dt>
+                    <dd className="break-words">{detail.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <p className="mt-2 text-sm text-muted-foreground">No profile details added</p>
+            )}
             <Button asChild variant="link" className="mt-3 h-auto p-0 text-sm">
               <Link href="/profile" onClick={() => setAccountPopoverOpen(false)}>View profile</Link>
             </Button>

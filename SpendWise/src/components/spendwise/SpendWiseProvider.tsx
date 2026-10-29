@@ -6,6 +6,7 @@ import {
   createDemoData,
   parseFinanceData,
   STORAGE_KEY,
+  withDemoProfileSettings,
   type Budget,
   type Category,
   type FinanceData,
@@ -69,8 +70,11 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
           setStorageError("Saved finance data is invalid. Your saved data has not been overwritten.");
           setPersistAllowed(false);
         } else {
-          setData(financeData);
-          setIsDemoMode(window.localStorage.getItem(DEMO_MODE_KEY) !== "false");
+          const demoMode = window.localStorage.getItem(DEMO_MODE_KEY) !== "false";
+          setData(demoMode
+            ? { ...financeData, settings: withDemoProfileSettings(financeData.settings) }
+            : financeData);
+          setIsDemoMode(demoMode);
           setPersistAllowed(true);
         }
       }
