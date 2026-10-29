@@ -3,7 +3,7 @@
 ## Updates
 
 - Added a Home landing page, an About section, and Games with nine Chord Guess levels and locally saved high scores.
-- Added the **Amethyst** theme alongside Midnight and Studio. Theme selections are saved in the browser.
+- Added the **Amethyst** and **Crimson** themes alongside Midnight and Studio. Theme selections are saved in the browser.
 - Added a custom fretboard favicon.
 - Updated Circle of Fifths chord controls with clear hover and touch feedback; clicking a chord plays it.
 - Matched Chord Library playback to the Circle of Fifths chord sound while keeping guitar voicing diagrams available.
@@ -24,7 +24,7 @@ FretLab is a browser-based guitar practice toolkit built with React and Vite. It
 - **Scale Library** — explores scales on an interactive guitar fretboard.
 - **Chord Library** — searches chord types, saves favorites, plays chord tones, and displays guitar voicings.
 - **Games** — practice ear training with nine Chord Guess level groups, from open chords and power chords to sevenths and mixed sets; best scores are saved per level on the device.
-- **Themes** — choose Midnight, Studio, or Amethyst.
+- **Themes** — choose Midnight, Studio, Amethyst, or Crimson.
 
 ## Requirements
 

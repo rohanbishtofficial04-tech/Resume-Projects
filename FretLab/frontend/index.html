@@ -12,7 +12,7 @@
     <script>
       try {
         const savedTheme = window.localStorage.getItem("fretlab.theme");
-        if (savedTheme === '"studio"' || savedTheme === '"amethyst"') {
+        if (savedTheme === '"studio"' || savedTheme === '"amethyst"' || savedTheme === '"netflix"') {
           document.documentElement.dataset.theme = JSON.parse(savedTheme);
         }
       } catch {

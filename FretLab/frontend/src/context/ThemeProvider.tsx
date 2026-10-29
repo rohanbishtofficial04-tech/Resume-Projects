@@ -2,12 +2,13 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from "react";
 import { STORAGE_KEYS, readJSON, writeJSON } from "@/lib/storage";
 
-export type ThemeId = "midnight" | "studio" | "amethyst";
+export type ThemeId = "midnight" | "studio" | "amethyst" | "netflix";
 
 export const THEMES: { id: ThemeId; name: string; description: string; swatch: string }[] = [
   { id: "midnight", name: "Midnight", description: "Charcoal + amber", swatch: "#F59E0B" },
   { id: "studio", name: "Studio", description: "Dark gray + lime", swatch: "#84CC16" },
   { id: "amethyst", name: "Amethyst", description: "Deep violet + lavender", swatch: "#A78BFA" },
+  { id: "netflix", name: "Crimson", description: "Cinematic black + red", swatch: "#E50914" },
 ];
 
 interface ThemeContextValue {
