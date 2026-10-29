@@ -2,6 +2,8 @@
 
 SpendWise is a personal finance dashboard for tracking income and expenses, managing budgets, and understanding spending over time. It is built with Next.js, React, TypeScript, Tailwind CSS, shadcn/ui components, and Recharts.
 
+**Live site:** [spendwise-beta-steel.vercel.app](https://spendwise-beta-steel.vercel.app/)
+
 ## Updates
 
 - **First-run demo experience:** New users start with sample transactions and budgets in Indian rupees (INR). The sample history covers the current month and the six preceding months, and sample food spending exceeds its budget to demonstrate the notification bell.
