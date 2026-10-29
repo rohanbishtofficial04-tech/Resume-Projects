@@ -14,12 +14,16 @@ import {
 import { GameCarousel } from "@/components/GameCarousel";
 import { RatingBadge } from "@/components/RatingBadge";
 import { PlatformBadges } from "@/components/PlatformBadges";
-import { clampText, stripHtml, formatYear } from "@/utils/format";
+import { formatYear } from "@/utils/format";
 import { ChevronRight, Flame, Play } from "lucide-react";
 
-const Hero = ({ game }) => {
+const Hero = ({ game, error }) => {
   if (!game) {
-    return <div className="relative min-h-[90vh] w-full nf-skeleton" />;
+    return error ? (
+      <div role="status" className="grid min-h-[90vh] w-full place-items-center text-sm text-[color:var(--nf-text-dim)]">
+        {error}
+      </div>
+    ) : <div className="relative min-h-[90vh] w-full nf-skeleton" />;
   }
   return (
     <section
@@ -92,13 +96,15 @@ const Hero = ({ game }) => {
   );
 };
 
-const GenrePlatformStrip = ({ genres, platforms }) => (
+const GenrePlatformStrip = ({ genres, platforms, errors }) => (
   <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-24 grid gap-12 md:grid-cols-2">
     <div data-testid={TID.sectionGenres}>
       <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Popular Genres</p>
       <h3 className="font-display text-3xl mt-1">Choose your descent</h3>
       <div className="mt-6 flex flex-wrap gap-2">
-        {(genres || []).slice(0, 10).map((g) => (
+        {errors.genres ? (
+          <p role="status" className="text-sm text-[color:var(--nf-text-dim)]">{errors.genres}</p>
+        ) : (genres || []).slice(0, 10).map((g) => (
           <Link key={g.id} to={`/browse?genre=${g.slug}`} className="nf-chip">
             {g.name}
           </Link>
@@ -109,7 +115,9 @@ const GenrePlatformStrip = ({ genres, platforms }) => (
       <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Popular Platforms</p>
       <h3 className="font-display text-3xl mt-1">Pick your device</h3>
       <div className="mt-6 flex flex-wrap gap-2">
-        {(platforms || []).slice(0, 10).map((p) => (
+        {errors.platforms ? (
+          <p role="status" className="text-sm text-[color:var(--nf-text-dim)]">{errors.platforms}</p>
+        ) : (platforms || []).slice(0, 10).map((p) => (
           <Link key={p.id} to={`/browse?platform=${p.id}`} className="nf-chip">
             {p.name}
           </Link>
@@ -180,13 +188,14 @@ export default function Home() {
   const [genres, setGenres] = useState([]);
   const [platforms, setPlatforms] = useState([]);
   const [heroGame, setHeroGame] = useState(null);
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const [tr, tp, rc, up, gn, pf, featured] = await Promise.all([
+        const results = await Promise.allSettled([
           getTrending({ page_size: 12 }),
           getTopRated({ page_size: 12 }),
           getRecent({ page_size: 12 }),
@@ -196,13 +205,27 @@ export default function Home() {
           getDetails("outlast-2"),
         ]);
         if (!mounted) return;
-        setTrending(tr?.results || []);
-        setTop(tp?.results || []);
-        setRecent(rc?.results || []);
-        setUpcoming(up?.results || []);
-        setGenres(gn?.results || []);
-        setPlatforms(pf?.results || []);
-        setHeroGame(featured);
+        const setters = [
+          (data) => setTrending(data?.results || []),
+          (data) => setTop(data?.results || []),
+          (data) => setRecent(data?.results || []),
+          (data) => setUpcoming(data?.results || []),
+          (data) => setGenres(data?.results || []),
+          (data) => setPlatforms(data?.results || []),
+          setHeroGame,
+        ];
+        const keys = ["trending", "top", "recent", "upcoming", "genres", "platforms", "hero"];
+        results.forEach((result, index) => {
+          if (result.status === "fulfilled") {
+            setters[index](result.value);
+          } else {
+            console.error(`Unable to load homepage ${keys[index]} data.`, result.reason);
+            setErrors((previous) => ({
+              ...previous,
+              [keys[index]]: "Unable to load this section. Please try again later.",
+            }));
+          }
+        });
       } finally {
         if (mounted) setLoading(false);
       }
@@ -212,16 +235,15 @@ export default function Home() {
     };
   }, []);
 
-  const hero = heroGame || top[0] || trending[0];
-
   return (
     <div data-testid={TID.home}>
-      <Hero game={hero} />
+      <Hero game={heroGame} error={errors.hero} />
       <GameCarousel
         title="Trending in the Dark"
         subtitle="Trending Now"
         games={trending}
         loading={loading}
+        error={errors.trending}
         tid={TID.sectionTrending}
         viewAllTo="/browse?sort=-added"
       />
@@ -230,6 +252,7 @@ export default function Home() {
         subtitle="Top Rated"
         games={top}
         loading={loading}
+        error={errors.top}
         tid={TID.sectionTopRated}
         viewAllTo="/browse?sort=-rating"
       />
@@ -238,6 +261,7 @@ export default function Home() {
         subtitle="Last 12 Months"
         games={recent}
         loading={loading}
+        error={errors.recent}
         tid={TID.sectionRecent}
         viewAllTo="/browse?sort=-released"
       />
@@ -246,10 +270,11 @@ export default function Home() {
         subtitle="Coming Soon"
         games={upcoming}
         loading={loading}
+        error={errors.upcoming}
         tid={TID.sectionUpcoming}
         viewAllTo="/browse?sort=released"
       />
-      <GenrePlatformStrip genres={genres} platforms={platforms} />
+      <GenrePlatformStrip genres={genres} platforms={platforms} errors={errors} />
       <FeaturedCollection games={top} />
     </div>
   );

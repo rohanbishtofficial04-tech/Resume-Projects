@@ -10,25 +10,35 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
+  const [error, setError] = useState("");
   const debounced = useDebounce(q, 350);
 
   useEffect(() => {
     if (!open) {
       setQ("");
       setResults([]);
+      setError("");
     }
   }, [open]);
 
   useEffect(() => {
     if (!debounced.trim()) {
       setResults([]);
+      setError("");
       return;
     }
     let cancel = false;
     setLoading(true);
+    setError("");
     getSearch({ query: debounced, page_size: 30 })
       .then((data) => {
         if (!cancel) setResults(data?.results || []);
+      })
+      .catch((requestError) => {
+        if (cancel) return;
+        console.error("Unable to load search suggestions.", requestError);
+        setResults([]);
+        setError("Unable to load search suggestions. Please try again later.");
       })
       .finally(() => !cancel && setLoading(false));
     return () => {
@@ -81,7 +91,11 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
             </div>
 
             <div data-testid={TID.searchResults} className="mt-6 max-h-[60vh] overflow-y-auto">
-              {results.length === 0 && debounced && !loading ? (
+              {error ? (
+                <div role="status" className="py-16 text-center">
+                  <p className="font-brand text-xs tracking-[0.2em] text-[color:var(--nf-text-dim)]">{error}</p>
+                </div>
+              ) : results.length === 0 && debounced && !loading ? (
                 <div data-testid={TID.searchEmpty} className="py-16 text-center">
                   <p className="font-brand text-xs tracking-[0.2em] text-[color:var(--nf-text-dim)]">
                     No echoes returned. Try another name.

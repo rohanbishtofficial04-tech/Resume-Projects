@@ -33,20 +33,36 @@ export default function Browse() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [filterError, setFilterError] = useState("");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const requestId = useRef(0);
 
   useEffect(() => {
-    Promise.all([getGenres(), getPlatforms()]).then(([g, p]) => {
-      setGenres(g?.results || []);
-      setPlatforms(p?.results || []);
+    let active = true;
+    Promise.allSettled([getGenres(), getPlatforms()]).then(([genresResult, platformsResult]) => {
+      if (!active) return;
+      if (genresResult.status === "fulfilled") setGenres(genresResult.value?.results || []);
+      else {
+        console.error("Unable to load browse genres.", genresResult.reason);
+        setFilterError("Unable to load filters. Please try again later.");
+      }
+      if (platformsResult.status === "fulfilled") setPlatforms(platformsResult.value?.results || []);
+      else {
+        console.error("Unable to load browse platforms.", platformsResult.reason);
+        setFilterError("Unable to load filters. Please try again later.");
+      }
     });
+    return () => {
+      active = false;
+    };
   }, []);
 
   const load = useCallback(
     async (targetPage, replace) => {
       const currentRequest = ++requestId.current;
       setLoading(true);
+      setError("");
       try {
         let nextPage = targetPage;
         let data;
@@ -73,6 +89,14 @@ export default function Browse() {
         setHasMore(Boolean(data?.next));
         setGames((prev) => (replace ? results : [...prev, ...results]));
         setPage(nextPage);
+      } catch (requestError) {
+        if (currentRequest !== requestId.current) return;
+        console.error("Unable to load browse results.", requestError);
+        setError("Unable to load games. Please try again later.");
+        if (replace) {
+          setGames([]);
+          setHasMore(false);
+        }
       } finally {
         if (currentRequest === requestId.current) setLoading(false);
       }
@@ -108,6 +132,9 @@ export default function Browse() {
 
   const FiltersInner = (
     <div className="space-y-8">
+    {filterError && (
+      <p role="status" className="text-sm text-[color:var(--nf-text-dim)]">{filterError}</p>
+    )}
       <div>
         <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)] mb-3">Sort by</p>
         <select
@@ -235,6 +262,7 @@ export default function Browse() {
           <GameGrid
             games={games}
             loading={loading}
+            error={error}
             emptyLabel={
               rating
                 ? "No matching games on this page. Load more to continue searching."

@@ -11,26 +11,34 @@ import { formatYear, stripHtml, clampText } from "@/utils/format";
 export default function Random() {
   const [rolling, setRolling] = useState(false);
   const [game, setGame] = useState(null);
+  const [error, setError] = useState("");
 
   const roll = async () => {
     setRolling(true);
-    // Build a pool by combining trending/top/recent
-    const [t, r, n] = await Promise.all([
-      getTrending({ page_size: 40 }),
-      getTopRated({ page_size: 40 }),
-      getRecent({ page_size: 40 }),
-    ]);
-    const pool = [
-      ...(t?.results || []),
-      ...(r?.results || []),
-      ...(n?.results || []),
-    ];
-    const unique = Array.from(new Map(pool.map((g) => [g.id, g])).values());
-    // Suspenseful delay
-    await new Promise((res) => setTimeout(res, 1400));
-    const picked = unique[Math.floor(Math.random() * unique.length)] || null;
-    setGame(picked);
-    setRolling(false);
+    setError("");
+    try {
+      const [t, r, n] = await Promise.all([
+        getTrending({ page_size: 40 }),
+        getTopRated({ page_size: 40 }),
+        getRecent({ page_size: 40 }),
+      ]);
+      const pool = [
+        ...(t?.results || []),
+        ...(r?.results || []),
+        ...(n?.results || []),
+      ];
+      const unique = Array.from(new Map(pool.map((g) => [g.id, g])).values());
+      await new Promise((res) => setTimeout(res, 1400));
+      const picked = unique[Math.floor(Math.random() * unique.length)] || null;
+      setGame(picked);
+      if (!picked) setError("No games are available right now. Please try again later.");
+    } catch (requestError) {
+      console.error("Unable to load games for the random picker.", requestError);
+      setGame(null);
+      setError("Unable to load games. Please try again later.");
+    } finally {
+      setRolling(false);
+    }
   };
 
   return (
@@ -100,16 +108,19 @@ export default function Random() {
               </div>
             </motion.div>
           ) : (
-            <motion.button
-              key="idle"
-              data-testid={TID.randomRollBtn}
-              onClick={roll}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="relative nf-btn nf-btn-primary text-base px-8 py-4"
-            >
-              <Skull className="h-4 w-4" /> Dare to Play
-            </motion.button>
+            <div className="relative">
+              {error && <p role="status" className="mb-5 text-sm text-[color:var(--nf-text-dim)]">{error}</p>}
+              <motion.button
+                key="idle"
+                data-testid={TID.randomRollBtn}
+                onClick={roll}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="nf-btn nf-btn-primary text-base px-8 py-4"
+              >
+                <Skull className="h-4 w-4" /> Dare to Play
+              </motion.button>
+            </div>
           )}
         </AnimatePresence>
       </div>

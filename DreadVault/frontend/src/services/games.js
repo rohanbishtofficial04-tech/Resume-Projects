@@ -8,12 +8,7 @@ export const isMockMode = () => usingMock;
 
 const safe = async (live, mock) => {
   if (usingMock) return mock();
-  try {
-    return await live();
-  } catch (e) {
-    console.warn("[RAWG] request failed, falling back to mock:", e?.message);
-    return mock();
-  }
+  return live();
 };
 
 export const getTrending = (p) =>

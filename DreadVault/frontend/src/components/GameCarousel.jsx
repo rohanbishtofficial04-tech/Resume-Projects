@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { GameCard } from "./GameCard";
 import { SkeletonCard } from "./SkeletonCard";
 
-export const GameCarousel = ({ title, subtitle, games, loading, tid, viewAllTo }) => {
+export const GameCarousel = ({ title, subtitle, games, loading, error, tid, viewAllTo }) => {
   const scrollerRef = useRef(null);
 
   const scroll = (dir) => {
@@ -48,7 +48,11 @@ export const GameCarousel = ({ title, subtitle, games, loading, tid, viewAllTo }
           </button>
         </div>
       </div>
-      <div
+      {error ? (
+        <p role="status" className="py-8 text-sm text-[color:var(--nf-text-dim)]">
+          {error}
+        </p>
+      ) : <div
         ref={scrollerRef}
         className="flex gap-3 sm:gap-5 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 md:mx-0 md:px-0"
       >
@@ -63,7 +67,7 @@ export const GameCarousel = ({ title, subtitle, games, loading, tid, viewAllTo }
                 <GameCard game={g} />
               </div>
             ))}
-      </div>
+      </div>}
     </section>
   );
 };

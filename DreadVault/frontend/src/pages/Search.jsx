@@ -12,6 +12,7 @@ export default function Search() {
   const [q, setQ] = useState(initial);
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const debounced = useDebounce(q, 350);
   const navigate = useNavigate();
 
@@ -19,13 +20,21 @@ export default function Search() {
     setParams(debounced ? { q: debounced } : {}, { replace: true });
     if (!debounced) {
       setGames([]);
+      setError("");
       return;
     }
     let cancel = false;
     setLoading(true);
+    setError("");
     getSearch({ query: debounced, page_size: 20 })
       .then((data) => {
         if (!cancel) setGames(data?.results || []);
+      })
+      .catch((requestError) => {
+        if (cancel) return;
+        console.error("Unable to load search results.", requestError);
+        setGames([]);
+        setError("Unable to load search results. Please try again later.");
       })
       .finally(() => !cancel && setLoading(false));
     return () => {
@@ -57,6 +66,7 @@ export default function Search() {
         <GameGrid
           games={games}
           loading={loading}
+          error={error}
           emptyLabel={q ? "No echoes returned." : "Type a name to begin."}
         />
       </div>

@@ -77,6 +77,10 @@ export default function GameDetails() {
   const [movies, setMovies] = useState([]);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState("");
+  const [screensError, setScreensError] = useState("");
+  const [moviesError, setMoviesError] = useState("");
+  const [relatedError, setRelatedError] = useState("");
   const [lightbox, setLightbox] = useState(null);
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [collectionOpen, setCollectionOpen] = useState(false);
@@ -90,32 +94,75 @@ export default function GameDetails() {
     setScreens([]);
     setMovies([]);
     setRelated([]);
+    setPageError("");
+    setScreensError("");
+    setMoviesError("");
+    setRelatedError("");
     (async () => {
+      let currentGame;
       try {
-        const [g, s, m] = await Promise.all([
-          getDetails(slug),
-          getScreenshots(slug),
-          getMovies(slug),
-        ]);
-        const r = await getRelated(slug, g);
-        if (!mounted) return;
-        setGame(g);
-        setScreens(s?.results || []);
-        setMovies(m?.results || []);
-        let rel = r?.results || [];
-        if (rel.length < 4 && g?.genres?.length) {
+        currentGame = await getDetails(slug);
+      } catch (requestError) {
+        console.error(`Unable to load details for ${slug}.`, requestError);
+        if (mounted) {
+          setPageError("Unable to load this game. Please try again later.");
+          setLoading(false);
+        }
+        return;
+      }
+
+      if (!mounted) return;
+      if (!currentGame) {
+        setPageError("This game could not be found.");
+        setLoading(false);
+        return;
+      }
+      setGame(currentGame);
+      setLoading(false);
+      if (currentGame) trackRecent(currentGame);
+
+      const results = await Promise.allSettled([
+        getScreenshots(slug),
+        getMovies(slug),
+        getRelated(slug, currentGame),
+      ]);
+      if (!mounted) return;
+
+      if (results[0].status === "fulfilled") {
+        setScreens(results[0].value?.results || []);
+      } else {
+        console.error(`Unable to load screenshots for ${slug}.`, results[0].reason);
+        setScreensError("Unable to load screenshots right now.");
+      }
+
+      if (results[1].status === "fulfilled") {
+        setMovies(results[1].value?.results || []);
+      } else {
+        console.error(`Unable to load the trailer for ${slug}.`, results[1].reason);
+        setMoviesError("Unable to load the trailer right now.");
+      }
+
+      if (results[2].status === "rejected") {
+        console.error(`Unable to load related games for ${slug}.`, results[2].reason);
+        setRelatedError("Unable to load related games right now.");
+        return;
+      }
+
+      let rel = results[2].value?.results || [];
+      if (rel.length < 4 && currentGame?.genres?.length) {
+        try {
           const fallback = await getBrowse({
             page_size: 8,
-            genres: g.genres[0].slug,
+            genres: currentGame.genres[0].slug,
             ordering: "-rating",
           });
-          rel = (fallback?.results || []).filter((x) => x.id !== g.id).slice(0, 8);
+          rel = (fallback?.results || []).filter((item) => item.id !== currentGame.id).slice(0, 8);
+        } catch (requestError) {
+          console.error(`Unable to load additional related games for ${slug}.`, requestError);
+          if (rel.length === 0) setRelatedError("Unable to load related games right now.");
         }
-        setRelated(rel);
-        if (g) trackRecent(g);
-      } finally {
-        if (mounted) setLoading(false);
       }
+      if (mounted) setRelated(rel);
     })();
     return () => {
       mounted = false;
@@ -140,7 +187,7 @@ export default function GameDetails() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lightbox, visibleScreens.length]);
 
-  if (loading || !game) {
+  if (loading) {
     return (
       <div data-testid={TID.detailsPage} className="min-h-screen">
         <div className="h-[70vh] w-full nf-skeleton" />
@@ -149,6 +196,16 @@ export default function GameDetails() {
           <div className="h-4 w-1/3 nf-skeleton" />
           <div className="h-24 w-full nf-skeleton" />
         </div>
+      </div>
+    );
+  }
+
+  if (!game) {
+    return (
+      <div data-testid={TID.detailsPage} className="min-h-screen px-6 pt-20 text-center">
+        <p role="status" className="text-sm text-[color:var(--nf-text-dim)]">
+          {pageError || "Unable to load this game. Please try again later."}
+        </p>
       </div>
     );
   }
@@ -380,18 +437,20 @@ export default function GameDetails() {
             className="mt-6 w-full"
           />
         ) : (
-          <p className="mt-6 border border-[color:var(--nf-border)] p-5 text-sm text-[color:var(--nf-text-dim)]">
-            Not available
+          <p role={moviesError ? "status" : undefined} className="mt-6 border border-[color:var(--nf-border)] p-5 text-sm text-[color:var(--nf-text-dim)]">
+            {moviesError || "Not available"}
           </p>
         )}
       </section>
 
       {/* Screenshots */}
-      {screens.length > 0 && (
+      {(screens.length > 0 || screensError) && (
         <section data-testid={TID.detailsScreenshots} className="max-w-[1440px] mx-auto px-6 md:px-10 mt-20">
           <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Screenshots</p>
           <h2 className="font-display text-3xl md:text-4xl mt-1">Fragments</h2>
-          <div className="mt-6 grid gap-3 grid-cols-2 md:grid-cols-3">
+          {screensError ? (
+            <p role="status" className="mt-6 text-sm text-[color:var(--nf-text-dim)]">{screensError}</p>
+          ) : <div className="mt-6 grid gap-3 grid-cols-2 md:grid-cols-3">
             {visibleScreens.map((s, i) => (
               <button
                 key={s.id}
@@ -408,20 +467,22 @@ export default function GameDetails() {
                 />
               </button>
             ))}
-          </div>
+          </div>}
         </section>
       )}
 
       {/* Related */}
-      {related.length > 0 && (
+      {(related.length > 0 || relatedError) && (
         <section data-testid={TID.detailsRelated} className="max-w-[1440px] mx-auto px-6 md:px-10 mt-20 mb-20">
           <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Related</p>
           <h2 className="font-display text-3xl md:text-4xl mt-1">Kindred Nightmares</h2>
-          <div className="mt-6 grid grid-cols-1 min-[360px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          {relatedError ? (
+            <p role="status" className="mt-6 text-sm text-[color:var(--nf-text-dim)]">{relatedError}</p>
+          ) : <div className="mt-6 grid grid-cols-1 min-[360px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {related.slice(0, 8).map((g, i) => (
               <GameCard key={g.id} game={g} index={i} />
             ))}
-          </div>
+          </div>}
         </section>
       )}
 

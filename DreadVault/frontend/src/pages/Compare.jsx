@@ -13,35 +13,50 @@ const useOptions = () => {
   const [q, setQ] = useState("");
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const debounced = useDebounce(q, 300);
   useEffect(() => {
     let cancel = false;
     (async () => {
+      setLoading(true);
+      setError("");
       if (!debounced.trim()) {
-        setLoading(true);
-        const data = await getBrowse({ page_size: 12, ordering: "-added" });
-        if (!cancel) {
-          setOptions(data?.results || []);
-          setLoading(false);
+        try {
+          const data = await getBrowse({ page_size: 12, ordering: "-added" });
+          if (!cancel) setOptions(data?.results || []);
+        } catch (requestError) {
+          if (!cancel) {
+            console.error("Unable to load games for comparison.", requestError);
+            setOptions([]);
+            setError("Unable to load games. Please try again later.");
+          }
+        } finally {
+          if (!cancel) setLoading(false);
         }
         return;
       }
-      setLoading(true);
-      const data = await getSearch({ query: debounced, page_size: 10 });
-      if (!cancel) {
-        setOptions(data?.results || []);
-        setLoading(false);
+      try {
+        const data = await getSearch({ query: debounced, page_size: 10 });
+        if (!cancel) setOptions(data?.results || []);
+      } catch (requestError) {
+        if (!cancel) {
+          console.error("Unable to search games for comparison.", requestError);
+          setOptions([]);
+          setError("Unable to search games. Please try again later.");
+        }
+      } finally {
+        if (!cancel) setLoading(false);
       }
     })();
     return () => {
       cancel = true;
     };
   }, [debounced]);
-  return { q, setQ, options, loading };
+  return { q, setQ, options, loading, error };
 };
 
-const Picker = ({ slot, selected, onPick, onClear, testId }) => {
-  const { q, setQ, options, loading } = useOptions();
+const Picker = ({ slot, selected, onPick, onClear, testId, detailError }) => {
+  const { q, setQ, options, loading, error } = useOptions();
   if (selected) {
     return (
       <div className="border border-[color:var(--nf-border)] bg-[color:var(--nf-surface)]">
@@ -77,7 +92,11 @@ const Picker = ({ slot, selected, onPick, onClear, testId }) => {
       </div>
       <ul className="mt-3 max-h-64 overflow-y-auto divide-y divide-white/5">
         {loading && <li className="py-3 text-xs text-[color:var(--nf-text-dim)]">Searching…</li>}
-        {!loading &&
+        {!loading && error && <li role="status" className="py-3 text-xs text-[color:var(--nf-text-dim)]">{error}</li>}
+        {!loading && !error && options.length === 0 && (
+          <li className="py-3 text-xs text-[color:var(--nf-text-dim)]">No games found.</li>
+        )}
+        {!loading && !error &&
           options.map((g) => (
             <li key={g.id}>
               <button
@@ -97,6 +116,7 @@ const Picker = ({ slot, selected, onPick, onClear, testId }) => {
             </li>
           ))}
       </ul>
+      {detailError && <p role="status" className="mt-2 text-xs text-[color:var(--nf-text-dim)]">{detailError}</p>}
     </div>
   );
 };
@@ -120,11 +140,21 @@ const names = (items) => items?.map((item) => item.name).filter(Boolean).join(",
 export default function Compare() {
   const [a, setA] = useState(null);
   const [b, setB] = useState(null);
+  const [detailErrors, setDetailErrors] = useState({});
 
   const selectGame = async (slot, game) => {
-    const details = await getDetails(game.slug);
-    const selected = { ...game, ...details };
-    (slot === "A" ? setA : setB)(selected);
+    setDetailErrors((previous) => ({ ...previous, [slot]: "" }));
+    try {
+      const details = await getDetails(game.slug);
+      const selected = { ...game, ...details };
+      (slot === "A" ? setA : setB)(selected);
+    } catch (requestError) {
+      console.error(`Unable to load comparison details for slot ${slot}.`, requestError);
+      setDetailErrors((previous) => ({
+        ...previous,
+        [slot]: "Unable to load this game's details. Please try again.",
+      }));
+    }
   };
 
   return (
@@ -138,8 +168,8 @@ export default function Compare() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Picker slot={SLOTS[0]} selected={a} onPick={(game) => selectGame(SLOTS[0], game)} onClear={() => setA(null)} testId={TID.compareSelectA} />
-        <Picker slot={SLOTS[1]} selected={b} onPick={(game) => selectGame(SLOTS[1], game)} onClear={() => setB(null)} testId={TID.compareSelectB} />
+        <Picker slot={SLOTS[0]} selected={a} onPick={(game) => selectGame(SLOTS[0], game)} onClear={() => setA(null)} testId={TID.compareSelectA} detailError={detailErrors.A} />
+        <Picker slot={SLOTS[1]} selected={b} onPick={(game) => selectGame(SLOTS[1], game)} onClear={() => setB(null)} testId={TID.compareSelectB} detailError={detailErrors.B} />
       </div>
 
       {(a || b) && (
