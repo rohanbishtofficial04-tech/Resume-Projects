@@ -66,7 +66,7 @@ export default function ProfilePage() {
         <p className="mt-1 text-sm text-muted-foreground">All fields are optional. Save your changes when you’re ready.</p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <label className="block space-y-1.5 text-sm font-medium">Display name
-            <Input aria-label="Profile display name" maxLength={60} placeholder="e.g. Rohan" value={draft.displayName} onChange={(event) => setDraft({ ...draft, displayName: event.target.value })} />
+            <Input aria-label="Profile display name" maxLength={60} placeholder="John Doe" value={draft.displayName} onChange={(event) => setDraft({ ...draft, displayName: event.target.value })} />
           </label>
           <label className="block space-y-1.5 text-sm font-medium">Email address
             <Input aria-label="Profile email address" type="email" maxLength={254} placeholder="you@example.com" value={draft.email} onChange={(event) => setDraft({ ...draft, email: event.target.value })} />
