@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SpendWiseProvider } from "@/components/spendwise/SpendWiseProvider";
 import StorageNotice from "@/components/spendwise/StorageNotice";
+import DemoModeBanner from "@/components/spendwise/DemoModeBanner";
 import { cookies } from "next/headers";
 
 const geistSans = Geist({
@@ -49,6 +50,7 @@ export default async function RootLayout({
               <AppSidebar />
               <main className="min-w-0 flex-1">
                 <Navbar />
+                <DemoModeBanner />
                 <StorageNotice />
                 <div className="px-4 pt-6 sm:px-7">{children}</div>
               </main>

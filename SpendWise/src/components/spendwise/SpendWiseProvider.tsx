@@ -16,6 +16,7 @@ import {
 type SpendWiseContextValue = {
   data: FinanceData;
   ready: boolean;
+  isDemoMode: boolean;
   storageError: string | null;
   saveTransaction: (transaction: Transaction) => void;
   deleteTransaction: (id: string) => void;
@@ -29,10 +30,12 @@ type SpendWiseContextValue = {
 };
 
 const SpendWiseContext = createContext<SpendWiseContextValue | null>(null);
+const DEMO_MODE_KEY = `${STORAGE_KEY}-demo-mode`;
 
 export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<FinanceData>(() => createEmptyData());
   const [ready, setReady] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
   const [persistAllowed, setPersistAllowed] = useState(false);
 
@@ -41,6 +44,7 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
       const saved = window.localStorage.getItem(STORAGE_KEY);
       if (saved === null) {
         setData(createDemoData());
+        setIsDemoMode(true);
         setPersistAllowed(true);
       } else {
         const parsed: unknown = JSON.parse(saved);
@@ -50,6 +54,7 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
           setPersistAllowed(false);
         } else {
           setData(financeData);
+          setIsDemoMode(window.localStorage.getItem(DEMO_MODE_KEY) !== "false");
           setPersistAllowed(true);
         }
       }
@@ -66,12 +71,13 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
     if (!ready || !persistAllowed) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      window.localStorage.setItem(DEMO_MODE_KEY, String(isDemoMode));
       setStorageError(null);
     } catch (error) {
       console.error("Could not save SpendWise data to local storage.", error);
       setStorageError("Changes could not be saved to this browser. Check available storage space.");
     }
-  }, [data, persistAllowed, ready]);
+  }, [data, isDemoMode, persistAllowed, ready]);
 
   const update = useCallback((updater: (current: FinanceData) => FinanceData) => {
     setData((current) => updater(current));
@@ -80,6 +86,7 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<SpendWiseContextValue>(() => ({
     data,
     ready,
+    isDemoMode,
     storageError,
     saveTransaction: (transaction) => update((current) => ({
       ...current,
@@ -114,15 +121,17 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
     })),
     loadDemoData: () => {
       setData((current) => createDemoData(current));
+      setIsDemoMode(true);
       setPersistAllowed(true);
       setStorageError(null);
     },
     clearFinancialData: () => {
       setData(createEmptyData());
+      setIsDemoMode(false);
       setPersistAllowed(true);
       setStorageError(null);
     },
-  }), [data, ready, storageError, update]);
+  }), [data, isDemoMode, ready, storageError, update]);
 
   return <SpendWiseContext.Provider value={value}>{children}</SpendWiseContext.Provider>;
 }
