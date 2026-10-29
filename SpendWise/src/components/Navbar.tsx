@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Bell, Moon, Sun, UserRound } from "lucide-react";
@@ -24,6 +25,7 @@ const titles: Record<string, string> = {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [accountPopoverOpen, setAccountPopoverOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const { data } = useSpendWise();
   const hydrated = useFinanceHydrated();
@@ -73,7 +75,12 @@ export default function Navbar() {
       <Button variant="ghost" size="icon" aria-label="Toggle theme" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
         <Sun className="size-4 dark:hidden" /><Moon className="hidden size-4 dark:block" />
       </Button>
-      <Popover>
+      <Popover
+        open={pathname !== "/profile" && accountPopoverOpen}
+        onOpenChange={(open) => {
+          if (pathname !== "/profile") setAccountPopoverOpen(open);
+        }}
+      >
         <PopoverTrigger asChild>
           <Button variant="ghost" size="icon" aria-label={`Open profile details for ${accountName}`} className="rounded-full">
             <span className="grid size-8 place-items-center rounded-full bg-primary/10 text-primary"><UserRound className="size-4" /></span>
@@ -89,7 +96,7 @@ export default function Navbar() {
               </div>
             </div>
             <Button asChild variant="link" className="mt-3 h-auto p-0 text-sm">
-              <Link href="/profile">View profile</Link>
+              <Link href="/profile" onClick={() => setAccountPopoverOpen(false)}>View profile</Link>
             </Button>
           </>}
         </PopoverContent>
