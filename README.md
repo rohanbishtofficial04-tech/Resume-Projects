@@ -20,9 +20,18 @@ A guitar practice toolkit with an in-browser tuner, metronome, Circle of Fifths,
 - **Live site:** [fretlab.vercel.app](https://fretlab.vercel.app)
 - **Project guide:** [FretLab README](./FretLab/README.md)
 
+### [SpendWise](./SpendWise/)
+
+A personal finance dashboard for tracking income and expenses, managing monthly budgets, and reviewing spending trends. Includes budget alerts, analytics, profile settings, and local browser storage.
+
+- **Stack:** Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, Recharts
+- **Live site:** [spendwise.vercel.app](https://spendwise.vercel.app)
+- **Project guide:** [SpendWise README](./SpendWise/README.md)
+
 ## Running a project
 
 Each project manages its own dependencies and run scripts. Follow the setup instructions in its README:
 
 - [Set up DreadVault](./DreadVault/README.md#getting-started)
 - [Set up FretLab](./FretLab/README.md#getting-started)
+- [Set up SpendWise](./SpendWise/README.md#getting-started)
