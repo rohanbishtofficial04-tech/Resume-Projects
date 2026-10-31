@@ -1,5 +1,4 @@
 #!/bin/sh
-# Rewrites the "@/lib/music" alias so Node can run the files directly (type-stripping).
 set -e
 T=$(mktemp -d)
 sed 's#@/lib/music#./music.ts#' src/lib/chords.ts > "$T/chords.ts"

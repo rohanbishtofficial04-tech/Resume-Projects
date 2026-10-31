@@ -1,6 +1,4 @@
-// Central registry of data-testid values used across DreadVault.
 export const TID = {
-  // Nav
   navRoot: "navbar-root",
   navHome: "nav-link-home",
   navBrowse: "nav-link-browse",
@@ -13,7 +11,6 @@ export const TID = {
   navMobileToggle: "nav-mobile-toggle",
   themeToggle: "theme-toggle-button",
 
-  // Search modal
   searchOverlay: "search-overlay",
   searchInput: "search-input",
   searchClose: "search-close",
@@ -21,7 +18,6 @@ export const TID = {
   searchSuggestion: "search-suggestion",
   searchEmpty: "search-empty",
 
-  // Home
   home: "home-page",
   heroBanner: "hero-banner",
   heroCta: "hero-cta-details",
@@ -33,7 +29,6 @@ export const TID = {
   sectionPlatforms: "section-platforms",
   sectionFeatured: "section-featured",
 
-  // Browse
   browsePage: "browse-page",
   filterPanel: "filter-panel",
   filterGenre: "filter-genre",
@@ -44,12 +39,10 @@ export const TID = {
   filterClear: "filter-clear",
   loadMore: "load-more-btn",
 
-  // Game card / grid
   gameCard: "game-card",
   gameGrid: "game-grid",
   favoriteBtn: "favorite-btn",
 
-  // Details
   detailsPage: "game-details-page",
   detailsShare: "details-share",
   detailsFavorite: "details-favorite",
@@ -58,7 +51,6 @@ export const TID = {
   detailsScreenshots: "details-screenshots",
   detailsRelated: "details-related",
 
-  // Favorites, Collections, Recently viewed, Compare, Random
   favoritesPage: "favorites-page",
   favoritesEmpty: "favorites-empty",
   collectionsPage: "collections-page",
@@ -71,7 +63,6 @@ export const TID = {
   randomRollBtn: "random-roll-btn",
   randomResult: "random-result",
 
-  // Other
   aboutPage: "about-page",
   notFoundPage: "not-found-page",
   scrollTop: "scroll-top-btn",

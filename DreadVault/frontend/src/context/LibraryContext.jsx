@@ -1,5 +1,3 @@
-// One provider that owns everything persisted to localStorage:
-// favorites, recently viewed, and user-made collections.
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 
 const LibraryContext = createContext(null);
@@ -19,7 +17,6 @@ const readJSON = (k, fallback) => {
   }
 };
 
-// Slim a game down to only what we need to render cards & lists.
 export const compactGame = (g) => ({
   id: g.id,
   slug: g.slug,

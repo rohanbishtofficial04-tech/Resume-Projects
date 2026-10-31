@@ -40,8 +40,7 @@ export default function Search() {
     return () => {
       cancel = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debounced]);
+  }, [debounced, setParams]);
 
   return (
     <div className="max-w-[1440px] mx-auto px-6 md:px-10 pt-14 pb-24">

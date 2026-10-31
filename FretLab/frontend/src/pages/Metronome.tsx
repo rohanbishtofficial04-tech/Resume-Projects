@@ -70,7 +70,6 @@ export default function Metronome() {
     [setPrefs],
   );
 
-  // Engine lives for the life of the page and closes its AudioContext on unmount.
   useEffect(() => {
     const engine = new MetronomeEngine();
     engineRef.current = engine;
@@ -103,7 +102,6 @@ export default function Metronome() {
     }
   }, []);
 
-  // Visual beat tracking: drain events whose scheduled audio time has arrived.
   useEffect(() => {
     if (!playing) {
       if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);

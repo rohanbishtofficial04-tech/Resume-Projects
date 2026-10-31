@@ -167,8 +167,7 @@ export default function GameDetails() {
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug]);
+  }, [slug, trackRecent]);
 
   useEffect(() => {
     if (lightbox === null) return undefined;
@@ -241,7 +240,6 @@ export default function GameDetails() {
         toast("Link copied to clipboard");
       }
     } catch {
-      /* dismissed */
     }
   };
 
@@ -276,7 +274,6 @@ export default function GameDetails() {
 
   return (
     <div data-testid={TID.detailsPage}>
-      {/* Hero */}
       <section className="relative flex min-h-[75vh] flex-col overflow-hidden">
         <img
           src={game.background_image}
@@ -362,7 +359,6 @@ export default function GameDetails() {
         </div>
       </section>
 
-      {/* Body */}
       <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-16 grid gap-12 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">About</p>
@@ -426,7 +422,6 @@ export default function GameDetails() {
         </aside>
       </section>
 
-      {/* Trailer */}
       <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-20">
         <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Game Trailer</p>
         <h2 className="font-display text-3xl md:text-4xl mt-1">{game.name}</h2>
@@ -443,7 +438,6 @@ export default function GameDetails() {
         )}
       </section>
 
-      {/* Screenshots */}
       {(screens.length > 0 || screensError) && (
         <section data-testid={TID.detailsScreenshots} className="max-w-[1440px] mx-auto px-6 md:px-10 mt-20">
           <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Screenshots</p>
@@ -471,7 +465,6 @@ export default function GameDetails() {
         </section>
       )}
 
-      {/* Related */}
       {(related.length > 0 || relatedError) && (
         <section data-testid={TID.detailsRelated} className="max-w-[1440px] mx-auto px-6 md:px-10 mt-20 mb-20">
           <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Related</p>
@@ -562,7 +555,6 @@ export default function GameDetails() {
         )}
       </AnimatePresence>
 
-      {/* Lightbox */}
       {lightbox !== null && visibleScreens[lightbox] && (
         <div
           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl grid place-items-center p-6"
@@ -609,7 +601,6 @@ export default function GameDetails() {
         </div>
       )}
 
-      {/* Trailer */}
       {trailerOpen && trailer && (
         <div
           className="fixed inset-0 z-50 bg-black/95 grid place-items-center p-6"

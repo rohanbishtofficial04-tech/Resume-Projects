@@ -20,10 +20,6 @@ function audioContextCtor(): AudioContextCtor {
   return Ctor;
 }
 
-/**
- * Owns the microphone stream, the analyser, and the detection loop.
- * `stop()` releases every audio resource it created.
- */
 export class TunerEngine {
   private context: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
@@ -32,7 +28,6 @@ export class TunerEngine {
   private frame: number | null = null;
   private active = false;
 
-  /** Called with a detected frequency in Hz, or -1 when nothing is heard. */
   onFrequency: ((frequency: number) => void) | null = null;
 
   get listening(): boolean {

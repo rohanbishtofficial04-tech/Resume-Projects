@@ -1,5 +1,3 @@
-/** Shared Web Audio tone sources: reference pitches, chord strums, metronome clicks. */
-
 let sharedContext: AudioContext | null = null;
 
 type AudioContextCtor = new () => AudioContext;
@@ -14,7 +12,6 @@ function audioContextCtor(): AudioContextCtor {
   return Ctor;
 }
 
-/** Lazily created, shared for the session — always called from a user gesture. */
 export function getAudioContext(): AudioContext {
   const context = sharedContext ?? new (audioContextCtor())();
   sharedContext = context;
@@ -59,12 +56,10 @@ function releaseVoices(voices: ActiveVoice[], at: number): void {
       gain.gain.setTargetAtTime(0.0001, at, 0.02);
       osc.stop(at + 0.12);
     } catch {
-      /* already stopped */
     }
   });
 }
 
-/** Fades out anything still ringing (used before a new preview / on unmount). */
 export function stopAllTones(): void {
   if (!sharedContext) return;
   const at = sharedContext.currentTime;
@@ -72,7 +67,6 @@ export function stopAllTones(): void {
   activeVoices = [];
 }
 
-/** Plucked-string reference pitch with upper harmonics that decay quickly. */
 export function playReferenceTone(frequency: number, duration = 2): void {
   const context = getAudioContext();
   const startTime = context.currentTime + 0.02;
@@ -101,7 +95,6 @@ export function playReferenceTone(frequency: number, duration = 2): void {
   });
 }
 
-/** Staggered strum of a set of frequencies (chord preview). */
 export function playStrum(frequencies: number[], strumGap = 0.045): void {
   if (frequencies.length === 0) return;
   const context = getAudioContext();
@@ -112,7 +105,6 @@ export function playStrum(frequencies: number[], strumGap = 0.045): void {
   });
 }
 
-/** Plays notes in order and returns the scheduled sequence duration in milliseconds. */
 export function playNoteSequence(frequencies: number[], noteDuration = 0.32, noteGap = 0.38): number {
   if (frequencies.length === 0) return 0;
   const context = getAudioContext();

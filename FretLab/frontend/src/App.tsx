@@ -12,7 +12,6 @@ import Home from "@/pages/Home";
 import Games from "@/pages/Games";
 import ChordGuess from "@/pages/ChordGuess";
 
-// One <Route> per page in src/pages; BrowserRouter already wraps this in main.tsx.
 export default function App() {
   const { pathname } = useLocation();
 

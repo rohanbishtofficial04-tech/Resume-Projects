@@ -10,13 +10,11 @@ const client = axios.create({
   timeout: 15000,
 });
 
-// Attach key to every request
 client.interceptors.request.use((config) => {
   config.params = { ...(config.params || {}), key: KEY };
   return config;
 });
 
-// RAWG exposes horror as a tag, not as a genre.
 const HORROR_TAG = "horror";
 
 const withHorror = (params = {}) => ({
@@ -24,9 +22,6 @@ const withHorror = (params = {}) => ({
   ...params,
 });
 
-// ------------------------------------------------------------------
-// Games
-// ------------------------------------------------------------------
 export const fetchTrending = ({ page = 1, page_size = 12 } = {}) =>
   client
     .get("/games", { params: withHorror({ ordering: "-added", page, page_size }) })
@@ -112,14 +107,8 @@ export const fetchRelated = (slug) =>
 export const fetchStores = (slug) =>
   client.get(`/games/${slug}/stores`).then((r) => r.data);
 
-// ------------------------------------------------------------------
-// Meta
-// ------------------------------------------------------------------
 export const fetchGenres = () => client.get("/genres").then((r) => r.data);
 export const fetchPlatforms = () =>
   client.get("/platforms").then((r) => r.data);
 
-// ------------------------------------------------------------------
-// Mock fallback (used when no API key present)
-// ------------------------------------------------------------------
 export { default as MOCK } from "./mockData";

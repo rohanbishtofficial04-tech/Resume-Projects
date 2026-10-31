@@ -1,5 +1,3 @@
-// Wrapper that switches between live RAWG API and mock data
-// depending on whether an API key is configured.
 import * as rawg from "./rawgApi";
 import MOCK from "./mockData";
 

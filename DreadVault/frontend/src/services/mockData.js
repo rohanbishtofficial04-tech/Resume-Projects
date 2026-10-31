@@ -1,6 +1,3 @@
-// Fallback data used when REACT_APP_RAWG_API_KEY is missing.
-// Lets the entire UI/UX be explored offline.
-
 const IMG = {
   fog: "https://images.pexels.com/photos/16166873/pexels-photo-16166873.jpeg",
   forest: "https://images.pexels.com/photos/29287033/pexels-photo-29287033.jpeg",

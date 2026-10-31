@@ -1,9 +1,9 @@
 
 import { freqFromMidi, NOTE_NAMES } from "@/lib/music";
 
-const STRING_OPEN_MIDI = [40, 45, 50, 55, 59, 64]; // low E → high e
+const STRING_OPEN_MIDI = [40, 45, 50, 55, 59, 64];
 const MAX_FRET = 15;
-const WINDOW = 3; // playable span in frets
+const WINDOW = 3;
 const MAX_VOICINGS = 3;
 
 export type ChordCategory = "major" | "minor" | "sevenths" | "suspended" | "diminished" | "extended";
@@ -48,7 +48,6 @@ export const CHORD_CATEGORIES: { id: ChordCategory | "all"; label: string }[] = 
   { id: "extended", label: "Extended" },
 ];
 
-/** A run of adjacent strings pressed by one finger (a real barre segment). */
 export interface VoicingBarre {
   fret: number;
   fromString: number;
@@ -56,11 +55,8 @@ export interface VoicingBarre {
 }
 
 export interface ChordVoicing {
-  /** 6 entries low E → high e; -1 = muted, 0 = open. */
   frets: number[];
-  /** 0 = open, -1 = muted, 1-4 = finger (1 = index). */
   fingers: number[];
-  /** Fret drawn at the top of the diagram (1 means the nut is shown). */
   startFret: number;
   barre: VoicingBarre | null;
   barres: VoicingBarre[];
@@ -98,11 +94,6 @@ interface Candidate {
   score: number;
 }
 
-/**
- * Playability score. Rewards a root in the bass, more sounding strings, a low
- * position, and distinct chord tones (so a voicing does not collapse into the
- * same note repeated across every string).
- */
 function scoreVoicing(frets: number[], rootPc: number, startFret: number): number {
   const sounding = soundingStrings(frets);
   if (sounding.length < 4) return Number.NEGATIVE_INFINITY;
@@ -131,7 +122,7 @@ function collectVoicings(rootPc: number, intervals: number[], startFret: number)
     for (let fret = Math.max(1, startFret); fret <= Math.min(MAX_FRET, startFret + WINDOW); fret += 1) {
       if (tones.has(stringPitchClass(s, fret))) frets.push(fret);
     }
-    frets.push(-1); // muting is always an option
+    frets.push(-1);
     options.push(frets);
   }
 
@@ -141,7 +132,7 @@ function collectVoicings(rootPc: number, intervals: number[], startFret: number)
   let highest = Number.NEGATIVE_INFINITY;
 
   const walk = (s: number): void => {
-    if (highest - lowest > WINDOW) return; // prune unplayable spans early
+    if (highest - lowest > WINDOW) return;
     if (s === 6) {
       const score = scoreVoicing(current, rootPc, startFret);
       if (score > Number.NEGATIVE_INFINITY) results.push({ frets: [...current], score });
@@ -179,8 +170,6 @@ function describeVoicing(frets: number[]): ChordVoicing {
     return fingerByFret.get(fret) ?? 1;
   });
 
-  // A barre is only ever a run of *adjacent* strings held at the lowest fret —
-  // adjacent means the finger really covers them (no open string in between).
   const barres: VoicingBarre[] = [];
   if (distinct.length > 0) {
     const lowestFret = distinct[0];
@@ -261,7 +250,6 @@ export function getChordLibrary(): Chord[] {
   return chords;
 }
 
-/** Sounding frequencies of a voicing, low string → high string. */
 export function voicingFrequencies(frets: number[]): number[] {
   const frequencies: number[] = [];
   frets.forEach((fret, s) => {
@@ -272,7 +260,6 @@ export function voicingFrequencies(frets: number[]): number[] {
   return frequencies;
 }
 
-/** Chord tones voiced from the same octave as the Circle of Fifths previews. */
 export function chordToneFrequencies(chord: Pick<Chord, "rootPc" | "qualityId">): number[] {
   const quality = CHORD_QUALITIES.find(({ id }) => id === chord.qualityId);
   const intervals = quality?.intervals ?? (chord.qualityId === "power" ? [0, 7] : null);

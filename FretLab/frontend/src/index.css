@@ -59,7 +59,6 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* ---------- Midnight (default): charcoal obsidian + studio amber ---------- */
 :root {
     --radius: 0.75rem;
 
@@ -105,7 +104,6 @@
     --sidebar-ring: #F59E0B;
 }
 
-/* ---------- Studio: anodized gray + electric lime ---------- */
 :root[data-theme="studio"] {
     --background: #0C1114;
     --foreground: #F1F5F9;
@@ -146,7 +144,6 @@
     --sidebar-ring: #84CC16;
 }
 
-/* ---------- Amethyst: deep violet + soft lavender ---------- */
 :root[data-theme="amethyst"] {
     --background: #100D1A;
     --foreground: #F5F3FF;
@@ -190,7 +187,6 @@
     --sidebar-ring: #A78BFA;
 }
 
-/* ---------- Netflix: cinematic black + signature red ---------- */
 :root[data-theme="netflix"] {
     --background: #090909;
     --foreground: #F5F5F1;
@@ -277,7 +273,6 @@
 .fl-glow { animation: fl-glow-pulse 1.4s ease-in-out infinite; }
 .fl-ring { animation: fl-string-ring 320ms ease-out both; }
 
-/* tactile fretboard motif used behind hero panels */
 .fl-fret-motif {
   background-image:
     repeating-linear-gradient(90deg, color-mix(in oklab, var(--string-line) 60%, transparent) 0 1px, transparent 1px 34px),

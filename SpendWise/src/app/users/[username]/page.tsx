@@ -39,11 +39,8 @@ const SingleUserPage = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      {/* CONTAINER */}
       <div className="mt-4 flex flex-col xl:flex-row gap-8">
-        {/* LEFT */}
         <div className="w-full xl:w-1/3 space-y-6">
-          {/* USER BADGES CONTAINER */}
           <div className="bg-primary-foreground p-4 rounded-lg">
             <h1 className="text-xl font-semibold">User Badges</h1>
             <div className="flex gap-4 mt-4">
@@ -106,7 +103,6 @@ const SingleUserPage = () => {
               </HoverCard>
             </div>
           </div>
-          {/* INFORMATION CONTAINER */}
           <div className="bg-primary-foreground p-4 rounded-lg">
             <div className="flex items-center justify-between">
               <h1 className="text-xl font-semibold">User Information</h1>
@@ -149,14 +145,11 @@ const SingleUserPage = () => {
               Joined on 2025.01.01
             </p>
           </div>
-          {/* CARD LIST CONTAINER */}
           <div className="bg-primary-foreground p-4 rounded-lg">
             <CardList title="Recent Transactions" />
           </div>
         </div>
-        {/* RIGHT */}
         <div className="w-full xl:w-2/3 space-y-6">
-          {/* USER CARD CONTAINER */}
           <div className="bg-primary-foreground p-4 rounded-lg space-y-2">
             <div className="flex items-center gap-2">
               <Avatar className="size-12">
@@ -173,7 +166,6 @@ const SingleUserPage = () => {
               in, quis quia.
             </p>
           </div>
-          {/* CHART CONTAINER */}
           <div className="bg-primary-foreground p-4 rounded-lg">
             <h1 className="text-xl font-semibold">User Activity</h1>
             <AppLineChart />

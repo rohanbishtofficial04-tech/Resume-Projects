@@ -34,10 +34,8 @@ const TodoList = () => {
           />
         </PopoverContent>
       </Popover>
-      {/* LIST */}
       <ScrollArea className="max-h-[400px] mt-4 overflow-y-auto">
         <div className="flex flex-col gap-4">
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" checked />
@@ -46,7 +44,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" checked />
@@ -55,7 +52,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" />
@@ -64,7 +60,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" />
@@ -73,7 +68,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" />
@@ -82,7 +76,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" />
@@ -91,7 +84,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" />
@@ -100,7 +92,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" />
@@ -109,7 +100,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" checked />
@@ -118,7 +108,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" checked />
@@ -127,7 +116,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" checked />
@@ -136,7 +124,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" checked />
@@ -145,7 +132,6 @@ const TodoList = () => {
               </label>
             </div>
           </Card>
-          {/* LIST ITEM */}
           <Card className="p-4">
             <div className="flex items-center gap-4">
               <Checkbox id="item1" checked />

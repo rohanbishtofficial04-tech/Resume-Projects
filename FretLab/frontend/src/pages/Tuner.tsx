@@ -53,7 +53,7 @@ export default function Tuner() {
 
   const handleFrequency = useCallback((frequency: number) => {
     const now = performance.now();
-    if (now - lastPaintRef.current < 70) return; // throttle readout repaints
+    if (now - lastPaintRef.current < 70) return;
     lastPaintRef.current = now;
 
     if (frequency <= 0) {

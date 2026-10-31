@@ -1,4 +1,3 @@
-/** LocalStorage helpers — FretLab is frontend-only for now, so every preference lives here. */
 
 export const STORAGE_KEYS = {
   theme: "fretlab.theme",
@@ -22,6 +21,5 @@ export function writeJSON(key: string, value: unknown): void {
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    /* storage unavailable (private mode / quota) — preferences simply do not persist */
   }
 }

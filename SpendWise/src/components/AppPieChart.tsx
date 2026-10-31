@@ -45,7 +45,6 @@ const chartData = [
 
 const AppPieChart = () => {
 
-  // If you don't use React compiler use useMemo hook to improve performance
   const totalVisitors = chartData.reduce((acc, curr) => acc + curr.visitors, 0);
   
   return (

@@ -20,7 +20,6 @@ export interface VoicingDiagramData {
 interface FretboardDiagramProps extends VoicingDiagramData {
   title: string;
   className?: string;
-  /** 0 = highest string index drawn on the left (standard diagram orientation). */
   testId?: string;
 }
 
@@ -61,7 +60,6 @@ export default function FretboardDiagram({
       data-testid={testId}
       className={cn("h-auto w-full", className)}
     >
-      {/* inlay markers */}
       {inlayMarkers.map(({ fret, dots }) =>
         dots.map((offset, i) => (
           <circle
@@ -75,7 +73,6 @@ export default function FretboardDiagram({
         )),
       )}
 
-      {/* fret wires */}
       {Array.from({ length: FRET_COUNT + 1 }).map((_, i) => (
         <line
           key={`wire-${i}`}
@@ -89,7 +86,6 @@ export default function FretboardDiagram({
         />
       ))}
 
-      {/* strings */}
       {Array.from({ length: 6 }).map((_, string) => (
         <line
           key={`string-${string}`}
@@ -102,7 +98,6 @@ export default function FretboardDiagram({
         />
       ))}
 
-      {/* barre */}
       {barre && (
         <rect
           x={stringX(barre.fromString) - 9}
@@ -114,7 +109,6 @@ export default function FretboardDiagram({
         />
       )}
 
-      {/* open / muted markers */}
       {frets.map((fret, string) => {
         if (fret > 0) return null;
         const x = stringX(string);
@@ -137,7 +131,6 @@ export default function FretboardDiagram({
         );
       })}
 
-      {/* finger dots */}
       {frets.map((fret, string) => {
         if (fret <= 0) return null;
         const isBarre = barre !== null && barre.fret === fret;
@@ -166,7 +159,6 @@ export default function FretboardDiagram({
         );
       })}
 
-      {/* position label when the nut is off-screen */}
       {startFret > 1 && (
         <text
           x={LEFT - 8}

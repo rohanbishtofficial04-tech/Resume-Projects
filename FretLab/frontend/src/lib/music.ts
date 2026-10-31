@@ -1,9 +1,7 @@
-/** Note / frequency math and guitar tuning profiles. */
 
 export const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] as const;
 export const FLAT_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"] as const;
 
-/** A4 = 440Hz, MIDI 69. */
 export function freqFromMidi(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
 }
@@ -31,7 +29,6 @@ export function noteLabel(midi: number, flats = false): string {
 }
 
 export interface TuningString {
-  /** 0 = lowest (low E) → 5 = highest (high e) */
   index: number;
   midi: number;
   label: string;
@@ -77,7 +74,6 @@ export function findTuning(id: string): Tuning {
   return TUNINGS.find((tuning) => tuning.id === id) ?? TUNINGS[0];
 }
 
-/** Nearest editable note to a raw detected frequency, with cents deviation. */
 export interface PitchReading {
   frequency: number;
   midi: number;
@@ -99,7 +95,6 @@ export function readingFromFrequency(frequency: number, flats = false): PitchRea
   };
 }
 
-/** Index of the tuning string a detected pitch is closest to. */
 export function closestStringIndex(midi: number, tuning: Tuning): number {
   let best = 0;
   let bestDistance = Number.POSITIVE_INFINITY;

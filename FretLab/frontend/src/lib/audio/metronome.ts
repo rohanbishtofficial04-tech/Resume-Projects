@@ -1,11 +1,8 @@
-/** Web Audio lookahead-scheduled metronome: rock-solid timing, sample-accurate beats. */
 
 export interface TickEvent {
-  /** AudioContext time the click was scheduled for. */
   time: number;
   beat: number;
   sub: number;
-  /** 2 = accented, 1 = normal, 0 = muted, -1 = subdivision tick */
   level: number;
   isSubdivision: boolean;
 }
@@ -40,9 +37,7 @@ const START_DELAY = 0.08;
 export class MetronomeEngine {
   bpm = 100;
   beatsPerBar = 4;
-  /** Clicks per beat: 1 = quarter, 2 = eighths, 3 = triplets, 4 = sixteenths. */
   subdivision = 1;
-  /** Accent level per beat index: 2 = accented, 1 = normal, 0 = muted. */
   accents: number[] = [2, 1, 1, 1];
 
   private context: AudioContext | null = null;
@@ -101,7 +96,6 @@ export class MetronomeEngine {
     this.sub = 0;
   }
 
-  /** Events whose audio time has arrived — drains the queue for visual sync. */
   drain(now: number): TickEvent[] {
     if (this.queue.length === 0) return [];
     const due: TickEvent[] = [];
@@ -146,7 +140,6 @@ export class MetronomeEngine {
     if (isDownbeat && beatLevel > 0) {
       this.click(time, beatLevel === 2 ? 1760 : 1120, beatLevel === 2 ? 0.85 : 0.55, 0.055);
     } else if (isDownbeat && beatLevel === 0) {
-      // muted beat: no click at all
     } else {
       this.click(time, 760, 0.22, 0.035);
     }
