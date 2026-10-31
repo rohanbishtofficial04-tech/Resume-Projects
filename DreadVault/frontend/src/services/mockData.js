@@ -46,6 +46,33 @@ const games = [
   g(14, "eternal-darkness-sanitys-requiem", "Eternal Darkness: Sanity's Requiem", "2002-06-21", 4.5, 92, IMG.fog, ["Horror", "Adventure"], ["Nintendo GameCube"]),
 ];
 
+const featuredGames = [
+  {
+    ...g(7, "outlast-2", "Outlast 2", "2017-04-25", 4.0, 75, IMG.forest, ["Horror"], ["PC", "PlayStation", "Xbox"]),
+    description_raw: "Investigative journalist Blake Langermann searches for his missing wife in a remote Arizona town gripped by a terrifying religious cult.",
+  },
+  {
+    ...g(16, "hellblade-senuas-sacrifice", "Hellblade: Senua's Sacrifice", "2017-08-08", 4.3, 81, IMG.forest, ["Action", "Adventure"], ["PC", "PlayStation", "Xbox"]),
+    description_raw: "Celtic warrior Senua journeys into a haunting vision of the Viking afterlife to save the soul of her lost beloved.",
+  },
+  {
+    ...g(17, "resident-evil-7-biohazard", "Resident Evil 7: Biohazard", "2017-01-24", 4.4, 86, IMG.corridor, ["Horror", "Action"], ["PC", "PlayStation", "Xbox"]),
+    description_raw: "Ethan Winters follows a message from his missing wife to a decaying Louisiana plantation and the dangerous Baker family.",
+  },
+  {
+    ...g(18, "until-dawn", "Until Dawn", "2015-08-25", 4.2, 79, IMG.woods, ["Horror", "Adventure"], ["PlayStation"]),
+    description_raw: "Eight friends return to an isolated mountain lodge, where their choices determine who survives the night.",
+  },
+  {
+    ...g(19, "silent-hill-2-2024", "Silent Hill 2", "2024-10-08", 4.6, 86, IMG.fog, ["Horror", "Adventure"], ["PC", "PlayStation"]),
+    description_raw: "James Sunderland returns to the fog-covered town of Silent Hill after receiving a letter from his deceased wife.",
+  },
+  {
+    ...g(20, "resident-evil-2", "Resident Evil 2", "2019-01-25", 4.6, 91, IMG.corridor, ["Horror", "Action"], ["PC", "PlayStation", "Xbox"]),
+    description_raw: "Newcomer Leon Kennedy and college student Claire Redfield fight to escape Raccoon City during a zombie outbreak.",
+  },
+];
+
 const listResp = (arr) => ({ count: arr.length, next: null, previous: null, results: arr });
 
 export default {
@@ -99,11 +126,10 @@ export default {
     };
   },
   details: (slug) => {
-    const found = games.find((x) => x.slug === slug) || games[0];
+    const found = featuredGames.find((x) => x.slug === slug) || games.find((x) => x.slug === slug) || games[0];
     return {
       ...found,
-      description_raw:
-        "In the fog-drenched streets of a forgotten town, whispers of the dead call to the living. A haunting descent into psychological terror where every shadow hides a story and every silence screams.",
+      description_raw: found.description_raw || "Explore a memorable journey through a world of terror, mystery, and survival.",
       developers: [{ id: 1, name: "Team Silent" }],
       publishers: [{ id: 1, name: "Konami" }],
       website: "https://example.com",

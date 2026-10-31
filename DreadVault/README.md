@@ -11,7 +11,7 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 
 ## Recent Updates
 
-- Featured **Outlast 2** in the homepage hero with a fixed DreadVault tagline.
+- Added a 7-second sliding homepage hero for **Outlast 2**, **Silent Hill 2 (2024)**, **Resident Evil 7**, **Until Dawn**, **Resident Evil 2 (2019)**, and **Hellblade: Senua's Sacrifice**. Dot navigation resets the timer, and slides show game details without RAWG heading markers.
 - Expanded game comparisons with rating counts, average playtime, ESRB ratings, developers, and publishers.
 - Hid scrollbar visuals across the app while preserving mouse, touch, and keyboard scrolling.
 - Improved the responsive game details hero and back-navigation layout.
@@ -27,7 +27,7 @@ Silent Hill, Resident Evil, Dead Space, and Alan Wake.
 
 ##  Features
 
-- **Home** — Outlast 2 featured hero, trending / top-rated / recent / upcoming carousels, genre & platform strips, featured collection bento grid
+- **Home** — rotating hero for Outlast 2, Hellblade: Senua's Sacrifice, Resident Evil 7, Until Dawn, the Silent Hill 2 remake, and the Resident Evil 2 remake; trending / top-rated / recent / upcoming carousels, genre & platform strips, featured collection bento grid
 - **Browse** — genre / platform / release-year / rating filters, sorting, "load more" pagination
 - **Game Details** — responsive hero with back navigation, rating and platform details, rating count, playtime, ESRB rating, trailer player, screenshots gallery with lightbox, related games, stores, and official website
 - **Live Search** — debounced RAWG queries, keyboard-driven modal (⌘/Ctrl+K), highlighted matches
