@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Bell, Moon, Sun, UserRound, X } from "lucide-react";
+import { Bell, CalendarDays, Moon, Sun, UserRound, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -29,6 +29,7 @@ export default function Navbar() {
   const { theme, setTheme } = useTheme();
   const { data, dismissedBudgetAlerts, dismissBudgetAlert, dismissBudgetAlerts } = useSpendWise();
   const hydrated = useFinanceHydrated();
+  const today = new Date();
   const accountName = data.settings.displayName.trim() || "Personal account";
   const profileDetails = [
     { label: "Email", value: data.settings.email.trim() },
@@ -52,9 +53,11 @@ export default function Navbar() {
   });
   const budgetAlerts = allBudgetAlerts.filter((alert) => !dismissedBudgetAlerts.includes(alert.id));
   const formatAmount = (amount: number) => formatCurrency(amount, data.settings.currency, data.settings.fractionDigits);
+  const currentDate = pathname === "/" && <time className="flex items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground" aria-label="Current date"><CalendarDays className="size-4 shrink-0" /><span className="hidden md:inline">{today.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" })}</span><span className="md:hidden">{today.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span></time>;
   return <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-7">
     <div className="flex items-center gap-3"><SidebarTrigger /><span className="text-sm font-medium">{titles[pathname] ?? "SpendWise"}</span></div>
     <div className="flex items-center gap-2">
+      {currentDate}
       <Popover>
         <PopoverTrigger asChild>
           <Button variant="ghost" size="icon" aria-label={budgetAlerts.length ? `Notifications: ${budgetAlerts.length} budget alerts` : "Notifications"} className="relative">

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowDownLeft, ArrowUpRight, CalendarDays, CircleDollarSign, Pencil, Plus, Sparkles, Wallet, X } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, CircleDollarSign, Pencil, Plus, Sparkles, Wallet, X } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -106,6 +106,10 @@ export default function DashboardPage() {
       <StatCard title="Monthly savings" value={formatAmount(totals.income - totals.expense)} detail={`${savingsRate}% of this month’s income`} icon={<CircleDollarSign className="size-4" />} />
     </section>
 
+    <div className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-muted/40 p-5">
+      <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-lg bg-primary/10 text-primary"><Sparkles className="size-5" /></span><div><p className="font-medium">You’re building good habits</p><p className="mt-0.5 text-sm text-muted-foreground">{savingsRate === 0 ? "Start saving today—even small steps count." : `Your savings rate this month is ${savingsRate}%.`}</p></div></div>
+    </div>
+
     <section className="mt-6 grid gap-5 xl:grid-cols-[1.65fr_1fr]">
       <article className="min-w-0 rounded-xl border bg-card p-5">
         <SectionTitle title="Income vs. expenses" description="A six-month view of your cash flow" />
@@ -171,23 +175,20 @@ export default function DashboardPage() {
             const category = getCategory(data, budget.categoryId);
             const spent = getBudgetSpent(data.transactions, budget.categoryId);
             const percent = Math.min(100, spent / budget.limit * 100);
+            const nearLimit = percent >= 90;
             const over = spent > budget.limit;
             return <div key={budget.id}>
               <div className="mb-2 flex items-center justify-between gap-2 text-sm">
                 <span className="flex items-center gap-2 font-medium"><i className="size-2 rounded-full" style={{ backgroundColor: category?.color }} />{category?.name ?? "Category"}</span>
                 <span className={`text-xs tabular-nums ${over ? "font-medium text-destructive" : "text-muted-foreground"}`}>{formatAmount(spent)} / {formatAmount(budget.limit)}</span>
               </div>
-              <Progress value={percent} aria-label={`${category?.name ?? "Category"} budget ${Math.round(percent)}% used`} className={over ? "[&>div]:bg-destructive" : ""} />
+              <Progress value={percent} aria-label={`${category?.name ?? "Category"} budget ${Math.round(percent)}% used`} className={nearLimit ? "[&>div]:bg-destructive" : ""} />
             </div>;
           })}
           {!data.budgets.length && <div className="rounded-lg border border-dashed py-10 text-center text-sm text-muted-foreground">No budgets yet. Create one to start tracking.</div>}
         </div>
       </article>
     </section>
-    <div className="mt-5 flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-muted/40 p-5">
-      <div className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-lg bg-primary/10 text-primary"><Sparkles className="size-5" /></span><div><p className="font-medium">You’re building good habits</p><p className="mt-0.5 text-sm text-muted-foreground">Your savings rate this month is {savingsRate}%.</p></div></div>
-      <p className="flex items-center gap-2 text-sm text-muted-foreground"><CalendarDays className="size-4" />{new Date().toLocaleDateString(undefined, { month: "long", year: "numeric" })}</p>
-    </div>
     <TransactionDialog key={`transaction-${dialog}`} open={dialog} onClose={() => setDialog(false)} />
     <OpeningBalanceDialog key={`balance-${balanceDialog}`} open={balanceDialog} onClose={() => setBalanceDialog(false)} />
   </div>;

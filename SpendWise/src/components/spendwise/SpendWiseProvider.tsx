@@ -35,12 +35,21 @@ type SpendWiseContextValue = {
 
 const SpendWiseContext = createContext<SpendWiseContextValue | null>(null);
 const DEMO_MODE_KEY = `${STORAGE_KEY}-demo-mode`;
+const USER_DATA_KEY = `${STORAGE_KEY}-has-user-data`;
+const LAST_ACTIVE_MONTH_KEY = `${STORAGE_KEY}-last-active-month`;
 const DISMISSED_BUDGET_ALERTS_KEY = `${STORAGE_KEY}-dismissed-budget-alerts`;
+
+function currentMonthKey() {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
 
 export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<FinanceData>(() => createEmptyData());
   const [ready, setReady] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [hasUserData, setHasUserData] = useState(false);
+  const [activeMonth, setActiveMonth] = useState<string | null>(null);
   const [dismissedBudgetAlerts, setDismissedBudgetAlerts] = useState<string[]>([]);
   const [storageError, setStorageError] = useState<string | null>(null);
   const [persistAllowed, setPersistAllowed] = useState(false);
@@ -48,8 +57,11 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(STORAGE_KEY);
+      const month = currentMonthKey();
+      const monthChanged = window.localStorage.getItem(LAST_ACTIVE_MONTH_KEY) !== month;
+      setActiveMonth(month);
       const savedDismissedAlerts = window.localStorage.getItem(DISMISSED_BUDGET_ALERTS_KEY);
-      if (savedDismissedAlerts) {
+      if (savedDismissedAlerts && !monthChanged) {
         const parsedDismissedAlerts: unknown = JSON.parse(savedDismissedAlerts);
         if (Array.isArray(parsedDismissedAlerts) && parsedDismissedAlerts.every((id) => typeof id === "string")) {
           setDismissedBudgetAlerts(parsedDismissedAlerts);
@@ -62,6 +74,7 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
       if (saved === null) {
         setData(createDemoData());
         setIsDemoMode(true);
+        setHasUserData(false);
         setPersistAllowed(true);
       } else {
         const parsed: unknown = JSON.parse(saved);
@@ -70,11 +83,22 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
           setStorageError("Saved finance data is invalid. Your saved data has not been overwritten.");
           setPersistAllowed(false);
         } else {
-          const demoMode = window.localStorage.getItem(DEMO_MODE_KEY) !== "false";
-          setData(demoMode
-            ? { ...financeData, settings: withDemoProfileSettings(financeData.settings) }
-            : financeData);
+          const demoMode =
+            window.localStorage.getItem(DEMO_MODE_KEY) === "true" &&
+            (financeData.transactions.length > 0 || financeData.budgets.length > 0);
+          const hasSavedUserData =
+            window.localStorage.getItem(USER_DATA_KEY) === "true" ||
+            financeData.transactions.some((transaction) => !transaction.id.startsWith("demo-"));
+          const refreshedDemoTransactions = demoMode && monthChanged && !hasSavedUserData
+            ? createDemoData(financeData).transactions
+            : financeData.transactions;
+          setData({
+            ...financeData,
+            transactions: refreshedDemoTransactions,
+            settings: demoMode ? withDemoProfileSettings(financeData.settings) : financeData.settings,
+          });
           setIsDemoMode(demoMode);
+          setHasUserData(hasSavedUserData);
           setPersistAllowed(true);
         }
       }
@@ -92,13 +116,43 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       window.localStorage.setItem(DEMO_MODE_KEY, String(isDemoMode));
+      window.localStorage.setItem(USER_DATA_KEY, String(hasUserData));
+      if (activeMonth) window.localStorage.setItem(LAST_ACTIVE_MONTH_KEY, activeMonth);
       window.localStorage.setItem(DISMISSED_BUDGET_ALERTS_KEY, JSON.stringify(dismissedBudgetAlerts));
       setStorageError(null);
     } catch (error) {
       console.error("Could not save SpendWise data to local storage.", error);
       setStorageError("Changes could not be saved to this browser. Check available storage space.");
     }
-  }, [data, dismissedBudgetAlerts, isDemoMode, persistAllowed, ready]);
+  }, [activeMonth, data, dismissedBudgetAlerts, hasUserData, isDemoMode, persistAllowed, ready]);
+
+  useEffect(() => {
+    if (!ready || !persistAllowed || !activeMonth) return;
+
+    const checkForMonthChange = () => {
+      const month = currentMonthKey();
+      if (month === activeMonth) return;
+
+      setData((current) => ({
+        ...current,
+        transactions: isDemoMode && !hasUserData
+          ? createDemoData(current).transactions
+          : [...current.transactions],
+      }));
+      setDismissedBudgetAlerts([]);
+      setActiveMonth(month);
+    };
+
+    const interval = window.setInterval(checkForMonthChange, 60_000);
+    window.addEventListener("focus", checkForMonthChange);
+    document.addEventListener("visibilitychange", checkForMonthChange);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", checkForMonthChange);
+      document.removeEventListener("visibilitychange", checkForMonthChange);
+    };
+  }, [activeMonth, hasUserData, isDemoMode, persistAllowed, ready]);
 
   const update = useCallback((updater: (current: FinanceData) => FinanceData) => {
     setData((current) => updater(current));
@@ -110,17 +164,23 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
     isDemoMode,
     dismissedBudgetAlerts,
     storageError,
-    saveTransaction: (transaction) => update((current) => ({
-      ...current,
-      transactions: [
-        transaction,
-        ...current.transactions.filter((item) => item.id !== transaction.id),
-      ],
-    })),
-    deleteTransaction: (id) => update((current) => ({
-      ...current,
-      transactions: current.transactions.filter((item) => item.id !== id),
-    })),
+    saveTransaction: (transaction) => {
+      setHasUserData(true);
+      update((current) => ({
+        ...current,
+        transactions: [
+          transaction,
+          ...current.transactions.filter((item) => item.id !== transaction.id),
+        ],
+      }));
+    },
+    deleteTransaction: (id) => {
+      setHasUserData(true);
+      update((current) => ({
+        ...current,
+        transactions: current.transactions.filter((item) => item.id !== id),
+      }));
+    },
     saveBudget: (budget) => update((current) => ({
       ...current,
       budgets: [budget, ...current.budgets.filter((item) => item.id !== budget.id)],
@@ -144,6 +204,7 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
     loadDemoData: () => {
       setData((current) => createDemoData(current));
       setIsDemoMode(true);
+      setHasUserData(false);
       setDismissedBudgetAlerts([]);
       setPersistAllowed(true);
       setStorageError(null);
@@ -151,6 +212,8 @@ export function SpendWiseProvider({ children }: { children: React.ReactNode }) {
     clearFinancialData: () => {
       setData(createEmptyData());
       setIsDemoMode(false);
+      setHasUserData(false);
+      setActiveMonth(currentMonthKey());
       setDismissedBudgetAlerts([]);
       setPersistAllowed(true);
       setStorageError(null);

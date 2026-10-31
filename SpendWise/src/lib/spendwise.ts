@@ -100,11 +100,7 @@ export function createDemoData(baseData: FinanceData = createEmptyData()): Finan
   const demoCategories = [...DEFAULT_CATEGORIES, ...baseData.categories.filter(
     (category) => !DEFAULT_CATEGORIES.some((defaultCategory) => defaultCategory.id === category.id),
   )];
-  return {
-    ...baseData,
-    settings: withDemoProfileSettings(baseData.settings),
-    categories: demoCategories,
-    transactions: [
+  const transactions: Transaction[] = ([
       { id: "demo-salary-7", name: "Monthly salary", amount: 60000, categoryId: "salary", date: dateInMonth(-6, 1), paymentMethod: "Bank transfer", type: "income" },
       { id: "demo-rent-7", name: "Rent", amount: 17000, categoryId: "bills", date: dateInMonth(-6, 3), paymentMethod: "Bank transfer", type: "expense" },
       { id: "demo-groceries-7", name: "Groceries", amount: 3750, categoryId: "food", date: dateInMonth(-6, 8), paymentMethod: "Debit card", type: "expense" },
@@ -135,9 +131,21 @@ export function createDemoData(baseData: FinanceData = createEmptyData()): Finan
       { id: "demo-dinner", name: "Dinner with friends", amount: 1450, categoryId: "food", date: dateInMonth(0, 11), paymentMethod: "UPI", type: "expense" },
       { id: "demo-shopping", name: "Household essentials", amount: 2300, categoryId: "shopping", date: dateInMonth(0, 16), paymentMethod: "Credit card", type: "expense" },
       { id: "demo-freelance", name: "Design project", amount: 8500, categoryId: "freelance", date: dateInMonth(0, 20), paymentMethod: "Bank transfer", type: "income" },
-    ],
+    ] satisfies Transaction[]).map((transaction) => ({
+      ...transaction,
+      amount: Math.max(50, Math.round(transaction.amount * (0.85 + Math.random() * 0.3) / 50) * 50),
+    }));
+  const currentMonthFoodSpending = transactions
+    .filter((transaction) => transaction.type === "expense" && transaction.categoryId === "food" && isSameMonth(transaction.date))
+    .reduce((total, transaction) => total + transaction.amount, 0);
+
+  return {
+    ...baseData,
+    settings: withDemoProfileSettings(baseData.settings),
+    categories: demoCategories,
+    transactions,
     budgets: [
-      { id: "demo-budget-food", categoryId: "food", limit: 5000 },
+      { id: "demo-budget-food", categoryId: "food", limit: Math.max(50, Math.floor(currentMonthFoodSpending * 0.9 / 50) * 50) },
       { id: "demo-budget-transport", categoryId: "transport", limit: 4000 },
       { id: "demo-budget-shopping", categoryId: "shopping", limit: 5000 },
       { id: "demo-budget-bills", categoryId: "bills", limit: 20000 },

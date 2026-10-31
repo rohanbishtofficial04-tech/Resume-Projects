@@ -7,6 +7,7 @@ SpendWise is a personal finance dashboard for tracking income and expenses, mana
 ## Updates
 
 - **First-run demo experience:** New users start with sample transactions and budgets in Indian rupees (INR). The sample history covers the current month and the six preceding months, and sample food spending exceeds its budget to demonstrate the notification bell.
+- **Monthly demo rollover:** Only active demo data refreshes with varied amounts for the new month and stays stable during that month. After a personal transaction is added, all transaction history is preserved; monthly totals and budget spending recalculate from the new month's dates, and dismissed budget alerts reset. Clearing financial data exits demo mode and leaves the account empty across reloads.
 - **Demo profile:** Sample mode includes example name, email, phone, location, and occupation details in the account menu. Existing profile details are preserved when demo data is loaded.
 - **Refreshable sample data:** Use **Settings → Load demo data** to replace transactions and budgets with the sample dataset. Existing categories, preferences, and profile details are preserved. Confirm before loading.
 - **Dashboard and analytics:** The dashboard includes a seven-month cash-flow chart, category charts, recent transactions, balances, and budget progress. Analytics opens to the current month and six preceding months, with editable date filters.
@@ -84,7 +85,7 @@ Loading demo data replaces transactions and budgets, while retaining categories,
 
 ## Data and privacy
 
-SpendWise stores its finance data in browser `localStorage` under the `spendwise-data-v1` key. The data is specific to the current browser profile and device; it is not synchronized to a server. Clearing browser site data can remove it. Loading sample data replaces the stored transactions and budgets, so preserve any records you want to keep before doing so.
+SpendWise stores its finance data in browser `localStorage` under the `spendwise-data-v1` key. The data is specific to the current browser profile and device; it is not synchronized to a server. Clearing browser site data can remove it. Sample transactions refresh at a month boundary only while there are no personal transactions. Once personal transactions are added, the app preserves all transaction history and calculates monthly totals and budget spending from transaction dates. Loading sample data replaces the stored transactions and budgets, so preserve any records you want to keep before doing so.
 
 ## Project structure
 
