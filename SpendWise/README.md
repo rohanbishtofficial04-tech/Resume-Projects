@@ -11,6 +11,7 @@ SpendWise is a personal finance dashboard for tracking income and expenses, mana
 - **Demo profile:** Sample mode includes example name, email, phone, location, and occupation details in the account menu. Existing profile details are preserved when demo data is loaded.
 - **Refreshable sample data:** Use **Settings → Load demo data** to replace transactions and budgets with the sample dataset. Existing categories, preferences, and profile details are preserved. Confirm before loading.
 - **Dashboard and analytics:** The dashboard includes a seven-month cash-flow chart, category charts, recent transactions, balances, and budget progress. Analytics opens to the current month and six preceding months, with editable date filters.
+- **Overview guidance:** The Overview header shows the current date beside notifications. Monthly budget bars turn red at 90% usage, and the savings banner appears above the cash-flow chart with an encouraging prompt when the savings rate is 0%.
 - **Profile and account menu:** Add a display name and optional contact details on the separate Profile page. The account menu shows each entered detail, keeps the profile icon aligned with the name, and uses the saved name in the homepage greeting. Profile edits require **Save changes**.
 - **Mobile navigation:** Selecting a page from the mobile sidebar closes the navigation drawer.
 - **Budget notifications:** The header bell displays the number of current-month budget alerts. Each alert identifies the category, amount spent, limit, and percentage. Alerts begin at a configurable threshold (default 80%) and distinguish approaching, reached (100%), and exceeded (over 100%) budgets. Notifications are in-app only.
@@ -22,7 +23,7 @@ SpendWise is a personal finance dashboard for tracking income and expenses, mana
 
 ## Features
 
-- **Overview:** Opening balance, all-time balance, monthly income, expenses and savings, seven-month cash-flow chart, spending breakdown, recent transactions, and budgets.
+- **Overview:** Current date, opening balance, all-time balance, monthly income, expenses and savings, a savings prompt, seven-month cash-flow chart, spending breakdown, recent transactions, and budgets. Budget bars turn red at 90% usage.
 - **Transactions:** Add, edit, delete, search, sort, and filter income and expense records. Transactions include a name, amount, category, date, and payment method.
 - **Budgets:** Set monthly spending limits by expense category. Progress is calculated from expense transactions in that category during the current month.
 - **Analytics:** Review income, expenses, net savings, and category spending for a selectable date range. The default range includes the current month and six preceding months.
