@@ -36,6 +36,7 @@ export default function FretLabShell() {
   const { pathname } = useLocation();
   const navRef = useRef<HTMLElement>(null);
   const previousPathRef = useRef<string | null>(null);
+  const navigationDirectionRef = useRef<"forward" | "backward" | null>(null);
   const activeTheme = THEMES.find((option) => option.id === theme) ?? THEMES[0];
   const nextTheme = THEMES[(THEMES.findIndex((option) => option.id === theme) + 1) % THEMES.length];
 
@@ -46,7 +47,7 @@ export default function FretLabShell() {
     const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>("a"));
     const clickedIndex = links.indexOf(event.currentTarget);
     const activeIndex = links.findIndex((link) => link.getAttribute("aria-current") === "page");
-    if (clickedIndex < 0 || activeIndex < 0 || clickedIndex === activeIndex) return;
+    if (clickedIndex < 0 || activeIndex < 0) return;
 
     const navBounds = nav.getBoundingClientRect();
     const visibleLeft = navBounds.left + nav.clientLeft;
@@ -63,8 +64,44 @@ export default function FretLabShell() {
     const lastVisibleIndex = visibleIndexes[visibleIndexes.length - 1];
     if (firstVisibleIndex === undefined || lastVisibleIndex === undefined) return;
 
-    const movingForward = clickedIndex > activeIndex;
-    const movingBackward = clickedIndex < activeIndex;
+    const isSameActiveLink = clickedIndex === activeIndex;
+    const isOnlyVisibleLink = firstVisibleIndex === lastVisibleIndex;
+    const isAtScrollEnd = nav.scrollLeft >= nav.scrollWidth - nav.clientWidth - 1;
+    const canMoveForward = clickedIndex < links.length - 1;
+    const canMoveBackward = clickedIndex > 0;
+    const fallbackDirection = canMoveForward && !isAtScrollEnd
+      ? "forward"
+      : canMoveBackward
+        ? "backward"
+        : "forward";
+    const edgeDirection = clickedIndex === lastVisibleIndex
+      ? "forward"
+      : clickedIndex === firstVisibleIndex
+        ? "backward"
+        : null;
+    const sameLinkDirection = isOnlyVisibleLink
+      ? navigationDirectionRef.current === "forward" && canMoveForward
+        ? "forward"
+        : navigationDirectionRef.current === "backward" && canMoveBackward
+          ? "backward"
+          : fallbackDirection
+      : edgeDirection
+        ? navigationDirectionRef.current === "forward" && canMoveForward
+          ? "forward"
+          : navigationDirectionRef.current === "backward" && canMoveBackward
+            ? "backward"
+            : edgeDirection
+        : null;
+    const direction = isSameActiveLink
+      ? sameLinkDirection
+      : clickedIndex > activeIndex
+        ? "forward"
+        : "backward";
+    if (direction) navigationDirectionRef.current = direction;
+    const movingForward = direction === "forward" &&
+      (clickedIndex === lastVisibleIndex || (isSameActiveLink && clickedIndex === firstVisibleIndex));
+    const movingBackward = direction === "backward" &&
+      (clickedIndex === firstVisibleIndex || (isSameActiveLink && clickedIndex === lastVisibleIndex));
     let targetScrollLeft = nav.scrollLeft;
     const minimumRevealWidth = (link: HTMLAnchorElement) => Math.min(link.offsetWidth * 0.65, 72);
 
