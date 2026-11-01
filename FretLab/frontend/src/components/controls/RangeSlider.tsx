@@ -10,9 +10,10 @@ interface RangeSliderProps {
   ariaLabel: string;
   testId?: string;
   className?: string;
+  disabled?: boolean;
 }
 
-export default function RangeSlider({ value, min, max, step = 1, onChange, ariaLabel, testId, className }: RangeSliderProps) {
+export default function RangeSlider({ value, min, max, step = 1, onChange, ariaLabel, testId, className, disabled }: RangeSliderProps) {
   const fill = max === min ? 0 : ((value - min) / (max - min)) * 100;
 
   return (
@@ -24,8 +25,9 @@ export default function RangeSlider({ value, min, max, step = 1, onChange, ariaL
       value={value}
       aria-label={ariaLabel}
       data-testid={testId}
+      disabled={disabled}
       onChange={(event) => onChange(Number(event.target.value))}
-      className={cn("h-6 w-full accent-primary", className)}
+      className={cn("h-6 w-full accent-primary disabled:cursor-not-allowed disabled:opacity-60", className)}
       style={{ "--fl-fill": `${fill}%` } as React.CSSProperties}
     />
   );

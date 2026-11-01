@@ -29,7 +29,7 @@ interface TunerErrorState {
   message: string;
 }
 
-const STRING_LABELS = ["6th · low E", "5th · A", "4th · D", "3rd · G", "2nd · B", "1st · high e"];
+const STRING_LABELS = ["6th · low", "5th", "4th", "3rd", "2nd", "1st · high"];
 
 export default function Tuner() {
   const [tuningId, setTuningId] = usePersistentState<string>(STORAGE_KEYS.tuning, DEFAULT_TUNING_ID);
@@ -95,6 +95,7 @@ export default function Tuner() {
     setError(null);
     setStatus("requesting");
     const result = await engine.start();
+    if (result.cancelled) return;
     if (!result.ok) {
       setStatus("error");
       setError({ kind: result.kind ?? "unknown", message: result.message ?? "Microphone unavailable." });
@@ -202,6 +203,37 @@ export default function Tuner() {
             </Badge>
 
             <CentsGauge cents={cents} className="max-w-md" />
+
+            <div
+              data-testid="tuner-string-indicator"
+              role="group"
+              aria-label={`${tuning.name} guitar strings`}
+              className="grid w-full max-w-md grid-cols-6 gap-2"
+            >
+              {tuning.strings.map((string) => {
+                const isActive = listening && activeString === string.index;
+                return (
+                  <div
+                    key={string.index}
+                    data-string-index={string.index}
+                    data-active={isActive}
+                    aria-current={isActive ? "true" : undefined}
+                    aria-label={`${STRING_LABELS[string.index]}, ${string.label}${isActive ? ", currently tuning" : ""}`}
+                    className={cn(
+                      "flex min-w-0 flex-col items-center gap-1 rounded-lg border px-1 py-2 transition-colors",
+                      isActive
+                        ? "border-primary bg-primary/15 text-primary"
+                        : "border-transparent text-muted-foreground",
+                    )}
+                  >
+                    <span className="font-mono text-lg font-bold leading-none">{string.label.replace(/\d+$/, "")}</span>
+                    <span className="text-center text-[9px] font-semibold uppercase leading-tight tracking-wide">
+                      {STRING_LABELS[string.index]}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
 
             <p className="relative text-center text-xs text-muted-foreground">
               {!listening

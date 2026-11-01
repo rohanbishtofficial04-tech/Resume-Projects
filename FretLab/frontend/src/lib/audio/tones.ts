@@ -105,12 +105,41 @@ export function playStrum(frequencies: number[], strumGap = 0.045): void {
   });
 }
 
-export function playNoteSequence(frequencies: number[], noteDuration = 0.32, noteGap = 0.38): number {
+export function playNoteSequence(
+  frequencies: number[],
+  noteDuration = 0.4,
+  noteGap = 0.43,
+  pauseAfterIndex = -1,
+  pauseDuration = 0,
+): number {
   if (frequencies.length === 0) return 0;
   const context = getAudioContext();
   const startTime = context.currentTime + 0.04;
+  const partials = [
+    { multiple: 1, level: 0.11, decay: 1 },
+    { multiple: 2, level: 0.035, decay: 0.68 },
+    { multiple: 3, level: 0.014, decay: 0.46 },
+    { multiple: 4, level: 0.006, decay: 0.32 },
+  ];
   frequencies.forEach((frequency, index) => {
-    activeVoices.push(pluck(context, frequency, startTime + index * noteGap, noteDuration, 0.14));
+    const pauseOffset = index > pauseAfterIndex ? pauseDuration : 0;
+    const noteStart = startTime + index * noteGap + pauseOffset;
+    partials.forEach(({ multiple, level, decay }) => {
+      const osc = context.createOscillator();
+      const gain = context.createGain();
+      const noteEnd = noteStart + noteDuration * decay;
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(frequency * multiple, noteStart);
+      gain.gain.setValueAtTime(0.0001, noteStart);
+      gain.gain.linearRampToValueAtTime(level, noteStart + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, noteEnd);
+      osc.connect(gain);
+      gain.connect(context.destination);
+      osc.start(noteStart);
+      osc.stop(noteEnd + 0.03);
+      activeVoices.push({ osc, gain });
+    });
   });
-  return Math.ceil(((frequencies.length - 1) * noteGap + noteDuration) * 1000);
+  const sequencePause = frequencies.length - 1 > pauseAfterIndex ? pauseDuration : 0;
+  return Math.ceil(((frequencies.length - 1) * noteGap + sequencePause + noteDuration) * 1000);
 }

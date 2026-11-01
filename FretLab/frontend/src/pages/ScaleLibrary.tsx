@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Play, Square } from "lucide-react";
+import { Minus, Play, Plus, Square } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { playNoteSequence, playReferenceTone, stopAllTones } from "@/lib/audio/tones";
@@ -12,6 +12,7 @@ const BOARD_TOP = 40;
 const FRET_WIDTH = 70;
 const STRING_GAP = 42;
 const BOARD_HEIGHT = BOARD_TOP + (STRING_NAMES.length - 1) * STRING_GAP + 38;
+type FretboardNote = { midi: number; stringIndex: number; fret: number };
 
 const SCALES = [
   { name: "Major", formula: "1 2 3 4 5 6 7", intervals: [0, 2, 4, 5, 7, 9, 11], rarity: "common" },
@@ -42,6 +43,8 @@ const SCALES = [
 
 const LAYOUTS = ["Full", "Vertical", "Diagonal"] as const;
 const RARITIES = ["common", "rare", "exotic"] as const;
+const MIN_PLAYBACK_BPM = 40;
+const MAX_PLAYBACK_BPM = 240;
 
 export default function ScaleLibrary() {
   const [root, setRoot] = useState("C");
@@ -49,8 +52,12 @@ export default function ScaleLibrary() {
   const [tuningId, setTuningId] = useState(DEFAULT_TUNING_ID);
   const [layout, setLayout] = useState<(typeof LAYOUTS)[number]>("Full");
   const [rarity, setRarity] = useState<(typeof RARITIES)[number]>("common");
+  const [showAllNotes, setShowAllNotes] = useState(false);
+  const [playbackBpm, setPlaybackBpm] = useState(120);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [activeScalePosition, setActiveScalePosition] = useState<FretboardNote | null>(null);
   const playbackTimerRef = useRef<number | null>(null);
+  const playbackStepRef = useRef<number | null>(null);
   const scale = SCALES.find((item) => item.name === scaleName) ?? SCALES[0];
   const notes = useMemo(() => {
     const rootIndex = NOTE_NAMES.indexOf(root as (typeof NOTE_NAMES)[number]);
@@ -60,7 +67,10 @@ export default function ScaleLibrary() {
   const tuning = TUNINGS.find((item) => item.id === tuningId) ?? TUNINGS[0];
   const openStringMidi = tuning.strings.map((string) => string.midi);
   const stringNames = tuning.strings.map((string) => string.label);
-  const scaleToneSet = useMemo(() => new Set<number>(scale.intervals), [scale]);
+  const scaleToneSet = useMemo(
+    () => new Set<number>(showAllNotes ? NOTE_NAMES.map((_, index) => index) : scale.intervals),
+    [scale, showAllNotes],
+  );
   const intervalLabels = scale.formula.split(" ");
   const rootFret = (rootPitchClass - openStringMidi[0] % NOTE_NAMES.length + NOTE_NAMES.length) % NOTE_NAMES.length;
   const boardStartFret = layout === "Full" ? 0 : rootFret;
@@ -68,6 +78,78 @@ export default function ScaleLibrary() {
   const boardFretCount = boardEndFret - boardStartFret;
   const boardWidth = BOARD_LEFT + boardFretCount * FRET_WIDTH + 12;
   const rootMidi = openStringMidi[0] + rootFret;
+  const playbackNotes = useMemo(() => {
+    const octaveSpan = layout === "Diagonal" ? 12 : 24;
+    const targetPitches = Array.from({ length: octaveSpan / 12 }, (_, octave) =>
+      scale.intervals.map((interval) => rootMidi + octave * 12 + interval),
+    ).flat();
+    targetPitches.push(rootMidi + octaveSpan);
+
+    const candidatesByPitch = targetPitches.map((midi, pitchIndex) => {
+      const candidates: FretboardNote[] = [];
+      tuning.strings.forEach(({ midi: openMidi }, stringIndex) => {
+        const fret = midi - openMidi;
+        const handPositionFret = fret - rootFret;
+        if (
+          fret >= boardStartFret &&
+          fret <= boardEndFret &&
+          handPositionFret >= 0 &&
+          handPositionFret <= 4 &&
+          (layout !== "Diagonal" || (midi >= rootMidi && midi <= rootMidi + 12)) &&
+          (pitchIndex !== 0 || (stringIndex === 0 && fret === rootFret))
+        ) {
+          candidates.push({ midi, stringIndex, fret });
+        }
+      });
+      return candidates;
+    });
+
+    if (candidatesByPitch.some((candidates) => candidates.length === 0)) return [];
+
+    const costs: number[][] = [[0]];
+    const previousIndexes: number[][] = [];
+    candidatesByPitch.slice(1).forEach((candidates, pitchIndex) => {
+      const previousCandidates = candidatesByPitch[pitchIndex];
+      const pitchCosts: number[] = [];
+      const pitchPreviousIndexes: number[] = [];
+      candidates.forEach((candidate) => {
+        let bestCost = Number.POSITIVE_INFINITY;
+        let bestPreviousIndex = 0;
+        previousCandidates.forEach((previous, previousIndex) => {
+          const stringDistance = Math.abs(candidate.stringIndex - previous.stringIndex);
+          const fretDistance = Math.abs(candidate.fret - previous.fret);
+          const directionPenalty = candidate.stringIndex < previous.stringIndex ? 3 : 0;
+          const positionShiftPenalty = Math.max(0, fretDistance - 2) * 1.5;
+          const cost = costs[pitchIndex][previousIndex] +
+            stringDistance * 2 +
+            fretDistance * 0.4 +
+            directionPenalty +
+            positionShiftPenalty;
+          if (cost < bestCost) {
+            bestCost = cost;
+            bestPreviousIndex = previousIndex;
+          }
+        });
+        pitchCosts.push(bestCost);
+        pitchPreviousIndexes.push(bestPreviousIndex);
+      });
+      costs.push(pitchCosts);
+      previousIndexes.push(pitchPreviousIndexes);
+    });
+
+    const lastCosts = costs[costs.length - 1];
+    let candidateIndex = lastCosts.indexOf(Math.min(...lastCosts));
+    const path = Array<FretboardNote>(targetPitches.length);
+    for (let pitchIndex = targetPitches.length - 1; pitchIndex >= 0; pitchIndex -= 1) {
+      path[pitchIndex] = candidatesByPitch[pitchIndex][candidateIndex];
+      if (pitchIndex > 0) candidateIndex = previousIndexes[pitchIndex - 1][candidateIndex];
+    }
+    return path;
+  }, [boardEndFret, boardStartFret, layout, rootFret, rootMidi, scale.intervals, tuning]);
+  const playbackPositionKeys = useMemo(
+    () => new Set(playbackNotes.map(({ stringIndex, fret }) => `${stringIndex}:${fret}`)),
+    [playbackNotes],
+  );
 
   const stopPlayback = useCallback(() => {
     stopAllTones();
@@ -75,13 +157,19 @@ export default function ScaleLibrary() {
       window.clearTimeout(playbackTimerRef.current);
       playbackTimerRef.current = null;
     }
+    if (playbackStepRef.current !== null) {
+      window.clearTimeout(playbackStepRef.current);
+      playbackStepRef.current = null;
+    }
     setIsPlaying(false);
+    setActiveScalePosition(null);
   }, []);
 
   useEffect(
     () => () => {
       stopAllTones();
       if (playbackTimerRef.current !== null) window.clearTimeout(playbackTimerRef.current);
+      if (playbackStepRef.current !== null) window.clearTimeout(playbackStepRef.current);
     },
     [],
   );
@@ -92,12 +180,35 @@ export default function ScaleLibrary() {
       return;
     }
     stopAllTones();
-    const frequencies = [...scale.intervals, 12].map((interval) => freqFromMidi(rootMidi + interval));
-    const duration = playNoteSequence(frequencies);
+    const ascendingNotes = playbackNotes;
+    const fullSequence = [...ascendingNotes, ...ascendingNotes.slice(0, -1).reverse()];
+    const frequencies = fullSequence.map(({ midi }) => freqFromMidi(midi));
+    if (frequencies.length === 0) return;
+    const beatDuration = 60 / playbackBpm;
+    const noteGap = beatDuration;
+    const noteDuration = beatDuration * 0.9;
+    const pauseDuration = beatDuration * 2;
+    const duration = playNoteSequence(frequencies, noteDuration, noteGap, ascendingNotes.length - 1, pauseDuration);
+    let activeIndex = 0;
+    setActiveScalePosition(fullSequence[activeIndex]);
     setIsPlaying(true);
+    const advancePlayback = () => {
+      activeIndex += 1;
+      if (activeIndex < fullSequence.length) {
+        setActiveScalePosition(fullSequence[activeIndex]);
+        const delay = noteGap * 1000 + (activeIndex === ascendingNotes.length - 1 ? pauseDuration * 1000 : 0);
+        playbackStepRef.current = window.setTimeout(advancePlayback, delay);
+      }
+    };
+    playbackStepRef.current = window.setTimeout(advancePlayback, noteGap * 1000);
     playbackTimerRef.current = window.setTimeout(() => {
       playbackTimerRef.current = null;
+      if (playbackStepRef.current !== null) {
+        window.clearTimeout(playbackStepRef.current);
+        playbackStepRef.current = null;
+      }
       setIsPlaying(false);
+      setActiveScalePosition(null);
     }, duration);
   };
 
@@ -280,41 +391,98 @@ export default function ScaleLibrary() {
       <Card data-testid="scale-fretboard-card">
         <CardContent className="flex flex-col gap-5 py-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                {tuning.name} tuning · frets {boardStartFret}–{boardEndFret}
-              </p>
-              <h2 className="mt-1 font-heading text-xl font-bold tracking-tight">
-                {root} {scale.name} · {layout}
-              </h2>
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {tuning.name} tuning · frets {boardStartFret}–{boardEndFret}
+                </p>
+                <h2 className="mt-1 font-heading text-xl font-bold tracking-tight">
+                  {root} {scale.name} · {layout}
+                </h2>
+              </div>
+              <label className="mr-6 flex shrink-0 cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  aria-label="Show all notes"
+                  checked={showAllNotes}
+                  onChange={(event) => {
+                    if (event.target.checked) stopPlayback();
+                    setShowAllNotes(event.target.checked);
+                  }}
+                  className="peer sr-only"
+                />
+                <span
+                  aria-hidden="true"
+                  className="relative inline-flex h-6 w-11 shrink-0 rounded-full bg-muted transition-colors after:absolute after:left-1 after:top-1 after:h-4 after:w-4 after:rounded-full after:bg-background after:transition-transform peer-checked:bg-primary peer-checked:after:translate-x-5 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ring"
+                />
+                <span>All notes</span>
+              </label>
             </div>
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
-              <span className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-primary" />
-                Root
-              </span>
+              {!showAllNotes && (
+                <span className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-primary" />
+                  Root
+                </span>
+              )}
               <span className="flex items-center gap-2">
                 <span className="h-3 w-3 rounded-full border border-primary bg-surface-raised" />
-                Scale note
+                {showAllNotes ? "Note" : "Scale note"}
               </span>
+              {!showAllNotes && (
+                <span className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full border border-dashed border-foreground" />
+                  Fingering
+                </span>
+              )}
             </div>
-            <Button
-              type="button"
-              data-testid="scale-play-button"
-              aria-label={isPlaying ? "Stop scale playback" : `Play ${root} ${scale.name} scale`}
-              onClick={toggleScalePlayback}
-              className="sm:ml-auto"
-            >
-              {isPlaying ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-              {isPlaying ? "Stop" : "Play scale"}
-            </Button>
+            <div className="flex items-center gap-2 sm:ml-auto">
+              <div className="flex items-center gap-1.5" aria-label="Scale playback tempo">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-8 px-0"
+                  aria-label="Decrease scale tempo by one BPM"
+                  disabled={isPlaying || playbackBpm <= MIN_PLAYBACK_BPM}
+                  onClick={() => setPlaybackBpm((bpm) => Math.max(MIN_PLAYBACK_BPM, bpm - 1))}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <div className="min-w-16 text-center font-mono text-sm font-semibold tabular-nums">
+                  <output data-testid="scale-playback-bpm" aria-live="polite">{playbackBpm}</output>
+                  <span className="ml-1 text-[10px] font-medium text-muted-foreground">BPM</span>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 w-8 px-0"
+                  aria-label="Increase scale tempo by one BPM"
+                  disabled={isPlaying || playbackBpm >= MAX_PLAYBACK_BPM}
+                  onClick={() => setPlaybackBpm((bpm) => Math.min(MAX_PLAYBACK_BPM, bpm + 1))}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <Button
+                type="button"
+                data-testid="scale-play-button"
+                aria-label={isPlaying ? "Stop scale playback" : `Play ${root} ${scale.name} scale`}
+                onClick={toggleScalePlayback}
+              >
+                {isPlaying ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                {isPlaying ? "Stop" : "Play scale"}
+              </Button>
+            </div>
           </div>
 
           <div className="scale-fretboard-scroll mx-auto w-full min-w-0 overflow-x-auto rounded-xl border border-border bg-surface p-3 sm:p-5 md:max-w-[936px]">
             <svg
               viewBox={`0 0 ${boardWidth} ${BOARD_HEIGHT}`}
               role="group"
-              aria-label={`${root} ${scale.name} scale notes on the guitar fretboard, frets ${boardStartFret} through ${boardEndFret}, ${layout.toLowerCase()} layout, ${tuning.name} tuning`}
+              aria-label={`${showAllNotes ? "All" : `${root} ${scale.name} scale`} notes on the guitar fretboard, frets ${boardStartFret} through ${boardEndFret}, ${layout.toLowerCase()} layout, ${tuning.name} tuning`}
               data-testid="scale-fretboard"
               className="scale-fretboard-svg h-auto w-full"
               style={{ "--board-width": `${boardWidth}px` } as React.CSSProperties}
@@ -390,20 +558,27 @@ export default function ScaleLibrary() {
                   const interval = (pitchClass - rootPitchClass + NOTE_NAMES.length) % NOTE_NAMES.length;
                   if (!scaleToneSet.has(interval)) return null;
                   const midi = openMidi + fret;
-                  if (layout === "Diagonal" && (midi < rootMidi || midi > rootMidi + 12)) return null;
+                  if (!showAllNotes && layout === "Diagonal" && (midi < rootMidi || midi > rootMidi + 12)) return null;
 
-                  const isRoot = interval === 0;
+                  const isRoot = !showAllNotes && interval === 0;
+                  const isPlaybackPosition = !showAllNotes && playbackPositionKeys.has(`${stringIndex}:${fret}`);
+                  const isPlayingNote = !showAllNotes &&
+                    activeScalePosition?.stringIndex === stringIndex &&
+                    activeScalePosition.fret === fret;
                   const x = fret === 0 ? BOARD_LEFT - 19 : BOARD_LEFT + (fretOffset - 0.5) * FRET_WIDTH;
                   const note = NOTE_NAMES[pitchClass];
                   const scaleDegreeIndex = scale.intervals.findIndex((scaleInterval) => scaleInterval === interval);
-                  const label = `${note} · ${intervalLabels[scaleDegreeIndex]}`;
+                  const label = showAllNotes ? note : `${note} · ${intervalLabels[scaleDegreeIndex]}`;
                   return (
                     <g
                       key={`note-${stringIndex}-${fret}`}
                       data-root={isRoot || undefined}
+                      data-playback-path={isPlaybackPosition || undefined}
+                      data-playing-note={isPlayingNote || undefined}
+                      data-midi={midi}
                       role="button"
                       tabIndex={0}
-                      aria-label={`Play ${label}${isRoot ? ", root" : ""} on ${stringNames[stringIndex]} string, fret ${fret}`}
+                      aria-label={`${isPlayingNote ? "Currently playing " : "Play "}${label}${isRoot ? ", root" : ""}${isPlaybackPosition ? ", fingering position" : ""} on ${stringNames[stringIndex]} string, fret ${fret}`}
                       className="cursor-pointer outline-none focus-visible:[&>circle]:stroke-foreground focus-visible:[&>circle]:stroke-[3]"
                       onClick={() => playFretboardNote(midi)}
                       onKeyDown={(event) => {
@@ -413,14 +588,36 @@ export default function ScaleLibrary() {
                         }
                       }}
                     >
-                      <title>{`${label}${isRoot ? " (root)" : ""}, ${STRING_NAMES[stringIndex]} string, fret ${fret}`}</title>
+                      <title>{`${label}${isRoot ? " (root)" : ""}, ${stringNames[stringIndex]} string, fret ${fret}`}</title>
+                      {isPlayingNote && (
+                        <circle
+                          cx={x}
+                          cy={y}
+                          r={19}
+                          fill="none"
+                          stroke="var(--ring)"
+                          strokeWidth={3}
+                        />
+                      )}
+                      {isPlaybackPosition && !isPlayingNote && (
+                        <circle
+                          cx={x}
+                          cy={y}
+                          r={18}
+                          fill="none"
+                          stroke="var(--foreground)"
+                          strokeWidth={1.5}
+                          strokeDasharray="2 2"
+                          opacity={0.65}
+                        />
+                      )}
                       <circle
                         cx={x}
                         cy={y}
-                        r={15}
+                        r={isPlayingNote ? 16 : 15}
                         fill={isRoot ? "var(--primary)" : "var(--surface-raised)"}
                         stroke={isRoot ? "var(--primary)" : "var(--primary)"}
-                        strokeWidth={isRoot ? 2 : 1.5}
+                        strokeWidth={isPlayingNote ? 3 : isRoot ? 2 : 1.5}
                       />
                       <text
                         x={x}
@@ -445,7 +642,7 @@ export default function ScaleLibrary() {
               : layout === "Vertical"
                 ? "Vertical layout focuses on a five-fret position around the root."
                 : "Diagonal layout follows scale tones from the root up to its octave across the strings."}{" "}
-            String labels show the selected tuning from low string at the bottom to high string at the top. Root notes are highlighted.
+              String labels show the selected tuning from low string at the bottom to high string at the top. Root notes are highlighted, and the dashed outline marks the playable fingering. Playback ascends that connected position, pauses at the octave, then descends.
           </p>
         </CardContent>
       </Card>

@@ -21,7 +21,7 @@ FretLab is a browser-based guitar practice toolkit built with React and Vite. It
 - **Tuner** — detects pitch through the microphone and provides reference tones for the selected tuning.
 - **Metronome** — supports tempo and subdivision controls.
 - **Circle of Fifths** — explores keys, modes, notes, and playable diatonic chords.
-- **Scale Library** — explores scales on an interactive guitar fretboard.
+- **Scale Library** — explores scales on an interactive guitar fretboard. Playback follows a connected four-fret fingering, ascending through one or two octaves and descending back after a pause. The fingering path is marked on the fretboard, the active string and fret are highlighted, and playback tempo is adjustable from 40 to 240 BPM.
 - **Chord Library** — searches chord types, saves favorites, plays chord tones, and displays guitar voicings.
 - **Games** — practice ear training with nine Chord Guess level groups, from open chords and power chords to sevenths and mixed sets; best scores are saved per level on the device.
 - **Themes** — choose Midnight, Studio, Amethyst, or Crimson.

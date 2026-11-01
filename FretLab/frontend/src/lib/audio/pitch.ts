@@ -1,65 +1,70 @@
-const RMS_GATE = 0.008;
-const CLARITY_GATE = 0.6;
+const RMS_GATE = 0.003;
+const MIN_FREQUENCY = 30;
+const MAX_FREQUENCY = 1200;
+const YIN_THRESHOLD = 0.14;
+const MAX_YIN_CONFIDENCE = 0.28;
 
 export function autoCorrelate(buffer: Float32Array, sampleRate: number): number {
-  const size = buffer.length;
-  let rms = 0;
-  for (let i = 0; i < size; i += 1) rms += buffer[i] * buffer[i];
-  rms = Math.sqrt(rms / size);
-  if (rms < RMS_GATE) return -1;
+  const sampleCount = Math.floor(buffer.length / 2);
+  if (sampleCount < 1024 || !Number.isFinite(sampleRate) || sampleRate <= 0) return -1;
 
-  let start = 0;
-  let end = size - 1;
-  const threshold = 0.2;
-  for (let i = 0; i < size / 2; i += 1) {
-    if (Math.abs(buffer[i]) < threshold) {
-      start = i;
-      break;
-    }
-  }
-  for (let i = 1; i < size / 2; i += 1) {
-    if (Math.abs(buffer[size - i]) < threshold) {
-      end = size - i;
-      break;
-    }
-  }
+  let energy = 0;
+  for (let i = 0; i < buffer.length; i += 1) energy += buffer[i] * buffer[i];
+  if (Math.sqrt(energy / buffer.length) < RMS_GATE) return -1;
 
-  const window = buffer.slice(start, end);
-  const windowSize = window.length;
-  if (windowSize < 128) return -1;
+  const effectiveSampleRate = sampleRate / 2;
+  const minLag = Math.max(2, Math.floor(effectiveSampleRate / MAX_FREQUENCY));
+  const maxLag = Math.min(
+    Math.floor(effectiveSampleRate / MIN_FREQUENCY),
+    sampleCount - 1,
+  );
+  const normalizedDifference = new Float64Array(maxLag + 1);
 
-  const correlation = new Float32Array(windowSize);
-  for (let lag = 0; lag < windowSize; lag += 1) {
+  let cumulativeDifference = 0;
+  for (let lag = 1; lag <= maxLag; lag += 1) {
     let sum = 0;
-    for (let i = 0; i < windowSize - lag; i += 1) sum += window[i] * window[i + lag];
-    correlation[lag] = sum;
+    const limit = sampleCount - lag;
+    for (let i = 0; i < limit; i += 1) {
+      const delta = buffer[i * 2] - buffer[(i + lag) * 2];
+      sum += delta * delta;
+    }
+    cumulativeDifference += sum;
+    normalizedDifference[lag] = cumulativeDifference === 0
+      ? 1
+      : (sum * lag) / cumulativeDifference;
   }
-
-  let offset = 0;
-  while (offset + 1 < windowSize && correlation[offset] > correlation[offset + 1]) offset += 1;
 
   let bestLag = -1;
-  let bestValue = -1;
-  for (let lag = offset; lag < windowSize; lag += 1) {
-    if (correlation[lag] > bestValue) {
-      bestValue = correlation[lag];
+  for (let lag = minLag; lag <= maxLag; lag += 1) {
+    if (normalizedDifference[lag] < YIN_THRESHOLD) {
       bestLag = lag;
+      while (bestLag < maxLag && normalizedDifference[bestLag + 1] < normalizedDifference[bestLag]) {
+        bestLag += 1;
+      }
+      break;
     }
   }
-  if (bestLag <= 0) return -1;
 
-  const clarity = bestValue / correlation[0];
-  if (clarity < CLARITY_GATE) return -1;
+  if (bestLag === -1) {
+    let bestConfidence = Number.POSITIVE_INFINITY;
+    for (let lag = minLag; lag <= maxLag; lag += 1) {
+      if (normalizedDifference[lag] < bestConfidence) {
+        bestConfidence = normalizedDifference[lag];
+        bestLag = lag;
+      }
+    }
+  }
 
-  const x1 = correlation[bestLag - 1] ?? 0;
-  const x2 = correlation[bestLag];
-  const x3 = correlation[bestLag + 1] ?? 0;
-  const a = (x1 + x3 - 2 * x2) / 2;
-  const b = (x3 - x1) / 2;
-  let refined = bestLag;
-  if (a !== 0) refined = bestLag - b / (2 * a);
+  if (bestLag < minLag || normalizedDifference[bestLag] > MAX_YIN_CONFIDENCE) return -1;
 
-  const frequency = sampleRate / refined;
-  if (!Number.isFinite(frequency) || frequency < 55 || frequency > 1500) return -1;
+  const previous = normalizedDifference[bestLag - 1];
+  const current = normalizedDifference[bestLag];
+  const next = normalizedDifference[bestLag + 1];
+  const denominator = previous - 2 * current + next;
+  const refinedLag = denominator === 0
+    ? bestLag
+    : bestLag + 0.5 * (previous - next) / denominator;
+  const frequency = effectiveSampleRate / refinedLag;
+  if (!Number.isFinite(frequency) || frequency < MIN_FREQUENCY || frequency > MAX_FREQUENCY) return -1;
   return frequency;
 }

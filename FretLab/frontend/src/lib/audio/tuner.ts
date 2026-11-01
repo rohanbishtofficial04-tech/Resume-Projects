@@ -4,6 +4,7 @@ export type TunerErrorKind = "permission-denied" | "no-microphone" | "insecure-c
 
 export interface TunerStartResult {
   ok: boolean;
+  cancelled?: boolean;
   kind?: TunerErrorKind;
   message?: string;
 }
@@ -27,6 +28,9 @@ export class TunerEngine {
   private source: MediaStreamAudioSourceNode | null = null;
   private frame: number | null = null;
   private active = false;
+  private startGeneration = 0;
+  private lastAnalysisAt = 0;
+  private recentFrequencies: number[] = [];
 
   onFrequency: ((frequency: number) => void) | null = null;
 
@@ -36,6 +40,7 @@ export class TunerEngine {
 
   async start(): Promise<TunerStartResult> {
     if (this.active) return { ok: true };
+    const generation = ++this.startGeneration;
 
     if (typeof window !== "undefined" && window.isSecureContext === false) {
       return {
@@ -52,36 +57,57 @@ export class TunerEngine {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
       });
+      if (generation !== this.startGeneration) {
+        stream.getTracks().forEach((track) => track.stop());
+        return { ok: false, cancelled: true };
+      }
+      this.stream = stream;
       const context = new (audioContextCtor())();
+      this.context = context;
       const source = context.createMediaStreamSource(stream);
       const analyser = context.createAnalyser();
-      analyser.fftSize = 2048;
+      analyser.fftSize = 8192;
       analyser.smoothingTimeConstant = 0;
       source.connect(analyser);
 
-      this.context = context;
-      this.stream = stream;
       this.source = source;
       this.analyser = analyser;
-      this.active = true;
 
       if (context.state === "suspended") await context.resume();
+      if (generation !== this.startGeneration) {
+        this.stop();
+        return { ok: false, cancelled: true };
+      }
+      this.active = true;
 
       const buffer = new Float32Array(analyser.fftSize);
       const sampleRate = context.sampleRate;
 
-      const tick = () => {
+      const tick = (timestamp: number) => {
         if (!this.active || !this.analyser) return;
-        this.analyser.getFloatTimeDomainData(buffer);
-        this.onFrequency?.(autoCorrelate(buffer, sampleRate));
+        if (timestamp - this.lastAnalysisAt >= 40) {
+          this.lastAnalysisAt = timestamp;
+          this.analyser.getFloatTimeDomainData(buffer);
+          const frequency = autoCorrelate(buffer, sampleRate);
+          if (frequency > 0) {
+            this.recentFrequencies.push(frequency);
+            if (this.recentFrequencies.length > 5) this.recentFrequencies.shift();
+            const sortedFrequencies = [...this.recentFrequencies].sort((a, b) => a - b);
+            this.onFrequency?.(sortedFrequencies[Math.floor(sortedFrequencies.length / 2)]);
+          } else {
+            this.recentFrequencies = [];
+            this.onFrequency?.(-1);
+          }
+        }
         this.frame = window.requestAnimationFrame(tick);
       };
       this.frame = window.requestAnimationFrame(tick);
 
       return { ok: true };
     } catch (error) {
+      if (generation !== this.startGeneration) return { ok: false, cancelled: true };
+      this.stop();
       const name = error instanceof DOMException ? error.name : "";
-      await this.releaseStream();
       if (name === "NotAllowedError" || name === "SecurityError") {
         return {
           ok: false,
@@ -101,7 +127,10 @@ export class TunerEngine {
   }
 
   stop(): void {
+    this.startGeneration += 1;
     this.active = false;
+    this.recentFrequencies = [];
+    this.lastAnalysisAt = 0;
     if (this.frame !== null) {
       window.cancelAnimationFrame(this.frame);
       this.frame = null;
