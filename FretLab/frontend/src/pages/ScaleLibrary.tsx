@@ -55,6 +55,7 @@ export default function ScaleLibrary() {
   const [showAllNotes, setShowAllNotes] = useState(false);
   const [playbackBpm, setPlaybackBpm] = useState(120);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [activeScalePosition, setActiveScalePosition] = useState<FretboardNote | null>(null);
   const playbackTimerRef = useRef<number | null>(null);
   const playbackStepRef = useRef<number | null>(null);
@@ -78,6 +79,14 @@ export default function ScaleLibrary() {
   const boardFretCount = boardEndFret - boardStartFret;
   const boardWidth = BOARD_LEFT + boardFretCount * FRET_WIDTH + 12;
   const rootMidi = openStringMidi[0] + rootFret;
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 639px)");
+    const updateViewport = () => setIsMobileViewport(mediaQuery.matches);
+    updateViewport();
+    mediaQuery.addEventListener("change", updateViewport);
+    return () => mediaQuery.removeEventListener("change", updateViewport);
+  }, []);
+
   const playbackNotes = useMemo(() => {
     const octaveSpan = layout === "Diagonal" ? 12 : 24;
     const targetPitches = Array.from({ length: octaveSpan / 12 }, (_, octave) =>
@@ -389,7 +398,7 @@ export default function ScaleLibrary() {
       </Card>
 
       <Card data-testid="scale-fretboard-card">
-        <CardContent className="flex flex-col gap-5 py-6">
+        <CardContent className="scale-fretboard-card-content flex flex-col gap-5 py-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="flex items-end justify-between gap-4">
               <div>
@@ -478,15 +487,18 @@ export default function ScaleLibrary() {
             </div>
           </div>
 
-          <div className="scale-fretboard-scroll mx-auto w-full min-w-0 overflow-x-auto rounded-xl border border-border bg-surface p-3 sm:p-5 md:max-w-[936px]">
+          <div className={`scale-fretboard-scroll mx-auto w-full min-w-0 overflow-x-auto rounded-xl border border-border bg-surface p-3 sm:p-5 md:max-w-[936px]${isMobileViewport ? " scale-fretboard-scroll-mobile" : ""}`}>
             <svg
-              viewBox={`0 0 ${boardWidth} ${BOARD_HEIGHT}`}
+              viewBox={isMobileViewport
+                ? `0 0 ${BOARD_HEIGHT} ${boardWidth}`
+                : `0 0 ${boardWidth} ${BOARD_HEIGHT}`}
               role="group"
               aria-label={`${showAllNotes ? "All" : `${root} ${scale.name} scale`} notes on the guitar fretboard, frets ${boardStartFret} through ${boardEndFret}, ${layout.toLowerCase()} layout, ${tuning.name} tuning`}
               data-testid="scale-fretboard"
               className="scale-fretboard-svg h-auto w-full"
               style={{ "--board-width": `${boardWidth}px` } as React.CSSProperties}
             >
+              <g transform={isMobileViewport ? `translate(${BOARD_HEIGHT} 0) rotate(90)` : undefined}>
               <rect
                 x={BOARD_LEFT}
                 y={BOARD_TOP}
@@ -511,7 +523,7 @@ export default function ScaleLibrary() {
                     />
                     <text
                       x={fret === 0 ? BOARD_LEFT - 19 : x - FRET_WIDTH / 2}
-                      y={BOARD_TOP + (STRING_NAMES.length - 1) * STRING_GAP + 24}
+                      y={BOARD_TOP + (STRING_NAMES.length - 1) * STRING_GAP + 28}
                       textAnchor="middle"
                       fontSize="12"
                       fill="var(--muted-foreground)"
@@ -634,14 +646,17 @@ export default function ScaleLibrary() {
                   );
                 });
               })}
+              </g>
             </svg>
           </div>
           <p className="text-xs text-muted-foreground">
-            {layout === "Full"
-              ? "Full layout shows frets 0–20. Scroll horizontally to explore frets beyond 12."
-              : layout === "Vertical"
-                ? "Vertical layout focuses on a five-fret position around the root."
-                : "Diagonal layout follows scale tones from the root up to its octave across the strings."}{" "}
+            {isMobileViewport
+              ? "The fretboard is displayed vertically on mobile. Scroll within it to explore the frets."
+              : layout === "Full"
+                ? "Full layout shows frets 0–20. Scroll horizontally to explore frets beyond 12."
+                : layout === "Vertical"
+                  ? "Vertical layout focuses on a five-fret position around the root."
+                  : "Diagonal layout follows scale tones from the root up to its octave across the strings."}{" "}
               String labels show the selected tuning from low string at the bottom to high string at the top. Root notes are highlighted, and the dashed outline marks the playable fingering. Playback ascends that connected position, pauses at the octave, then descends.
           </p>
         </CardContent>

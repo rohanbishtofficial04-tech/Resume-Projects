@@ -21,37 +21,41 @@ export function autoCorrelate(buffer: Float32Array, sampleRate: number): number 
   const normalizedDifference = new Float64Array(maxLag + 1);
 
   let cumulativeDifference = 0;
+  let bestLag = -1;
+  let bestConfidence = Number.POSITIVE_INFINITY;
+  let thresholdCrossed = false;
+  let valleyValue = Number.POSITIVE_INFINITY;
   for (let lag = 1; lag <= maxLag; lag += 1) {
     let sum = 0;
     const limit = sampleCount - lag;
     for (let i = 0; i < limit; i += 1) {
-      const delta = buffer[i * 2] - buffer[(i + lag) * 2];
+      const current = (buffer[i * 2] + buffer[i * 2 + 1]) * 0.5;
+      const delayed = (buffer[(i + lag) * 2] + buffer[(i + lag) * 2 + 1]) * 0.5;
+      const delta = current - delayed;
       sum += delta * delta;
     }
     cumulativeDifference += sum;
     normalizedDifference[lag] = cumulativeDifference === 0
       ? 1
       : (sum * lag) / cumulativeDifference;
-  }
 
-  let bestLag = -1;
-  for (let lag = minLag; lag <= maxLag; lag += 1) {
-    if (normalizedDifference[lag] < YIN_THRESHOLD) {
-      bestLag = lag;
-      while (bestLag < maxLag && normalizedDifference[bestLag + 1] < normalizedDifference[bestLag]) {
-        bestLag += 1;
-      }
-      break;
-    }
-  }
-
-  if (bestLag === -1) {
-    let bestConfidence = Number.POSITIVE_INFINITY;
-    for (let lag = minLag; lag <= maxLag; lag += 1) {
-      if (normalizedDifference[lag] < bestConfidence) {
-        bestConfidence = normalizedDifference[lag];
+    if (lag < minLag) continue;
+    const confidence = normalizedDifference[lag];
+    if (!thresholdCrossed) {
+      if (confidence < bestConfidence) {
+        bestConfidence = confidence;
         bestLag = lag;
       }
+      if (confidence < YIN_THRESHOLD) {
+        thresholdCrossed = true;
+        bestLag = lag;
+        valleyValue = confidence;
+      }
+    } else if (confidence < valleyValue) {
+      bestLag = lag;
+      valleyValue = confidence;
+    } else {
+      break;
     }
   }
 
@@ -59,7 +63,7 @@ export function autoCorrelate(buffer: Float32Array, sampleRate: number): number 
 
   const previous = normalizedDifference[bestLag - 1];
   const current = normalizedDifference[bestLag];
-  const next = normalizedDifference[bestLag + 1];
+  const next = normalizedDifference[Math.min(bestLag + 1, maxLag)];
   const denominator = previous - 2 * current + next;
   const refinedLag = denominator === 0
     ? bestLag

@@ -11,6 +11,7 @@ import About from "@/pages/About";
 import Home from "@/pages/Home";
 import Games from "@/pages/Games";
 import ChordGuess from "@/pages/ChordGuess";
+import ChordPlay from "@/pages/ChordPlay";
 
 export default function App() {
   const { pathname } = useLocation();
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/chords" element={<ChordLibrary />} />
           <Route path="/games" element={<Games />} />
           <Route path="/games/chord-guess" element={<ChordGuess />} />
+          <Route path="/games/chord-play" element={<ChordPlay />} />
           <Route path="/about" element={<About />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

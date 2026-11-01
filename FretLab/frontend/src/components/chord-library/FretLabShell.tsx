@@ -1,7 +1,9 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { useEffect, useLayoutEffect, useRef, type MouseEvent } from "react";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { Gauge, Timer, Library, Music2, CircleDot, House, Gamepad2, Palette, Info } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { THEMES, useTheme } from "@/context/ThemeProvider";
+import { readJSON, STORAGE_KEYS, writeJSON } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -31,8 +33,137 @@ function BrandMark() {
 
 export default function FretLabShell() {
   const { theme, setTheme } = useTheme();
+  const { pathname } = useLocation();
+  const navRef = useRef<HTMLElement>(null);
+  const previousPathRef = useRef<string | null>(null);
   const activeTheme = THEMES.find((option) => option.id === theme) ?? THEMES[0];
   const nextTheme = THEMES[(THEMES.findIndex((option) => option.id === theme) + 1) % THEMES.length];
+
+  const handleNavClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    const nav = navRef.current;
+    if (!nav) return;
+
+    const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>("a"));
+    const clickedIndex = links.indexOf(event.currentTarget);
+    const activeIndex = links.findIndex((link) => link.getAttribute("aria-current") === "page");
+    if (clickedIndex < 0 || activeIndex < 0 || clickedIndex === activeIndex) return;
+
+    const navBounds = nav.getBoundingClientRect();
+    const visibleLeft = navBounds.left + nav.clientLeft;
+    const visibleRight = visibleLeft + nav.clientWidth;
+    const visibleIndexes = links.flatMap((link, index) => {
+      const bounds = link.getBoundingClientRect();
+      const visibleWidth = Math.min(bounds.right, visibleRight) - Math.max(bounds.left, visibleLeft);
+      const minimumVisibleWidth = Math.min(link.offsetWidth * 0.5, 48);
+      return visibleWidth > 0 && (index === clickedIndex || visibleWidth >= minimumVisibleWidth)
+        ? [index]
+        : [];
+    });
+    const firstVisibleIndex = visibleIndexes[0];
+    const lastVisibleIndex = visibleIndexes[visibleIndexes.length - 1];
+    if (firstVisibleIndex === undefined || lastVisibleIndex === undefined) return;
+
+    const movingForward = clickedIndex > activeIndex;
+    const movingBackward = clickedIndex < activeIndex;
+    let targetScrollLeft = nav.scrollLeft;
+    const minimumRevealWidth = (link: HTMLAnchorElement) => Math.min(link.offsetWidth * 0.65, 72);
+
+    if (movingForward && clickedIndex === lastVisibleIndex && lastVisibleIndex < links.length - 1) {
+      const firstLink = links[firstVisibleIndex];
+      const nextLink = links[clickedIndex + 1];
+      const stepLink = links[firstVisibleIndex + 1];
+      const nextBounds = nextLink.getBoundingClientRect();
+      const minimumStep = stepLink.offsetLeft - firstLink.offsetLeft;
+      const revealStep = nextBounds.left + minimumRevealWidth(nextLink) - visibleRight;
+      targetScrollLeft += Math.max(minimumStep, revealStep);
+    } else if (movingBackward && clickedIndex === firstVisibleIndex && firstVisibleIndex > 0) {
+      const previousLink = links[firstVisibleIndex - 1];
+      const firstLink = links[firstVisibleIndex];
+      const previousBounds = previousLink.getBoundingClientRect();
+      const minimumStep = firstLink.offsetLeft - previousLink.offsetLeft;
+      const revealStep = visibleLeft + minimumRevealWidth(previousLink) - previousBounds.right;
+      targetScrollLeft -= Math.max(minimumStep, revealStep);
+    }
+
+    if (targetScrollLeft !== nav.scrollLeft) {
+      nav.scrollLeft = Math.max(0, Math.min(targetScrollLeft, nav.scrollWidth - nav.clientWidth));
+      writeJSON(STORAGE_KEYS.navigationScrollLeft, nav.scrollLeft);
+    }
+  };
+
+  const keepActiveLinkVisible = (nav: HTMLElement) => {
+    const activeLink = nav.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!activeLink) return;
+
+    const navBounds = nav.getBoundingClientRect();
+    const linkBounds = activeLink.getBoundingClientRect();
+    const visibleLeft = navBounds.left + nav.clientLeft + 4;
+    const visibleRight = navBounds.right - nav.clientLeft - 4;
+
+    if (linkBounds.left < visibleLeft) {
+      nav.scrollLeft += linkBounds.left - visibleLeft;
+    } else if (linkBounds.right > visibleRight) {
+      nav.scrollLeft += linkBounds.right - visibleRight;
+    }
+  };
+
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+
+    const previousPath = previousPathRef.current;
+    if (previousPath === pathname) return;
+
+    const isInitialRender = previousPath === null;
+    previousPathRef.current = pathname;
+
+    if (isInitialRender) {
+      const savedScrollLeft = readJSON<number | null>(STORAGE_KEYS.navigationScrollLeft, null);
+      if (typeof savedScrollLeft === "number" && Number.isFinite(savedScrollLeft)) {
+        nav.scrollLeft = Math.max(0, savedScrollLeft);
+      }
+    }
+
+    keepActiveLinkVisible(nav);
+    writeJSON(STORAGE_KEYS.navigationScrollLeft, nav.scrollLeft);
+  }, [pathname]);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+
+    let saveTimeout: number | undefined;
+    const saveScrollPosition = () => {
+      if (saveTimeout !== undefined) window.clearTimeout(saveTimeout);
+      saveTimeout = window.setTimeout(() => {
+        writeJSON(STORAGE_KEYS.navigationScrollLeft, nav.scrollLeft);
+      }, 100);
+    };
+    const flushScrollPosition = () => {
+      if (saveTimeout !== undefined) window.clearTimeout(saveTimeout);
+      writeJSON(STORAGE_KEYS.navigationScrollLeft, nav.scrollLeft);
+    };
+
+    nav.addEventListener("scroll", saveScrollPosition, { passive: true });
+    window.addEventListener("pagehide", flushScrollPosition);
+    return () => {
+      nav.removeEventListener("scroll", saveScrollPosition);
+      window.removeEventListener("pagehide", flushScrollPosition);
+      flushScrollPosition();
+    };
+  }, []);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+
+    const handleResize = () => {
+      keepActiveLinkVisible(nav);
+      writeJSON(STORAGE_KEYS.navigationScrollLeft, nav.scrollLeft);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className="relative flex min-h-svh flex-col bg-background text-foreground">
@@ -63,6 +194,7 @@ export default function FretLabShell() {
           </NavLink>
 
           <nav
+            ref={navRef}
             aria-label="FretLab features"
             className="fretlab-nav-scroll order-3 flex w-full items-center gap-1 overflow-x-auto rounded-xl border border-border bg-card p-1 sm:order-none sm:ml-4 sm:w-auto"
           >
@@ -72,6 +204,7 @@ export default function FretLabShell() {
                 to={to}
                 data-testid={testId}
                 end={end}
+                onClick={handleNavClick}
                 className={({ isActive }) =>
                   cn(
                     "flex flex-none items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors duration-150",

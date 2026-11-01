@@ -30,6 +30,7 @@ interface TunerErrorState {
 }
 
 const STRING_LABELS = ["6th · low", "5th", "4th", "3rd", "2nd", "1st · high"];
+const SIGNAL_HOLD_MS = 350;
 
 export default function Tuner() {
   const [tuningId, setTuningId] = usePersistentState<string>(STORAGE_KEYS.tuning, DEFAULT_TUNING_ID);
@@ -45,6 +46,7 @@ export default function Tuner() {
   const tuningRef = useRef(tuning);
   const handlerRef = useRef<(frequency: number) => void>(() => {});
   const lastPaintRef = useRef(0);
+  const lastValidFrequencyAtRef = useRef(0);
   const toneTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -53,14 +55,17 @@ export default function Tuner() {
 
   const handleFrequency = useCallback((frequency: number) => {
     const now = performance.now();
-    if (now - lastPaintRef.current < 70) return;
-    lastPaintRef.current = now;
-
     if (frequency <= 0) {
-      setReading(null);
-      setActiveString(null);
+      if (now - lastValidFrequencyAtRef.current >= SIGNAL_HOLD_MS) {
+        setReading(null);
+        setActiveString(null);
+      }
       return;
     }
+    lastValidFrequencyAtRef.current = now;
+    if (now - lastPaintRef.current < 40) return;
+    lastPaintRef.current = now;
+
     const next = readingFromFrequency(frequency, tuningRef.current.id === "half-step");
     setReading(next);
     setActiveString(closestStringIndex(next.midi, tuningRef.current));
@@ -84,6 +89,8 @@ export default function Tuner() {
 
   const stopListening = useCallback(() => {
     engineRef.current?.stop();
+    lastValidFrequencyAtRef.current = 0;
+    lastPaintRef.current = 0;
     setStatus("idle");
     setReading(null);
     setActiveString(null);
@@ -255,7 +262,8 @@ export default function Tuner() {
                 Input
               </CardTitle>
               <CardDescription>
-                FretLab uses your browser&apos;s microphone only while listening. Nothing is recorded or uploaded.
+                FretLab uses your browser&apos;s microphone only while listening. A gentle filter reduces rumble and
+                hiss; audio is never recorded or uploaded.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">

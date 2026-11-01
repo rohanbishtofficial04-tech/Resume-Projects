@@ -4,7 +4,9 @@ export const STORAGE_KEYS = {
   favorites: "fretlab.favorites",
   metronome: "fretlab.metronome",
   tuning: "fretlab.tuning",
+  navigationScrollLeft: "fretlab.navigation.scrollLeft",
   chordGuessHighScores: "fretlab.chordGuess.highScores",
+  chordPlayHighScores: "fretlab.chordPlay.highScores",
 } as const;
 
 export function readJSON<T>(key: string, fallback: T): T {

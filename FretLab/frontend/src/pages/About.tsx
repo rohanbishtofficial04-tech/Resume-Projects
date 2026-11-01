@@ -20,7 +20,7 @@ const FEATURES = [
   {
     icon: Gamepad2,
     title: "Games",
-    description: "Practice your musical ear with Chord Guess levels covering open chords, power chords, sevenths, and more.",
+    description: "Train your ear with Chord Guess or play chords on your instrument in Chord Sprint.",
   },
 ];
 

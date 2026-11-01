@@ -10,6 +10,8 @@ export interface TunerStartResult {
 }
 
 type AudioContextCtor = new () => AudioContext;
+const ANALYSIS_INTERVAL_MS = 30;
+const FREQUENCY_HISTORY_LENGTH = 3;
 
 function audioContextCtor(): AudioContextCtor {
   const w = window as unknown as {
@@ -26,6 +28,8 @@ export class TunerEngine {
   private analyser: AnalyserNode | null = null;
   private stream: MediaStream | null = null;
   private source: MediaStreamAudioSourceNode | null = null;
+  private highPass: BiquadFilterNode | null = null;
+  private lowPass: BiquadFilterNode | null = null;
   private frame: number | null = null;
   private active = false;
   private startGeneration = 0;
@@ -65,12 +69,24 @@ export class TunerEngine {
       const context = new (audioContextCtor())();
       this.context = context;
       const source = context.createMediaStreamSource(stream);
+      this.source = source;
+      const highPass = context.createBiquadFilter();
+      highPass.type = "highpass";
+      highPass.frequency.value = 30;
+      highPass.Q.value = Math.SQRT1_2;
+      this.highPass = highPass;
+      const lowPass = context.createBiquadFilter();
+      lowPass.type = "lowpass";
+      lowPass.frequency.value = 1200;
+      lowPass.Q.value = Math.SQRT1_2;
+      this.lowPass = lowPass;
       const analyser = context.createAnalyser();
       analyser.fftSize = 8192;
       analyser.smoothingTimeConstant = 0;
-      source.connect(analyser);
+      source.connect(highPass);
+      highPass.connect(lowPass);
+      lowPass.connect(analyser);
 
-      this.source = source;
       this.analyser = analyser;
 
       if (context.state === "suspended") await context.resume();
@@ -85,13 +101,13 @@ export class TunerEngine {
 
       const tick = (timestamp: number) => {
         if (!this.active || !this.analyser) return;
-        if (timestamp - this.lastAnalysisAt >= 40) {
+        if (timestamp - this.lastAnalysisAt >= ANALYSIS_INTERVAL_MS) {
           this.lastAnalysisAt = timestamp;
           this.analyser.getFloatTimeDomainData(buffer);
           const frequency = autoCorrelate(buffer, sampleRate);
           if (frequency > 0) {
             this.recentFrequencies.push(frequency);
-            if (this.recentFrequencies.length > 5) this.recentFrequencies.shift();
+            if (this.recentFrequencies.length > FREQUENCY_HISTORY_LENGTH) this.recentFrequencies.shift();
             const sortedFrequencies = [...this.recentFrequencies].sort((a, b) => a - b);
             this.onFrequency?.(sortedFrequencies[Math.floor(sortedFrequencies.length / 2)]);
           } else {
@@ -138,6 +154,14 @@ export class TunerEngine {
     if (this.source) {
       this.source.disconnect();
       this.source = null;
+    }
+    if (this.highPass) {
+      this.highPass.disconnect();
+      this.highPass = null;
+    }
+    if (this.lowPass) {
+      this.lowPass.disconnect();
+      this.lowPass = null;
     }
     if (this.analyser) {
       this.analyser.disconnect();
