@@ -7,6 +7,8 @@
 - Added a custom fretboard favicon.
 - Updated Circle of Fifths chord controls with clear hover and touch feedback; clicking a chord plays it.
 - Matched Chord Library playback to the Circle of Fifths chord sound while keeping guitar voicing diagrams available.
+- Expanded and validated chord voicings, including standard E- and A-form barre shapes for every major root.
+- Made chord details responsive: the title and close control stay visible while the diagram and playback controls scroll within the dialog on short screens.
 - Improved tuner reference tones with plucked-string harmonics, including a stronger audible presence for low notes.
 - Added Chord Sprint, a microphone-powered guitar chord challenge with open-chord, seventh, and barre-chord levels.
 - Improved the responsive feature menu so edge selections reveal the next option in either direction and the menu position persists after refresh.
@@ -24,7 +26,7 @@ FretLab is a browser-based guitar practice toolkit built with React and Vite. It
 - **Metronome** — supports tempo and subdivision controls.
 - **Circle of Fifths** — explores keys, modes, notes, and playable diatonic chords.
 - **Scale Library** — explores scales on an interactive guitar fretboard. Playback follows a connected four-fret fingering, ascending through one or two octaves and descending back after a pause. The fingering path is marked on the fretboard, the active string and fret are highlighted, and playback tempo is adjustable from 40 to 240 BPM.
-- **Chord Library** — searches chord types, saves favorites, plays chord tones, and displays guitar voicings.
+- **Chord Library** — searches 228 chords across 12 roots and 19 qualities, saves favorites, plays chord tones, and displays validated open and barre voicings. Chord details fit phone and desktop viewports with a persistent title and close control and independently scrollable content.
 - **Games** — practice ear training with nine Chord Guess level groups, from open chords and power chords to sevenths and mixed sets, or play the microphone-powered Chord Sprint instrument challenge. Chord Sprint includes beginner open chords, seventh chords, and barre-chord levels, starts 30-second rounds, detects each new strum without requiring the strings to be muted, gives note-level hints for incorrect chords, resets the round score when a round starts, and awards 5 bonus seconds after every three correctly played chords; best scores are saved per level on the device.
 - **Themes** — choose Midnight, Studio, Amethyst, or Crimson.
 
