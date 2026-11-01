@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "validate:chords": "sh scripts/validate-chords.sh"
+    "validate:chords": "node --experimental-strip-types scripts/validate-chords.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

@@ -1,5 +1,5 @@
 
-import { freqFromMidi, NOTE_NAMES } from "@/lib/music";
+import { freqFromMidi, NOTE_NAMES } from "./music.ts";
 
 const STRING_OPEN_MIDI = [40, 45, 50, 55, 59, 64];
 const MAX_FRET = 15;
@@ -94,7 +94,42 @@ interface Candidate {
   score: number;
 }
 
-function scoreVoicing(frets: number[], rootPc: number, startFret: number): number {
+function findBarres(frets: number[]): VoicingBarre[] {
+  const barres: VoicingBarre[] = [];
+  const fretsUsed = Array.from(new Set(frets.filter((fret) => fret > 0))).sort((a, b) => a - b);
+
+  for (const fret of fretsUsed) {
+    const strings = frets.flatMap((position, string) => (position === fret ? [string] : []));
+    if (strings.length < 2) continue;
+
+    const fromString = strings[0];
+    const toString = strings[strings.length - 1];
+    const canBarre = frets
+      .slice(fromString, toString + 1)
+      .every((position) => position >= fret);
+    if (canBarre) barres.push({ fret, fromString, toString });
+  }
+
+  return barres;
+}
+
+function fingerGroupCount(frets: number[], barres = findBarres(frets)): number {
+  const barreStrings = new Set<number>();
+  barres.forEach(({ fromString, toString }) => {
+    for (let string = fromString; string <= toString; string += 1) {
+      if (frets[string] === frets[fromString]) barreStrings.add(string);
+    }
+  });
+
+  return barres.length + frets.filter((fret, string) => fret > 0 && !barreStrings.has(string)).length;
+}
+
+function scoreVoicing(
+  frets: number[],
+  rootPc: number,
+  startFret: number,
+  requiredTones: Set<number>,
+): number {
   const sounding = soundingStrings(frets);
   if (sounding.length < 4) return Number.NEGATIVE_INFINITY;
 
@@ -102,18 +137,26 @@ function scoreVoicing(frets: number[], rootPc: number, startFret: number): numbe
   if (fretted.length > 0 && Math.max(...fretted) - Math.min(...fretted) > WINDOW) {
     return Number.NEGATIVE_INFINITY;
   }
-  if (new Set(fretted).size > 4) return Number.NEGATIVE_INFINITY;
+  const barres = findBarres(frets);
+  if (fingerGroupCount(frets, barres) > 4) return Number.NEGATIVE_INFINITY;
 
   const bassString = sounding[0];
   const bassIsRoot = stringPitchClass(bassString, frets[bassString]) === rootPc;
   const pitchClasses = new Set(sounding.map((s) => stringPitchClass(s, frets[s])));
+  if ([...requiredTones].some((tone) => !pitchClasses.has(tone))) return Number.NEGATIVE_INFINITY;
   const duplicates = sounding.length - pitchClasses.size;
 
   return (bassIsRoot ? 30 : -18) + sounding.length * 3 - startFret * 3 - duplicates * 3;
 }
 
-function collectVoicings(rootPc: number, intervals: number[], startFret: number): Candidate[] {
+function collectVoicings(
+  rootPc: number,
+  intervals: number[],
+  requiredIntervals: number[],
+  startFret: number,
+): Candidate[] {
   const tones = new Set(intervals.map((interval) => (rootPc + interval) % 12));
+  const requiredTones = new Set(requiredIntervals.map((interval) => (rootPc + interval) % 12));
 
   const options: number[][] = [];
   for (let s = 0; s < 6; s += 1) {
@@ -134,7 +177,7 @@ function collectVoicings(rootPc: number, intervals: number[], startFret: number)
   const walk = (s: number): void => {
     if (highest - lowest > WINDOW) return;
     if (s === 6) {
-      const score = scoreVoicing(current, rootPc, startFret);
+      const score = scoreVoicing(current, rootPc, startFret, requiredTones);
       if (score > Number.NEGATIVE_INFINITY) results.push({ frets: [...current], score });
       return;
     }
@@ -159,51 +202,104 @@ function collectVoicings(rootPc: number, intervals: number[], startFret: number)
 function describeVoicing(frets: number[]): ChordVoicing {
   const fretted = frets.filter((fret) => fret > 0);
   const startFret = fretted.length > 0 ? Math.min(...fretted) : 1;
-
-  const distinct = Array.from(new Set(fretted)).sort((a, b) => a - b);
-  const fingerByFret = new Map<number, number>();
-  distinct.forEach((fret, index) => fingerByFret.set(fret, Math.min(index + 1, 4)));
-
-  const fingers = frets.map((fret) => {
-    if (fret === -1) return -1;
-    if (fret === 0) return 0;
-    return fingerByFret.get(fret) ?? 1;
+  const barres = findBarres(frets);
+  const barreForString = new Map<number, VoicingBarre>();
+  barres.forEach((barre) => {
+    for (let string = barre.fromString; string <= barre.toString; string += 1) {
+      if (frets[string] === barre.fret) barreForString.set(string, barre);
+    }
   });
 
-  const barres: VoicingBarre[] = [];
-  if (distinct.length > 0) {
-    const lowestFret = distinct[0];
-    const held = frets.map((fret, s) => (fret === lowestFret ? s : -1)).filter((s) => s >= 0);
-    for (let i = 0; i < held.length; i += 1) {
-      let end = held[i];
-      let j = i;
-      while (j + 1 < held.length && held[j + 1] === held[j] + 1) {
-        j += 1;
-        end = held[j];
-      }
-      if (end > held[i]) barres.push({ fret: lowestFret, fromString: held[i], toString: end });
-      i = j;
-    }
-  }
+  const groups = new Map<string, { fret: number; strings: number[] }>();
+  frets.forEach((fret, string) => {
+    if (fret <= 0) return;
+    const barre = barreForString.get(string);
+    const key = barre ? `barre-${barre.fret}-${barre.fromString}-${barre.toString}` : `note-${string}`;
+    const group = groups.get(key) ?? { fret, strings: [] };
+    group.strings.push(string);
+    groups.set(key, group);
+  });
+
+  const fingerByString = new Map<number, number>();
+  [...groups.values()]
+    .sort((a, b) => a.fret - b.fret || a.strings[0] - b.strings[0])
+    .forEach((group, index) => group.strings.forEach((string) => fingerByString.set(string, index + 1)));
+
+  const fingers = frets.map((fret, string) => (fret <= 0 ? fret : fingerByString.get(string) ?? 4));
 
   const label =
     fretted.length === 0
       ? "Open position"
       : barres.length > 0
-        ? `Barre · fret ${startFret}`
+        ? `Barre · fret ${barres[0].fret}`
         : `Position · fret ${startFret}`;
 
   return { frets, fingers, startFret, barre: barres[0] ?? null, barres, label };
 }
 
-function buildVoicings(rootPc: number, intervals: number[]): ChordVoicing[] {
+function buildMajorVoicings(rootPc: number): ChordVoicing[] {
+  const voicings: ChordVoicing[] = [];
+  const openVoicings: Record<number, { frets: number[]; fingers: number[] }> = {
+    0: { frets: [-1, 3, 2, 0, 1, 0], fingers: [-1, 3, 2, 0, 1, 0] },
+    2: { frets: [-1, -1, 0, 2, 3, 2], fingers: [-1, -1, 0, 1, 3, 2] },
+    4: { frets: [0, 2, 2, 1, 0, 0], fingers: [0, 2, 3, 1, 0, 0] },
+    7: { frets: [3, 2, 0, 0, 0, 3], fingers: [2, 1, 0, 0, 0, 3] },
+    9: { frets: [-1, 0, 2, 2, 2, 0], fingers: [-1, 0, 1, 2, 3, 0] },
+  };
+  const open = openVoicings[rootPc];
+  if (open) {
+    voicings.push({
+      ...open,
+      startFret: 1,
+      barre: null,
+      barres: [],
+      label: "Open position",
+    });
+  }
+
+  const eFormFret = ((rootPc - 4 + 12) % 12) || 12;
+  const aFormFret = ((rootPc - 9 + 12) % 12) || 12;
+  voicings.push({
+    frets: [eFormFret, eFormFret + 2, eFormFret + 2, eFormFret + 1, eFormFret, eFormFret],
+    fingers: [1, 3, 4, 2, 1, 1],
+    startFret: eFormFret,
+    barre: { fret: eFormFret, fromString: 0, toString: 5 },
+    barres: [{ fret: eFormFret, fromString: 0, toString: 5 }],
+    label: `Barre · fret ${eFormFret}`,
+  });
+  voicings.push({
+    frets: [-1, aFormFret, aFormFret + 2, aFormFret + 2, aFormFret + 2, aFormFret],
+    fingers: [-1, 1, 3, 3, 3, 1],
+    startFret: aFormFret,
+    barre: { fret: aFormFret, fromString: 1, toString: 5 },
+    barres: [{ fret: aFormFret, fromString: 1, toString: 5 }],
+    label: `Barre · fret ${aFormFret}`,
+  });
+
+  return voicings;
+}
+
+function requiredChordIntervals(qualityId: string, intervals: number[]): number[] {
+  const requiredByQuality: Record<string, number[]> = {
+    "9": [0, 2, 4, 10],
+    maj9: [0, 2, 4, 11],
+    min9: [0, 2, 3, 10],
+    "11": [0, 4, 5, 10],
+    "13": [0, 4, 9, 10],
+  };
+  return requiredByQuality[qualityId] ?? intervals;
+}
+
+function buildVoicings(rootPc: number, quality: ChordQuality): ChordVoicing[] {
+  if (quality.id === "maj") return buildMajorVoicings(rootPc);
+  const { intervals } = quality;
   const starts = Array.from(new Set([0, ((rootPc - 4) % 12 + 12) % 12, ((rootPc - 9) % 12 + 12) % 12])).filter(
     (fret) => fret <= 11,
   );
 
   const candidates: Candidate[] = [];
   starts.forEach((startFret) => {
-    candidates.push(...collectVoicings(rootPc, intervals, startFret));
+    candidates.push(...collectVoicings(rootPc, intervals, requiredChordIntervals(quality.id, intervals), startFret));
   });
 
   candidates.sort(
@@ -242,7 +338,7 @@ export function getChordLibrary(): Chord[] {
         name: `${root} ${quality.label}`,
         symbol: `${root}${quality.symbol}`,
         category: quality.category,
-        voicings: buildVoicings(rootPc, quality.intervals),
+        voicings: buildVoicings(rootPc, quality),
       });
     }
   }

@@ -1,17 +1,19 @@
 import type * as React from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
 export function Dialog({ open, onOpenChange, children }: { open: boolean; onOpenChange?: (open: boolean) => void; children: React.ReactNode }) {
   if (!open) return null;
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
       onClick={(event) => {
         if (event.target === event.currentTarget) onOpenChange?.(false);
       }}
     >
       {children}
-    </div>
+    </div>,
+    document.body,
   );
 }
 

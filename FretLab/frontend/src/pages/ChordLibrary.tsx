@@ -255,76 +255,99 @@ export default function ChordLibrary() {
           if (!open) setSelected(null);
         }}
       >
-        <DialogContent className="max-w-lg" data-testid="chord-dialog">
+        <DialogContent
+          className="flex max-h-[calc(100vh-2rem)] max-h-[calc(100dvh-2rem)] flex-col overflow-hidden p-0 sm:p-0"
+          data-testid="chord-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="chord-dialog-title"
+          aria-describedby="chord-dialog-description"
+        >
           {selected && (
             <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-3 font-heading text-2xl">
+              <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-card px-4 py-3 sm:px-6">
+                <DialogTitle
+                  id="chord-dialog-title"
+                  className="flex min-w-0 flex-wrap items-center gap-2 font-heading text-xl sm:text-2xl"
+                >
                   {selected.symbol}
                   <Badge variant="secondary" className="text-[10px] uppercase tracking-[0.14em]">
                     {selected.qualityLabel}
                   </Badge>
                 </DialogTitle>
-                <DialogDescription>
-                  {selected.voicings.length} voicing{selected.voicings.length === 1 ? "" : "s"} — tap one to see its
-                  guitar diagram, then preview the chord.
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="flex flex-wrap gap-2">
-                {selected.voicings.map((voicing, index) => (
-                  <button
-                    key={`${voicing.frets.join("-")}-${index}`}
-                    type="button"
-                    data-testid={`chord-voicing-${index}`}
-                    aria-pressed={index === voicingIndex}
-                    onClick={() => setVoicingIndex(index)}
-                    className={cn(
-                      "rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors duration-150",
-                      index === voicingIndex
-                        ? "border-primary/60 bg-primary/15 text-primary"
-                        : "border-border bg-surface text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {voicing.label}
-                  </button>
-                ))}
+                <button
+                  type="button"
+                  data-testid="chord-dialog-close"
+                  aria-label="Back to chord list"
+                  onClick={() => setSelected(null)}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               </div>
+              <div data-testid="chord-dialog-scroll-area" className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+                <DialogHeader>
+                  <DialogDescription id="chord-dialog-description">
+                    {selected.voicings.length} voicing{selected.voicings.length === 1 ? "" : "s"} — tap one to see its
+                    guitar diagram, then preview the chord.
+                  </DialogDescription>
+                </DialogHeader>
 
-              {activeVoicing && (
-                <div className="flex flex-col items-center gap-4">
-                  <FretboardDiagram
-                    frets={activeVoicing.frets}
-                    fingers={activeVoicing.fingers}
-                    startFret={activeVoicing.startFret}
-                    barre={activeVoicing.barre}
-                    title={selected.symbol}
-                    className="max-w-[260px]"
-                    testId="chord-dialog-diagram"
-                  />
-                  <div className="flex flex-wrap justify-center gap-1.5">
-                    {voicingFrequencies(activeVoicing.frets).map((frequency, index) => (
-                      <span
-                        key={`${frequency}-${index}`}
-                        className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-[11px] text-muted-foreground"
-                      >
-                        {noteName(midiFromFreq(frequency))}
-                      </span>
-                    ))}
-                  </div>
-                  <Button
-                    data-testid="chord-dialog-play"
-                    onClick={() => {
-                      stopAllTones();
-                      playStrum(chordToneFrequencies(selected));
-                    }}
-                    className="w-full"
-                  >
-                    <Play className="h-4 w-4" />
-                    Play {selected.symbol}
-                  </Button>
+                <div className="flex flex-wrap gap-2">
+                  {selected.voicings.map((voicing, index) => (
+                    <button
+                      key={`${voicing.frets.join("-")}-${index}`}
+                      type="button"
+                      data-testid={`chord-voicing-${index}`}
+                      aria-pressed={index === voicingIndex}
+                      onClick={() => setVoicingIndex(index)}
+                      className={cn(
+                        "rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors duration-150",
+                        index === voicingIndex
+                          ? "border-primary/60 bg-primary/15 text-primary"
+                          : "border-border bg-surface text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {voicing.label}
+                    </button>
+                  ))}
                 </div>
-              )}
+
+                {activeVoicing && (
+                  <div className="flex flex-col items-center gap-4">
+                    <FretboardDiagram
+                      frets={activeVoicing.frets}
+                      fingers={activeVoicing.fingers}
+                      startFret={activeVoicing.startFret}
+                      barre={activeVoicing.barre}
+                      title={selected.symbol}
+                      className="max-w-[260px]"
+                      testId="chord-dialog-diagram"
+                    />
+                    <div className="flex flex-wrap justify-center gap-1.5">
+                      {voicingFrequencies(activeVoicing.frets).map((frequency, index) => (
+                        <span
+                          key={`${frequency}-${index}`}
+                          className="rounded-md border border-border bg-surface px-2 py-1 font-mono text-[11px] text-muted-foreground"
+                        >
+                          {noteName(midiFromFreq(frequency))}
+                        </span>
+                      ))}
+                    </div>
+                    <Button
+                      data-testid="chord-dialog-play"
+                      onClick={() => {
+                        stopAllTones();
+                        playStrum(chordToneFrequencies(selected));
+                      }}
+                      className="w-full"
+                    >
+                      <Play className="h-4 w-4" />
+                      Play {selected.symbol}
+                    </Button>
+                  </div>
+                )}
+              </div>
             </>
           )}
         </DialogContent>
