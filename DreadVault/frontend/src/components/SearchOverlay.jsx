@@ -22,6 +22,10 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
   }, [open]);
 
   useEffect(() => {
+    if (!open) {
+      setLoading(false);
+      return;
+    }
     if (!debounced.trim()) {
       setResults([]);
       setError("");
@@ -30,7 +34,7 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
     let cancel = false;
     setLoading(true);
     setError("");
-    getSearch({ query: debounced, page_size: 30 })
+    getSearch({ query: debounced, page_size: 12 })
       .then((data) => {
         if (!cancel) setResults(data?.results || []);
       })
@@ -44,7 +48,7 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
     return () => {
       cancel = true;
     };
-  }, [debounced]);
+  }, [open, debounced]);
 
   useEffect(() => {
     if (!open) return;

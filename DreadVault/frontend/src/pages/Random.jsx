@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getTrending, getTopRated, getRecent } from "@/services/games";
+import { getTrending } from "@/services/games";
 import { TID } from "@/constants/testIds";
 import { Skull, Play } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -17,16 +17,8 @@ export default function Random() {
     setRolling(true);
     setError("");
     try {
-      const [t, r, n] = await Promise.all([
-        getTrending({ page_size: 40 }),
-        getTopRated({ page_size: 40 }),
-        getRecent({ page_size: 40 }),
-      ]);
-      const pool = [
-        ...(t?.results || []),
-        ...(r?.results || []),
-        ...(n?.results || []),
-      ];
+      const data = await getTrending({ page_size: 40 });
+      const pool = data?.results || [];
       const unique = Array.from(new Map(pool.map((g) => [g.id, g])).values());
       await new Promise((res) => setTimeout(res, 1400));
       const picked = unique[Math.floor(Math.random() * unique.length)] || null;
