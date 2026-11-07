@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { TID } from "@/constants/testIds";
 import {
   getTrending,
@@ -8,6 +9,7 @@ import {
   getUpcoming,
   getGenres,
   getPlatforms,
+  getDetails,
   getSearch,
 } from "@/services/games";
 import { GameCarousel } from "@/components/GameCarousel";
@@ -16,17 +18,73 @@ import { PlatformBadges } from "@/components/PlatformBadges";
 import { formatYear, stripHtml } from "@/utils/format";
 import { ChevronRight, Flame, Play } from "lucide-react";
 
-const getFeaturedOutlast = async () => {
-  const search = await getSearch({ query: "Outlast 2", page_size: 10 });
-  const game = (search.results || []).find((result) => result.slug === "outlast-2");
-  if (!game) {
-    throw new Error("RAWG search did not return Outlast 2.");
+const getSilentHill2Remake = async () => {
+  try {
+    const game = await getDetails("silent-hill-2-2024");
+    if (String(game.released || "").startsWith("2024")) {
+      return { ...game, name: "Silent Hill 2" };
+    }
+  } catch (error) {
+    console.warn("Unable to load Silent Hill 2 by its expected slug; searching RAWG.", error);
   }
-  return game;
+
+  const search = await getSearch({ query: "Silent Hill 2", page_size: 40 });
+  const remake = (search.results || []).find((game) =>
+    String(game.released || "").startsWith("2024") &&
+    String(game.name || "").toLowerCase().includes("silent hill 2")
+  );
+  if (!remake?.slug) {
+    throw new Error("RAWG search did not return the 2024 Silent Hill 2 remake.");
+  }
+
+  const game = await getDetails(remake.slug);
+  if (!String(game.released || "").startsWith("2024")) {
+    throw new Error(`RAWG returned ${game.name || remake.slug} instead of the 2024 Silent Hill 2 remake.`);
+  }
+  return { ...game, name: "Silent Hill 2" };
 };
 
-const Hero = ({ game, error }) => {
-  if (!game) {
+const getResidentEvil2Remake = async () => {
+  try {
+    const game = await getDetails("resident-evil-2");
+    if (String(game.released || "").startsWith("2019")) {
+      return { ...game, name: "Resident Evil 2" };
+    }
+  } catch (error) {
+    console.warn("Unable to load Resident Evil 2 by its expected slug; searching RAWG.", error);
+  }
+
+  const search = await getSearch({ query: "Resident Evil 2", page_size: 40 });
+  const remake = (search.results || []).find((game) =>
+    String(game.released || "").startsWith("2019") &&
+    String(game.name || "").toLowerCase().includes("resident evil 2")
+  );
+  if (!remake?.slug) {
+    throw new Error("RAWG search did not return the 2019 Resident Evil 2 remake.");
+  }
+
+  const game = await getDetails(remake.slug);
+  if (!String(game.released || "").startsWith("2019")) {
+    throw new Error(`RAWG returned ${game.name || remake.slug} instead of the 2019 Resident Evil 2 remake.`);
+  }
+  return { ...game, name: "Resident Evil 2" };
+};
+
+const Hero = ({ games, error }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [timerReset, setTimerReset] = useState(0);
+  const reduceMotion = useReducedMotion();
+  const activeGame = games[activeIndex];
+
+  useEffect(() => {
+    if (games.length < 2) return undefined;
+    const timer = window.setInterval(() => {
+      setActiveIndex((index) => (index + 1) % games.length);
+    }, 7000);
+    return () => window.clearInterval(timer);
+  }, [activeIndex, games.length, timerReset]);
+
+  if (!activeGame) {
     return error ? (
       <div role="status" className="grid min-h-[90vh] w-full place-items-center text-sm text-[color:var(--nf-text-dim)]">
         {error}
@@ -38,49 +96,79 @@ const Hero = ({ game, error }) => {
       data-testid={TID.heroBanner}
       className="relative min-h-[90vh] min-h-[90svh] w-full overflow-hidden"
     >
-      <img
-        src={game.background_image}
-        alt={game.name}
-        fetchpriority="high"
-        decoding="async"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      <div className="absolute inset-0 nf-hero-fade" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
-      <div className="nf-fog" />
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={activeGame.id}
+          initial={{ x: reduceMotion ? 0 : "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: reduceMotion ? 0 : "-100%" }}
+          transition={{ duration: reduceMotion ? 0 : 0.8, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0"
+        >
+          <img
+            src={activeGame.background_image}
+            alt={activeGame.name}
+            fetchpriority={activeIndex === 0 ? "high" : "auto"}
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 nf-hero-fade" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
+          <div className="nf-fog" />
 
-      <div className="relative z-10 max-w-[1440px] mx-auto px-5 sm:px-6 md:px-10 min-h-[90vh] min-h-[90svh] flex flex-col justify-end pb-12 sm:pb-16 md:pb-24">
-        <p className="font-brand nf-overline text-[10px] sm:text-[11px] text-[color:var(--nf-accent)]">
-          <Flame className="inline h-3 w-3 mr-2 -mt-0.5" /> Featured · {game.genres?.map((genre) => genre.name).join(" · ") || "Game"}
-        </p>
-        <h1 className="font-display nf-hero-title text-[clamp(2.75rem,12vw,4rem)] sm:text-6xl md:text-7xl lg:text-[7rem] mt-4 max-w-4xl leading-[0.9] sm:leading-[0.82]">
-          {game.name}
-        </h1>
-        <div className="mt-6 flex flex-wrap items-center gap-3">
-          <RatingBadge value={game.rating} metacritic={game.metacritic} />
-          <PlatformBadges platforms={game.parent_platforms} max={6} />
-          <span className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">
-            · {formatYear(game.released)}
-          </span>
-          {game.esrb_rating?.name && (
-            <span className="font-brand text-[11px] tracking-[0.15em] text-[color:var(--nf-text-dim)]">
-              · {game.esrb_rating.name}
-            </span>
-          )}
+          <div className="relative z-10 max-w-[1440px] mx-auto px-5 sm:px-6 md:px-10 min-h-[90vh] min-h-[90svh] flex flex-col justify-end pb-12 sm:pb-16 md:pb-24">
+            <p className="font-brand nf-overline text-[10px] sm:text-[11px] text-[color:var(--nf-accent)]">
+              <Flame className="inline h-3 w-3 mr-2 -mt-0.5" /> Featured · {activeGame.genres?.map((genre) => genre.name).join(" · ") || "Game"}
+            </p>
+            <h1 className="font-display nf-hero-title text-[clamp(2.75rem,12vw,4rem)] sm:text-6xl md:text-7xl lg:text-[7rem] mt-4 max-w-4xl leading-[0.9] sm:leading-[0.82]">
+              {activeGame.name}
+            </h1>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <RatingBadge value={activeGame.rating} metacritic={activeGame.metacritic} />
+              <PlatformBadges platforms={activeGame.parent_platforms} max={6} />
+              <span className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">
+                · {formatYear(activeGame.released)}
+              </span>
+              {activeGame.esrb_rating?.name && (
+                <span className="font-brand text-[11px] tracking-[0.15em] text-[color:var(--nf-text-dim)]">
+                  · {activeGame.esrb_rating.name}
+                </span>
+              )}
+            </div>
+            <p className="mt-6 max-w-2xl line-clamp-3 text-base md:text-lg text-[color:var(--nf-text-dim)] leading-relaxed">
+              {stripHtml(activeGame.description_raw || "Descend into a curated vault of games - each one a doorway into a new world.")
+                .replace(/#{1,6}\s*/g, "")}
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link data-testid={TID.heroCta} to={`/game/${activeGame.slug}`} className="nf-btn nf-btn-primary">
+                <Play className="h-3.5 w-3.5" /> View Details
+              </Link>
+              <Link to="/browse" className="nf-btn">
+                Explore Vault <ChevronRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+      {games.length > 1 && (
+        <div role="group" aria-label="Featured games" className="absolute bottom-5 right-5 z-20 flex gap-2 sm:bottom-8 sm:right-8">
+          {games.map((game, index) => (
+            <button
+              key={game.id}
+              type="button"
+              onClick={() => {
+                setActiveIndex(index);
+                setTimerReset((reset) => reset + 1);
+              }}
+              aria-label={`Show ${game.name}`}
+              aria-current={index === activeIndex ? "true" : undefined}
+              className={`h-2 cursor-pointer select-none caret-transparent rounded-full transition-all duration-300 ${
+                index === activeIndex ? "w-8 bg-white" : "w-2 bg-white/50 hover:bg-white/80"
+              }`}
+            />
+          ))}
         </div>
-        <p className="mt-6 max-w-2xl line-clamp-3 text-base md:text-lg text-[color:var(--nf-text-dim)] leading-relaxed">
-          {stripHtml(game.description_raw || "Descend into a curated vault of games - each one a doorway into a new world.")
-            .replace(/#{1,6}\s*/g, "")}
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link data-testid={TID.heroCta} to={`/game/${game.slug}`} className="nf-btn nf-btn-primary">
-            <Play className="h-3.5 w-3.5" /> View Details
-          </Link>
-          <Link to="/browse" className="nf-btn">
-            Explore Vault <ChevronRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-      </div>
+      )}
     </section>
   );
 };
@@ -176,7 +264,7 @@ export default function Home() {
   const [upcoming, setUpcoming] = useState([]);
   const [genres, setGenres] = useState([]);
   const [platforms, setPlatforms] = useState([]);
-  const [heroGame, setHeroGame] = useState(null);
+  const [heroGames, setHeroGames] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -191,7 +279,22 @@ export default function Home() {
           getUpcoming({ page_size: 12 }),
           getGenres(),
           getPlatforms(),
-          getFeaturedOutlast(),
+          Promise.allSettled([
+            getDetails("outlast-2"),
+            getSilentHill2Remake(),
+            getDetails("resident-evil-7-biohazard"),
+            getDetails("until-dawn"),
+            getResidentEvil2Remake(),
+            getDetails("hellblade-senuas-sacrifice"),
+          ]).then((heroResults) => {
+            const games = heroResults.flatMap((result, index) => {
+              if (result.status === "fulfilled") return [result.value];
+              console.error(`Unable to load homepage featured game ${index + 1}.`, result.reason);
+              return [];
+            });
+            if (games.length === 0) throw new Error("Unable to load any featured games.");
+            return games;
+          }),
         ]);
         if (!mounted) return;
         const setters = [
@@ -201,7 +304,7 @@ export default function Home() {
           (data) => setUpcoming(data?.results || []),
           (data) => setGenres(data?.results || []),
           (data) => setPlatforms(data?.results || []),
-          setHeroGame,
+          setHeroGames,
         ];
         const keys = ["trending", "top", "recent", "upcoming", "genres", "platforms", "hero"];
         results.forEach((result, index) => {
@@ -226,7 +329,7 @@ export default function Home() {
 
   return (
     <div data-testid={TID.home}>
-      <Hero game={heroGame} error={errors.hero} />
+      <Hero games={heroGames} error={errors.hero} />
       <GameCarousel
         title="Trending in the Dark"
         subtitle="Trending Now"
