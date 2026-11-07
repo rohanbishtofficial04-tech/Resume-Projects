@@ -13,6 +13,9 @@ export const GameCarousel = ({ title, subtitle, games, loading, error, tid, view
     const delta = el.clientWidth * 0.85 * (dir === "next" ? 1 : -1);
     el.scrollBy({ left: delta, behavior: "smooth" });
   };
+  const sectionError = error || (!loading && (!games || games.length === 0)
+    ? "Unable to load section. Please try again later."
+    : "");
 
   return (
     <section data-testid={tid} className="max-w-[1440px] mx-auto px-6 md:px-10 mt-16">
@@ -48,9 +51,9 @@ export const GameCarousel = ({ title, subtitle, games, loading, error, tid, view
           </button>
         </div>
       </div>
-      {error ? (
+      {sectionError ? (
         <p role="status" className="py-8 text-sm text-[color:var(--nf-text-dim)]">
-          {error}
+          {sectionError}
         </p>
       ) : <div
         ref={scrollerRef}

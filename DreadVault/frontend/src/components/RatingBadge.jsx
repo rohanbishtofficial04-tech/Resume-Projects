@@ -1,16 +1,23 @@
 import { Star } from "lucide-react";
 import { ratingColor, metacriticColor } from "@/utils/format";
 
-export const RatingBadge = ({ value, metacritic, compact = false }) => {
+export const RatingBadge = ({
+  value,
+  metacritic,
+  criticRating,
+  provider = "rawg",
+  compact = false,
+}) => {
+  const criticsScore = metacritic || criticRating;
   if (compact) {
     return (
       <div className="flex items-center gap-1.5 px-2 py-1 bg-black/70 backdrop-blur-md border border-white/10">
-        {metacritic ? (
+        {criticsScore ? (
           <span
             className="font-brand text-[10px] font-medium tracking-[0.1em]"
-            style={{ color: metacriticColor(metacritic) }}
+            style={{ color: metacriticColor(criticsScore) }}
           >
-            {metacritic}
+            {criticsScore}
           </span>
         ) : null}
         {value ? (
@@ -36,9 +43,22 @@ export const RatingBadge = ({ value, metacritic, compact = false }) => {
           </span>
         </div>
       ) : null}
+      {!metacritic && criticRating ? (
+        <div className="flex items-baseline gap-2">
+          <span className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Critics</span>
+          <span
+            className="font-display text-2xl font-semibold"
+            style={{ color: metacriticColor(criticRating) }}
+          >
+            {criticRating}
+          </span>
+        </div>
+      ) : null}
       {value ? (
         <div className="flex items-baseline gap-2">
-          <span className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">RAWG</span>
+          <span className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">
+            {provider === "igdb" ? "IGDB" : "RAWG"}
+          </span>
           <span className="inline-flex items-center gap-1 font-display text-2xl" style={{ color: ratingColor(value) }}>
             <Star className="h-4 w-4" fill="currentColor" />
             {value.toFixed(1)}

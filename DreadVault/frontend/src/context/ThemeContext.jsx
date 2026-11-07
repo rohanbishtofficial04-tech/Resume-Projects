@@ -5,11 +5,20 @@ const ThemeContext = createContext({ theme: "fog", setTheme: () => {}, toggleThe
 const KEY = "nightfall:theme";
 const THEMES = ["fog", "blood", "eldritch"];
 
+const getDefaultTheme = () => {
+  if (typeof window === "undefined") return "fog";
+  const isMobile = window.matchMedia
+    ? window.matchMedia("(max-width: 767px)").matches
+    : window.innerWidth < 768;
+  return isMobile ? "blood" : "fog";
+};
+
 export const ThemeProvider = ({ children }) => {
   const [theme, setThemeState] = useState(() => {
-    if (typeof window === "undefined") return "fog";
+    const defaultTheme = getDefaultTheme();
+    if (typeof window === "undefined") return defaultTheme;
     const savedTheme = localStorage.getItem(KEY);
-    return THEMES.includes(savedTheme) ? savedTheme : "fog";
+    return THEMES.includes(savedTheme) ? savedTheme : defaultTheme;
   });
 
   useEffect(() => {
@@ -18,7 +27,7 @@ export const ThemeProvider = ({ children }) => {
   }, [theme]);
 
   const setTheme = useCallback((t) => {
-    setThemeState(THEMES.includes(t) ? t : "fog");
+    setThemeState(THEMES.includes(t) ? t : getDefaultTheme());
   }, []);
   const toggleTheme = useCallback(
     () => setThemeState((t) => THEMES[(THEMES.indexOf(t) + 1) % THEMES.length]),

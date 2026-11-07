@@ -7,7 +7,9 @@ const stack = [
   { label: "Tailwind CSS", note: "Design system" },
   { label: "Framer Motion", note: "Motion" },
   { label: "Context API", note: "State" },
-  { label: "RAWG API", note: "Data" },
+  { label: "Express", note: "Backend API" },
+  { label: "IGDB", note: "Primary game data" },
+  { label: "RAWG", note: "Fallback game data" },
   { label: "Axios", note: "Network" },
   { label: "Lucide", note: "Icons" },
 ];
@@ -21,21 +23,22 @@ export default function About() {
       <div className="mt-8 grid gap-10 lg:grid-cols-3">
         <div className="lg:col-span-2 text-[color:var(--nf-text-dim)] text-base leading-relaxed">
           <p>
-            DreadVault is a cinematic discovery platform for the horror genre — a hand-tuned
-            catalog built on top of the RAWG Video Games API. The design borrows from
-            survival-horror pillars like Silent Hill's fog and Resident Evil's blood-lit
-            corridors, adapted for a modern web experience.
+            DreadVault is a cinematic, horror-first game discovery platform. It brings together
+            trending, highly rated, recently released, and upcoming games using IGDB, with RAWG
+            available as a fallback. The design borrows from survival-horror pillars like Silent
+            Hill's fog and Resident Evil's blood-lit corridors, adapted for a modern web experience.
           </p>
           <p className="mt-4">
-            Everything you save lives in your browser. There is no account, no tracker
-            harvesting your library — only you, the vault, and whatever you choose to bring home from it.
+            Browse and search the catalog, compare games, or explore the rotating featured-game
+            carousel. Favorites, recently viewed titles, and personal collections are stored in
+            your browser, with no account required.
           </p>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             <div className="border border-[color:var(--nf-border)] p-5">
               <Layers className="h-5 w-5 text-[color:var(--nf-accent)]" strokeWidth={1.4} />
               <p className="mt-3 font-display text-xl">Curated</p>
-              <p className="mt-1 text-sm text-[color:var(--nf-text-dim)]">Filtered to the horror genre — always.</p>
+              <p className="mt-1 text-sm text-[color:var(--nf-text-dim)]">Horror-first discovery with hand-picked featured games.</p>
             </div>
             <div className="border border-[color:var(--nf-border)] p-5">
               <Zap className="h-5 w-5 text-[color:var(--nf-accent)]" strokeWidth={1.4} />
@@ -45,7 +48,7 @@ export default function About() {
             <div className="border border-[color:var(--nf-border)] p-5">
               <Shield className="h-5 w-5 text-[color:var(--nf-accent)]" strokeWidth={1.4} />
               <p className="mt-3 font-display text-xl">Private</p>
-              <p className="mt-1 text-sm text-[color:var(--nf-text-dim)]">Favorites stay in localStorage.</p>
+              <p className="mt-1 text-sm text-[color:var(--nf-text-dim)]">Your library stays in your browser.</p>
             </div>
           </div>
         </div>
@@ -70,21 +73,31 @@ export default function About() {
             <p className="mt-2 text-sm">Built as a portfolio piece for horror-game enthusiasts.</p>
             <div className="mt-4 flex flex-col gap-2 text-sm">
               <a
-                href="https://github.com/rohanbishtofficial04-tech/Resume-Projects/tree/main/DreadVault"
+                href="https://github.com/rohanbishtofficial04-tech/Resume-Projects"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 hover:text-[color:var(--nf-accent-strong)]"
               >
                 <Github className="h-3.5 w-3.5" /> GitHub repository <ExternalLink className="h-3.5 w-3.5" />
               </a>
-              <a
-                href="https://rawg.io/apidocs"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 hover:text-[color:var(--nf-accent-strong)]"
-              >
-                <ExternalLink className="h-3.5 w-3.5" /> RAWG API
-              </a>
+              <div className="mt-2 flex flex-col gap-2">
+                <a
+                  href="https://api-docs.igdb.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 hover:text-[color:var(--nf-accent-strong)]"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" /> IGDB API
+                </a>
+                <a
+                  href="https://rawg.io/apidocs"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 hover:text-[color:var(--nf-accent-strong)]"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" /> RAWG API fallback
+                </a>
+              </div>
             </div>
           </div>
         </aside>

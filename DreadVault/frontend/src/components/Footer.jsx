@@ -10,7 +10,7 @@ export const Footer = () => (
           <span className="font-brand text-sm">DreadVault</span>
         </div>
         <p className="mt-4 max-w-sm text-sm text-[color:var(--nf-text-dim)] leading-relaxed">
-          A cinematic discovery vault for the horror genre. Curated from the RAWG catalog —
+          A cinematic, horror-first discovery vault powered by IGDB, with RAWG as a fallback —
           designed for those who prefer their games with a pulse and a scream.
         </p>
       </div>
@@ -38,11 +38,19 @@ export const Footer = () => (
         <div className="mt-4 flex flex-wrap gap-3 text-sm">
           <a
             className="inline-flex items-center gap-1.5 hover:text-[color:var(--nf-accent-strong)]"
+            href="https://api-docs.igdb.com/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            IGDB <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+          <a
+            className="inline-flex items-center gap-1.5 hover:text-[color:var(--nf-accent-strong)]"
             href="https://rawg.io/apidocs"
             target="_blank"
             rel="noreferrer"
           >
-            RAWG Video Games API <ExternalLink className="h-3.5 w-3.5" />
+            RAWG fallback <ExternalLink className="h-3.5 w-3.5" />
           </a>
           <a
             className="inline-flex items-center gap-1.5 hover:text-[color:var(--nf-accent-strong)]"

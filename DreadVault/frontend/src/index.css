@@ -215,6 +215,20 @@
   color: var(--nf-text);
 }
 
+.nf-nonselectable,
+.nf-nonselectable * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nf-nonselectable::selection,
+.nf-nonselectable *::selection {
+  background: transparent;
+  color: inherit;
+}
+
 .nf-card-hover {
   transition:
     transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
@@ -341,6 +355,14 @@
 * {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  caret-color: transparent;
+}
+
+input,
+textarea,
+[contenteditable="true"],
+[contenteditable=""] {
+  caret-color: auto;
 }
 
 *::-webkit-scrollbar {

@@ -31,7 +31,13 @@ export const GameCard = ({ game, priority = false }) => {
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
           <div className="absolute top-2 right-2">
-            <RatingBadge value={game.rating} metacritic={game.metacritic} compact />
+            <RatingBadge
+              value={game.rating}
+              metacritic={game.metacritic}
+              criticRating={game.critic_rating}
+              provider={game.provider}
+              compact
+            />
           </div>
           <button
             data-testid={TID.favoriteBtn}
