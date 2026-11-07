@@ -4,11 +4,6 @@ import { motion } from "framer-motion";
 import { getBrowse, getGenres, getPlatforms } from "@/services/games";
 import { GameGrid } from "@/components/GameGrid";
 import { TID } from "@/constants/testIds";
-import {
-  prioritizePopularItems,
-  selectPopularGenres,
-  selectPopularPlatforms,
-} from "@/utils/popularCatalog";
 import { Filter, X } from "lucide-react";
 
 const SORTS = [
@@ -134,8 +129,6 @@ export default function Browse() {
     () => [genre, platform, year, rating, search].filter(Boolean).length,
     [genre, platform, year, rating, search]
   );
-  const orderedGenres = prioritizePopularItems(genres, selectPopularGenres(genres));
-  const orderedPlatforms = prioritizePopularItems(platforms, selectPopularPlatforms(platforms));
 
   const FiltersInner = (
     <div className="space-y-8">
@@ -161,7 +154,7 @@ export default function Browse() {
       <div>
         <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)] mb-3">Genre</p>
         <div data-testid={TID.filterGenre} className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-1">
-          {orderedGenres.map((g) => (
+          {genres.map((g) => (
             <button
               type="button"
               key={g.id}
@@ -179,7 +172,7 @@ export default function Browse() {
       <div>
         <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)] mb-3">Platform</p>
         <div data-testid={TID.filterPlatform} className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-1">
-          {orderedPlatforms.map((p) => (
+          {platforms.map((p) => (
             <button
               type="button"
               key={p.id}

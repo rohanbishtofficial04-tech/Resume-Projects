@@ -31,11 +31,7 @@ export const PlatformBadges = ({ platforms = [], max = 5 }) => {
     <div className="flex items-center gap-1.5 text-[color:var(--nf-text-dim)]">
       {items.map(({ key, name }) => {
         const Icon = ICONS[key] || Circle;
-        return (
-          <span key={key} title={name} aria-label={name}>
-            <Icon className="h-3 w-3" strokeWidth={1.5} aria-hidden="true" />
-          </span>
-        );
+        return <Icon key={key} className="h-3 w-3" strokeWidth={1.5} aria-label={name} />;
       })}
     </div>
   );

@@ -7,7 +7,6 @@ import {
   getScreenshots,
   getMovies,
   getRelated,
-  getSeries,
   getBrowse,
 } from "@/services/games";
 import { useLibrary } from "@/context/LibraryContext";
@@ -31,54 +30,10 @@ import {
 const TrailerVideo = ({ src, poster, autoPlay = false, className = "" }) => {
   const videoRef = useRef(null);
   const [playing, setPlaying] = useState(false);
-  const isYouTubeEmbed = /^https:\/\/www\.youtube-nocookie\.com\/embed\/[A-Za-z0-9_-]+$/.test(src || "");
-  const [youtubeStarted, setYoutubeStarted] = useState(autoPlay);
 
   const play = () => {
     videoRef.current?.play().catch(() => toast("Unable to play trailer."));
   };
-
-  if (isYouTubeEmbed) {
-    const videoId = src.split("/").pop();
-    const thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-    const url = new URL(src);
-    url.searchParams.set("autoplay", "1");
-    url.searchParams.set("playsinline", "1");
-    url.searchParams.set("rel", "0");
-    return (
-      <div className={`relative aspect-video overflow-hidden bg-black ${className}`} onClick={(event) => event.stopPropagation()}>
-        {youtubeStarted ? (
-          <iframe
-            src={url.toString()}
-            title="Game trailer"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            referrerPolicy="strict-origin-when-cross-origin"
-            className="h-full w-full border border-[color:var(--nf-border)]"
-          />
-        ) : (
-          <button
-            type="button"
-            onClick={() => setYoutubeStarted(true)}
-            aria-label="Play trailer"
-            className="group absolute inset-0 grid h-full w-full place-items-center overflow-hidden"
-          >
-            <img
-              src={thumbnail}
-              alt=""
-              onError={(event) => {
-                if (poster) event.currentTarget.src = poster;
-              }}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <span className="relative grid h-16 w-16 place-items-center rounded-full bg-black/70 text-white ring-1 ring-white/70 transition-transform group-hover:scale-110">
-              <Play className="ml-1 h-7 w-7 fill-current" />
-            </span>
-          </button>
-        )}
-      </div>
-    );
-  }
 
   return (
     <div className={`relative aspect-video overflow-hidden bg-black ${className}`} onClick={(event) => event.stopPropagation()}>
@@ -121,13 +76,11 @@ export default function GameDetails() {
   const [screens, setScreens] = useState([]);
   const [movies, setMovies] = useState([]);
   const [related, setRelated] = useState([]);
-  const [series, setSeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pageError, setPageError] = useState("");
   const [screensError, setScreensError] = useState("");
   const [moviesError, setMoviesError] = useState("");
   const [relatedError, setRelatedError] = useState("");
-  const [seriesError, setSeriesError] = useState("");
   const [lightbox, setLightbox] = useState(null);
   const [trailerOpen, setTrailerOpen] = useState(false);
   const [collectionOpen, setCollectionOpen] = useState(false);
@@ -141,12 +94,10 @@ export default function GameDetails() {
     setScreens([]);
     setMovies([]);
     setRelated([]);
-    setSeries([]);
     setPageError("");
     setScreensError("");
     setMoviesError("");
     setRelatedError("");
-    setSeriesError("");
     (async () => {
       let currentGame;
       try {
@@ -174,7 +125,6 @@ export default function GameDetails() {
         getScreenshots(slug),
         getMovies(slug),
         getRelated(slug, currentGame),
-        getSeries(slug, currentGame),
       ]);
       if (!mounted) return;
 
@@ -195,9 +145,10 @@ export default function GameDetails() {
       if (results[2].status === "rejected") {
         console.error(`Unable to load related games for ${slug}.`, results[2].reason);
         setRelatedError("Unable to load related games right now.");
+        return;
       }
 
-      let rel = results[2].status === "fulfilled" ? results[2].value?.results || [] : [];
+      let rel = results[2].value?.results || [];
       if (rel.length < 4 && currentGame?.genres?.length) {
         try {
           const fallback = await getBrowse({
@@ -210,12 +161,6 @@ export default function GameDetails() {
           console.error(`Unable to load additional related games for ${slug}.`, requestError);
           if (rel.length === 0) setRelatedError("Unable to load related games right now.");
         }
-      }
-      if (results[3].status === "fulfilled") {
-        setSeries(results[3].value?.results || []);
-      } else {
-        console.error(`Unable to load the series timeline for ${slug}.`, results[3].reason);
-        setSeriesError("Unable to load the series timeline right now.");
       }
       if (mounted) setRelated(rel);
     })();
@@ -319,66 +264,6 @@ export default function GameDetails() {
   };
 
   const trailer = movies[0]?.data?.max || movies[0]?.data?.["480"];
-  const releaseDates = game.release_dates || [];
-  const hasReleaseStatus = Boolean(game.release_status || releaseDates.some((release) => release.status));
-  const ratingDescriptors = [...new Set(
-    (game.age_ratings || []).flatMap((rating) => rating.descriptors || [])
-  )];
-  const ratingSynopses = [...new Set(
-    (game.age_ratings || []).map((rating) => rating.synopsis).filter(Boolean)
-  )];
-  const regionalRatings = (game.age_ratings || [])
-    .filter((rating) => rating.organization && rating.rating)
-    .map((rating) => ({
-      ...rating,
-      descriptors: [...new Set(rating.descriptors || [])],
-    }));
-  const multiplayerDetails = (game.multiplayer_modes || []).flatMap((mode) => {
-    const details = [];
-    if (mode.campaign_coop) details.push("Campaign co-op");
-    if (mode.drop_in) details.push("Drop-in / drop-out");
-    if (mode.lan_coop) details.push("LAN co-op");
-    if (mode.offline_coop) {
-      details.push(`Offline co-op${mode.offline_coop_max ? ` · up to ${mode.offline_coop_max}` : ""}`);
-    }
-    if (mode.online_coop) {
-      details.push(`Online co-op${mode.online_coop_max ? ` · up to ${mode.online_coop_max}` : ""}`);
-    }
-    if (mode.split_screen) details.push("Split-screen");
-    if (mode.split_screen_online) details.push("Online split-screen");
-    if (mode.offline_max) details.push(`Offline multiplayer · up to ${mode.offline_max}`);
-    if (mode.online_max) details.push(`Online multiplayer · up to ${mode.online_max}`);
-    return details.map((detail) => ({
-      key: `${mode.platform || "game"}-${detail}`,
-      label: mode.platform ? `${detail} (${mode.platform})` : detail,
-    }));
-  });
-  const gameVersions = [
-    ...(game.ports || []).map((item) => ({ ...item, relation: "Port" })),
-    ...(game.remakes || []).map((item) => ({ ...item, relation: "Remake" })),
-    ...(game.remasters || []).map((item) => ({ ...item, relation: "Remaster" })),
-  ].filter((item, index, items) =>
-    item.name && items.findIndex((candidate) => candidate.slug === item.slug || candidate.id === item.id) === index
-  );
-  const websites = game.websites || [];
-  const storefrontLinks = websites.filter((website) => website.category === "store");
-  const communityLinks = websites.filter((website) => website.category === "community");
-  const franchiseNames = [
-    ...(game.franchises || []).map((item) => item.name),
-    ...(game.collections || []).map((item) => item.name),
-  ].filter(Boolean);
-  const relatedContent = [
-    ...(game.dlcs || []).map((item) => ({ ...item, relation: "DLC" })),
-    ...(game.expansions || []).map((item) => ({ ...item, relation: "Expansion" })),
-    ...(game.expanded_games || []).map((item) => ({ ...item, relation: "Expanded game" })),
-    ...(game.standalone_expansions || []).map((item) => ({ ...item, relation: "Standalone expansion" })),
-    ...(game.parent_game ? [{ ...game.parent_game, relation: "Base game" }] : []),
-  ].filter((item, index, items) =>
-    item.name && items.findIndex((candidate) => candidate.slug === item.slug || candidate.id === item.id) === index
-  );
-  const timeline = [...series].sort((a, b) =>
-    String(a.released || "").localeCompare(String(b.released || ""))
-  );
 
   const showPreviousScreenshot = () => {
     setLightbox((index) => (index - 1 + visibleScreens.length) % visibleScreens.length);
@@ -404,31 +289,27 @@ export default function GameDetails() {
               navigate(location.key === "default" ? "/browse" : -1)
             }
             className="nf-btn min-h-11 min-w-11 px-3 sm:px-5 shadow-lg"
+            style={{ backgroundColor: "var(--nf-bg)" }}
             aria-label="Back to browse"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Back
           </button>
         </div>
-        <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 flex-col items-start justify-end px-4 pt-8 pb-4 sm:px-6 sm:pt-4 sm:pb-4 md:px-10 md:pb-6">
-          <div className="w-full min-w-0 max-w-4xl">
-            <p className="break-words font-brand text-[11px] tracking-[0.2em] sm:tracking-[0.3em] text-[color:var(--nf-accent)]">
+        <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 items-end px-6 pt-8 pb-2 sm:px-6 sm:pt-4 sm:pb-4 md:px-10 md:pb-6">
+          <div className="max-w-4xl">
+            <p className="font-brand text-[11px] tracking-[0.3em] text-[color:var(--nf-accent)]">
               {(game.genres || []).slice(0, 3).map((g) => g.name).join(" · ")}
             </p>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="break-words font-display text-4xl sm:text-6xl md:text-7xl tracking-tight leading-[0.95] mt-2 sm:mt-4"
+              className="font-display text-4xl sm:text-6xl md:text-7xl tracking-tight leading-[0.95] mt-2 sm:mt-4"
             >
               {game.name}
             </motion.h1>
             <div className="mt-3 sm:mt-6 flex flex-wrap items-center gap-3">
-              <RatingBadge
-                value={game.rating}
-                metacritic={game.metacritic}
-                criticRating={game.critic_rating}
-                provider={game.provider}
-              />
+              <RatingBadge value={game.rating} metacritic={game.metacritic} />
               <PlatformBadges platforms={game.parent_platforms} max={6} />
               <span className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">
                 Released {formatDate(game.released)}
@@ -438,7 +319,7 @@ export default function GameDetails() {
               <button
                 data-testid={TID.detailsFavorite}
                 onClick={() => toggleFavorite(game)}
-                className={`nf-btn min-h-11 ${fav ? "nf-btn-primary" : ""}`}
+                className={`nf-btn ${fav ? "nf-btn-primary" : ""}`}
                 aria-pressed={fav}
               >
                 <Heart className="h-3.5 w-3.5" fill={fav ? "currentColor" : "none"} />
@@ -447,18 +328,18 @@ export default function GameDetails() {
               <button
                 data-testid={TID.detailsCollection}
                 onClick={() => setCollectionOpen(true)}
-                className="nf-btn min-h-11"
+                className="nf-btn"
               >
                 <FolderPlus className="h-3.5 w-3.5" /> Add to Collection
               </button>
-              <button data-testid={TID.detailsShare} onClick={share} className="nf-btn min-h-11">
+              <button data-testid={TID.detailsShare} onClick={share} className="nf-btn">
                 <Share2 className="h-3.5 w-3.5" /> Share
               </button>
               {trailer && (
                 <button
                   data-testid={TID.detailsTrailer}
                   onClick={() => setTrailerOpen(true)}
-                  className="nf-btn min-h-11"
+                  className="nf-btn"
                 >
                   <Play className="h-3.5 w-3.5" /> Play Trailer
                 </button>
@@ -485,85 +366,39 @@ export default function GameDetails() {
           <p className="mt-6 text-[color:var(--nf-text-dim)] leading-relaxed whitespace-pre-line">
             {stripHtml(game.description_raw || game.description || "No description available.")}
           </p>
-          {(screens.length > 0 || screensError) && (
-            <section data-testid={TID.detailsScreenshots} className="mt-10">
-              <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Screenshots</p>
-              <h2 className="font-display text-3xl md:text-4xl mt-1">Fragments</h2>
-              {screensError ? (
-                <p role="status" className="mt-6 text-sm text-[color:var(--nf-text-dim)]">{screensError}</p>
-              ) : (
-                <div className="mt-6 grid gap-3 grid-cols-2 md:grid-cols-3">
-                  {visibleScreens.map((s, i) => (
-                    <button
-                      key={s.id}
-                      onClick={() => setLightbox(i)}
-                      className={`relative overflow-hidden border border-[color:var(--nf-border)] group ${
-                        i === 0 ? "md:col-span-2 md:row-span-2" : ""
-                      }`}
-                    >
-                      <img
-                        src={s.image}
-                        alt={`Screenshot ${i + 1}`}
-                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-[600ms] ease-out"
-                        loading="lazy"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
-          <section className="mt-10">
-            <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Game Trailer</p>
-            <h2 className="font-display text-3xl md:text-4xl mt-1">{game.name}</h2>
-            {trailer ? (
-              <TrailerVideo
-                src={trailer}
-                poster={game.background_image}
-                className="mt-6 w-full"
-              />
-            ) : (
-              <p role={moviesError ? "status" : undefined} className="mt-6 border border-[color:var(--nf-border)] p-5 text-sm text-[color:var(--nf-text-dim)]">
-                {moviesError || "Not available"}
-              </p>
-            )}
-          </section>
         </div>
 
         <aside className="space-y-6">
-          {[
-            ["Genres & themes", (game.genres || []).map((item) => item.name).filter(Boolean).join(", ")],
-            ["Developer", (game.developers || []).map((item) => item.name).filter(Boolean).join(", ")],
-            ["Publisher", (game.publishers || []).map((item) => item.name).filter(Boolean).join(", ")],
-            ["Platforms", (game.platforms || []).map((item) => item.platform?.name || item.name).filter(Boolean).join(", ")],
-            ["Series", [...new Set(franchiseNames)].join(", ")],
-            ["Game type", game.game_type],
-            ["Game engine", (game.game_engines || []).map((engine) => engine.name).filter(Boolean).join(", ")],
-            ["Game modes", (game.game_modes || []).map((item) => item.name).filter(Boolean).join(", ")],
-            ["Player perspective", (game.player_perspectives || []).map((item) => item.name).filter(Boolean).join(", ")],
-            ["Release status", game.release_status],
-            ["Player ratings", Number(game.rating_count || game.ratings_count) > 0
-              ? formatRatingCount(game.rating_count || game.ratings_count)
-              : ""],
-            ["Critic ratings", Number(game.critic_rating_count) > 0
-              ? formatRatingCount(game.critic_rating_count)
-              : ""],
-            ["Average playtime", Number(game.playtime) > 0 ? formatPlaytime(game.playtime) : ""],
-            ["ESRB rating", formatEsrb(game.esrb_rating) === "Not available" ? "" : formatEsrb(game.esrb_rating)],
-          ].filter(([, value]) => value).map(([label, value]) => (
-            <div key={label} className="border border-[color:var(--nf-border)] p-5">
-              <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">{label}</p>
-              <p className="mt-1 text-sm">{value}</p>
-            </div>
-          ))}
-          {multiplayerDetails.length > 0 && (
-            <div className="border border-[color:var(--nf-border)] p-5">
-              <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Multiplayer</p>
-              <ul className="mt-2 space-y-1 text-sm">
-                {multiplayerDetails.map((detail) => <li key={detail.key}>{detail.label}</li>)}
-              </ul>
-            </div>
-          )}
+          <div className="border border-[color:var(--nf-border)] p-5">
+            <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Developer</p>
+            <p className="mt-1 text-sm">
+              {(game.developers || []).map((d) => d.name).join(", ") || "—"}
+            </p>
+          </div>
+          <div className="border border-[color:var(--nf-border)] p-5">
+            <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Publisher</p>
+            <p className="mt-1 text-sm">
+              {(game.publishers || []).map((d) => d.name).join(", ") || "—"}
+            </p>
+          </div>
+          <div className="border border-[color:var(--nf-border)] p-5">
+            <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Platforms</p>
+            <p className="mt-1 text-sm">
+              {(game.platforms || []).map((p) => p.platform?.name || p.name).join(", ") || "—"}
+            </p>
+          </div>
+          <div className="border border-[color:var(--nf-border)] p-5">
+            <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Rating Count</p>
+            <p className="mt-1 text-sm">{formatRatingCount(game.ratings_count)}</p>
+          </div>
+          <div className="border border-[color:var(--nf-border)] p-5">
+            <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Playtime</p>
+            <p className="mt-1 text-sm">{formatPlaytime(game.playtime)}</p>
+          </div>
+          <div className="border border-[color:var(--nf-border)] p-5">
+            <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">ESRB Rating</p>
+            <p className="mt-1 text-sm">{formatEsrb(game.esrb_rating)}</p>
+          </div>
           {game.stores?.length ? (
             <div className="border border-[color:var(--nf-border)] p-5">
               <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-text-dim)] mb-3">
@@ -587,194 +422,46 @@ export default function GameDetails() {
         </aside>
       </section>
 
-      {(ratingDescriptors.length > 0 || ratingSynopses.length > 0) && (
-        <section
-          className="nf-nonselectable max-w-[1440px] mx-auto px-6 md:px-10 mt-16 cursor-default"
-          onContextMenu={(event) => event.preventDefault()}
-        >
-          <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Content & age-rating details</p>
-          <h2 className="font-display text-3xl md:text-4xl mt-1">Know what awaits</h2>
-          {ratingDescriptors.length > 0 && (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {ratingDescriptors.map((descriptor) => (
-                <span key={descriptor} className="nf-chip">{descriptor}</span>
-              ))}
-            </div>
-          )}
-          {ratingSynopses.map((synopsis) => (
-            <p key={synopsis} className="mt-4 max-w-3xl text-sm text-[color:var(--nf-text-dim)]">
-              {synopsis}
-            </p>
-          ))}
-        </section>
-      )}
+      <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-20">
+        <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Game Trailer</p>
+        <h2 className="font-display text-3xl md:text-4xl mt-1">{game.name}</h2>
+        {trailer ? (
+          <TrailerVideo
+            src={trailer}
+            poster={game.background_image}
+            className="mt-6 w-full"
+          />
+        ) : (
+          <p role={moviesError ? "status" : undefined} className="mt-6 border border-[color:var(--nf-border)] p-5 text-sm text-[color:var(--nf-text-dim)]">
+            {moviesError || "Not available"}
+          </p>
+        )}
+      </section>
 
-      {regionalRatings.length > 0 && (
-        <section
-          className="nf-nonselectable max-w-[1440px] mx-auto px-6 md:px-10 mt-16 cursor-default"
-          onContextMenu={(event) => event.preventDefault()}
-        >
-          <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Regional age ratings</p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {regionalRatings.map((rating, index) => (
-              <div key={`${rating.organization}-${rating.rating}-${index}`} className="border border-[color:var(--nf-border)] p-5">
-                <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-accent)]">{rating.organization}</p>
-                <p className="mt-2 font-display text-2xl">{rating.rating}</p>
-                {rating.descriptors.length > 0 && (
-                  <p className="mt-2 text-sm text-[color:var(--nf-text-dim)]">{rating.descriptors.join(", ")}</p>
-                )}
-              </div>
+      {(screens.length > 0 || screensError) && (
+        <section data-testid={TID.detailsScreenshots} className="max-w-[1440px] mx-auto px-6 md:px-10 mt-20">
+          <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Screenshots</p>
+          <h2 className="font-display text-3xl md:text-4xl mt-1">Fragments</h2>
+          {screensError ? (
+            <p role="status" className="mt-6 text-sm text-[color:var(--nf-text-dim)]">{screensError}</p>
+          ) : <div className="mt-6 grid gap-3 grid-cols-2 md:grid-cols-3">
+            {visibleScreens.map((s, i) => (
+              <button
+                key={s.id}
+                onClick={() => setLightbox(i)}
+                className={`relative overflow-hidden border border-[color:var(--nf-border)] group ${
+                  i === 0 ? "md:col-span-2 md:row-span-2" : ""
+                }`}
+              >
+                <img
+                  src={s.image}
+                  alt={`Screenshot ${i + 1}`}
+                  className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-[600ms] ease-out"
+                  loading="lazy"
+                />
+              </button>
             ))}
-          </div>
-        </section>
-      )}
-
-      {game.game_engines?.length > 0 && (
-        <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-16">
-          <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Game engine</p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {game.game_engines.map((engine) => (
-              <div key={engine.id || engine.name} className="border border-[color:var(--nf-border)] p-5">
-                {engine.url ? (
-                  <a href={engine.url} target="_blank" rel="noreferrer" className="font-display text-xl hover:text-[color:var(--nf-accent)]">
-                    {engine.name} <ExternalLink className="inline h-3.5 w-3.5" />
-                  </a>
-                ) : (
-                  <p className="font-display text-xl">{engine.name}</p>
-                )}
-                {engine.description && (
-                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--nf-text-dim)]">{engine.description}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {releaseDates.length > 0 && (
-        <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-16">
-          <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Release details</p>
-          <h2 className="font-display text-3xl md:text-4xl mt-1">When it arrived</h2>
-          <div className="mt-6 overflow-x-auto border border-[color:var(--nf-border)]">
-            <table className="w-full min-w-[480px] text-left text-sm">
-              <thead className="border-b border-[color:var(--nf-border)] text-[color:var(--nf-text-dim)]">
-                <tr>
-                  <th className="px-5 py-3 font-brand text-[10px] uppercase tracking-[0.15em]">Platform</th>
-                  <th className="px-5 py-3 font-brand text-[10px] uppercase tracking-[0.15em]">Release date</th>
-                  {hasReleaseStatus && <th className="px-5 py-3 font-brand text-[10px] uppercase tracking-[0.15em]">Status</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {releaseDates.map((release, index) => (
-                  <tr key={`${release.platform || "platform"}-${release.date || index}`} className="border-b border-[color:var(--nf-border)] last:border-0">
-                    <td className="px-5 py-3">{release.platform || "—"}</td>
-                    <td className="px-5 py-3">{release.human || (release.date ? formatDate(release.date) : "TBA")}</td>
-                    {hasReleaseStatus && <td className="px-5 py-3">{release.status || game.release_status || "—"}</td>}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
-      {relatedContent.length > 0 && (
-        <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-16">
-          <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Related releases</p>
-          <h2 className="font-display text-3xl md:text-4xl mt-1">More from this world</h2>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {relatedContent.map((item) => {
-              const content = (
-                <>
-                  <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-accent)]">{item.relation}</p>
-                  <p className="mt-2 font-display text-xl">{item.name}</p>
-                  {item.released && (
-                    <p className="mt-1 text-sm text-[color:var(--nf-text-dim)]">{formatDate(item.released)}</p>
-                  )}
-                </>
-              );
-              const className = "block h-full border border-[color:var(--nf-border)] p-5 transition-colors hover:border-[color:var(--nf-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nf-accent)]";
-
-              return item.slug ? (
-                <Link
-                  key={`${item.relation}-${item.id || item.slug}`}
-                  to={`/game/${item.slug}`}
-                  className={className}
-                >
-                  {content}
-                </Link>
-              ) : (
-                <div key={`${item.relation}-${item.id || item.slug}`} className={className}>
-                  {content}
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {gameVersions.length > 0 && (
-        <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-16">
-          <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Ports, remakes & remasters</p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {gameVersions.map((item) => (
-              <div key={`${item.relation}-${item.id || item.slug}`} className="border border-[color:var(--nf-border)] p-5">
-                <p className="font-brand text-[10px] tracking-[0.2em] text-[color:var(--nf-accent)]">{item.relation}</p>
-                <p className="mt-2 font-display text-xl">{item.name}</p>
-                {item.released && <p className="mt-1 text-sm text-[color:var(--nf-text-dim)]">{formatDate(item.released)}</p>}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {(storefrontLinks.length > 0 || communityLinks.length > 0) && (
-        <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-16 grid gap-10 md:grid-cols-2">
-          {storefrontLinks.length > 0 && (
-            <div>
-              <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Platform & storefront links</p>
-              <div className="mt-5 flex flex-wrap gap-3">
-                {storefrontLinks.map((website) => (
-                  <a key={website.id || website.url} href={website.url} target="_blank" rel="noreferrer" className="nf-btn">
-                    {website.name} <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-          {communityLinks.length > 0 && (
-            <div>
-              <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Community links</p>
-              <div className="mt-5 flex flex-wrap gap-3">
-                {communityLinks.map((website) => (
-                  <a key={website.id || website.url} href={website.url} target="_blank" rel="noreferrer" className="nf-btn">
-                    {website.name} <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
-      )}
-
-      {(timeline.length > 1 || seriesError) && (
-        <section className="max-w-[1440px] mx-auto px-6 md:px-10 mt-16">
-          <p className="font-brand text-[11px] tracking-[0.2em] text-[color:var(--nf-text-dim)]">Series</p>
-          <h2 className="font-display text-3xl md:text-4xl mt-1">The timeline</h2>
-          {seriesError ? (
-            <p role="status" className="mt-5 text-sm text-[color:var(--nf-text-dim)]">{seriesError}</p>
-          ) : (
-            <div className="mt-6 grid grid-cols-1 min-[360px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-              {timeline.map((entry, index) => (
-                <div key={entry.id || entry.slug}>
-                  <p className="mb-2 font-brand text-[10px] tracking-[0.15em] text-[color:var(--nf-text-dim)]">
-                    {entry.released ? formatDate(entry.released) : "Release date unavailable"}
-                  </p>
-                  <GameCard game={entry} index={index} />
-                </div>
-              ))}
-            </div>
-          )}
+          </div>}
         </section>
       )}
 

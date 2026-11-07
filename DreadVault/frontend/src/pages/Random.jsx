@@ -83,13 +83,7 @@ export default function Random() {
               </p>
               <h2 className="font-display text-4xl md:text-5xl mt-2">{game.name}</h2>
               <div className="mt-4 flex flex-wrap items-center gap-3 justify-center">
-                <RatingBadge
-                  value={game.rating}
-                  metacritic={game.metacritic}
-                  criticRating={game.critic_rating}
-                  provider={game.provider}
-                  compact
-                />
+                <RatingBadge value={game.rating} metacritic={game.metacritic} compact />
                 <PlatformBadges platforms={game.parent_platforms} />
               </div>
               <p className="mt-4 text-sm text-[color:var(--nf-text-dim)] max-w-lg mx-auto">

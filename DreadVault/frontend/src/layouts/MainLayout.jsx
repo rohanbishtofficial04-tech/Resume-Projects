@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { OfflineBanner } from "@/components/OfflineBanner";
+import { MissingKeyBanner } from "@/components/MissingKeyBanner";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { Toaster } from "sonner";
 import { TID } from "@/constants/testIds";
@@ -12,6 +13,7 @@ export const MainLayout = () => {
   return (
     <div className="nf-grain nf-vignette min-h-screen">
       <Navbar />
+      <MissingKeyBanner />
       <OfflineBanner />
       <main className="pt-16">
         <Outlet />

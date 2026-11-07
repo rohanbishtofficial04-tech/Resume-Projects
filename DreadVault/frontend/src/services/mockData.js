@@ -52,77 +52,32 @@ const featuredGames = [
     description_raw: "Investigative journalist Blake Langermann searches for his missing wife in a remote Arizona town gripped by a terrifying religious cult.",
   },
   {
-    ...g(21, "dead-by-daylight", "Dead by Daylight", "2016-06-14", 4.2, 71, IMG.grain, ["Horror", "Action"], ["PC", "PlayStation", "Xbox"]),
-    description_raw: "Four survivors must work together to escape a relentless killer in this asymmetrical multiplayer horror game.",
+    ...g(16, "hellblade-senuas-sacrifice", "Hellblade: Senua's Sacrifice", "2017-08-08", 4.3, 81, IMG.forest, ["Action", "Adventure"], ["PC", "PlayStation", "Xbox"]),
+    description_raw: "Celtic warrior Senua journeys into a haunting vision of the Viking afterlife to save the soul of her lost beloved.",
   },
   {
-    ...g(22, "the-dark-pictures-anthology-man-of-medan", "The Dark Pictures Anthology: Man of Medan", "2019-08-30", 3.8, 69, IMG.corridor, ["Horror", "Adventure"], ["PC", "PlayStation", "Xbox"]),
-    description_raw: "A group of friends encounter a nightmare aboard an abandoned World War II ship, where every choice can decide who survives.",
+    ...g(17, "resident-evil-7-biohazard", "Resident Evil 7: Biohazard", "2017-01-24", 4.4, 86, IMG.corridor, ["Horror", "Action"], ["PC", "PlayStation", "Xbox"]),
+    description_raw: "Ethan Winters follows a message from his missing wife to a decaying Louisiana plantation and the dangerous Baker family.",
+  },
+  {
+    ...g(18, "until-dawn", "Until Dawn", "2015-08-25", 4.2, 79, IMG.woods, ["Horror", "Adventure"], ["PlayStation"]),
+    description_raw: "Eight friends return to an isolated mountain lodge, where their choices determine who survives the night.",
   },
   {
     ...g(19, "silent-hill-2-2024", "Silent Hill 2", "2024-10-08", 4.6, 86, IMG.fog, ["Horror", "Adventure"], ["PC", "PlayStation"]),
     description_raw: "James Sunderland returns to the fog-covered town of Silent Hill after receiving a letter from his deceased wife.",
   },
   {
-    ...g(23, "resident-evil-4", "Resident Evil 4", "2023-03-24", 4.5, 93, IMG.corridor, ["Horror", "Action"], ["PC", "PlayStation", "Xbox"]),
-    description_raw: "Agent Leon S. Kennedy travels to a remote European village to rescue the president's daughter from a terrifying cult.",
-  },
-  {
-    ...g(24, "the-evil-within", "The Evil Within", "2014-10-14", 4.0, 75, IMG.forest, ["Horror", "Action"], ["PC", "PlayStation", "Xbox"]),
-    description_raw: "Detective Sebastian Castellanos is pulled into a nightmarish world while investigating a gruesome crime scene.",
-  },
-  {
-    ...g(17, "resident-evil-7-biohazard", "Resident Evil 7: Biohazard", "2017-01-24", 4.4, 86, IMG.corridor, ["Horror", "Action"], ["PC", "PlayStation", "Xbox"]),
-    description_raw: "Ethan Winters follows a message from his missing wife to a decaying Louisiana plantation and the dangerous Baker family.",
+    ...g(20, "resident-evil-2", "Resident Evil 2", "2019-01-25", 4.6, 91, IMG.corridor, ["Horror", "Action"], ["PC", "PlayStation", "Xbox"]),
+    description_raw: "Newcomer Leon Kennedy and college student Claire Redfield fight to escape Raccoon City during a zombie outbreak.",
   },
 ];
-
-const topNightmareGames = [
-  ["alien-isolation", "Alien: Isolation", "2014-10-07", IMG.corridor],
-  ["fatal-frame-ii-crimson-butterfly", "Fatal Frame II: Crimson Butterfly", "2003-11-27", IMG.woods],
-  ["amnesia-the-dark-descent", "Amnesia: The Dark Descent", "2010-09-08", IMG.fog],
-  ["silent-hill-2-2024", "Silent Hill 2", "2024-10-08", IMG.forest],
-  ["outlast", "Outlast", "2013-09-04", IMG.woods],
-  ["resident-evil-7-biohazard", "Resident Evil 7: Biohazard", "2017-01-24", IMG.corridor],
-  ["dead-space-2023", "Dead Space", "2023-01-27", IMG.abstract],
-  ["soma", "SOMA", "2015-09-22", IMG.grain],
-  ["visage", "Visage", "2020-10-30", IMG.fog],
-  ["left-4-dead", "Left 4 Dead", "2008-11-17", IMG.corridor],
-].map(([slug, name, released, image], index) => ({
-  ...g(31 + index, slug, name, released, 0, 0, image, ["Horror"], ["PC", "PlayStation"]),
-  rating: null,
-  metacritic: null,
-  ratings_count: 0,
-}));
-
-const trendingHorrorGames = [
-  ["phasmophobia", "Phasmophobia", "2020-09-18", IMG.grain],
-  ["the-outlast-trials", "The Outlast Trials", "2024-03-05", IMG.woods],
-  ["dead-by-daylight", "Dead by Daylight", "2016-06-14", IMG.fog],
-  ["lethal-company", "Lethal Company", "2023-10-23", IMG.corridor],
-  ["little-nightmares-iii", "Little Nightmares III", "2025-10-10", IMG.abstract],
-  ["silent-hill-f", "Silent Hill f", "2025-09-25", IMG.forest],
-  ["resident-evil-village", "Resident Evil Village", "2021-05-07", IMG.corridor],
-  ["five-nights-at-freddys-into-the-pit", "Five Nights at Freddy's: Into the Pit", "2024-08-07", IMG.grain],
-  ["mouthwashing", "Mouthwashing", "2024-09-26", IMG.abstract],
-  ["dying-light-the-beast", "Dying Light: The Beast", "2025-09-18", IMG.woods],
-  ["resident-evil-requiem", "Resident Evil Requiem", "2026-02-27", IMG.fog],
-  ["alan-wake-2", "Alan Wake 2", "2023-10-27", IMG.forest],
-].map(([slug, name, released, image], index) => ({
-  ...g(51 + index, slug, name, released, null, null, image, ["Horror"], ["PC", "PlayStation", "Xbox"]),
-  rating: null,
-  metacritic: null,
-  ratings_count: 0,
-}));
 
 const listResp = (arr) => ({ count: arr.length, next: null, previous: null, results: arr });
 
 export default {
   IMG,
   trending: () => listResp(games),
-  trendingHorror: () => listResp(trendingHorrorGames),
-  featuredGames: () => listResp(featuredGames),
-  topNightmares: () => listResp(topNightmareGames),
   topRated: () => listResp([...games].sort((a, b) => b.metacritic - a.metacritic)),
   recent: () => listResp([...games].sort((a, b) => b.released.localeCompare(a.released))),
   upcoming: () => listResp(games.slice(0, 6)),
@@ -135,9 +90,6 @@ export default {
     if (params.genres) arr = arr.filter((x) => x.genres.some((gg) => gg.slug === params.genres));
     if (params.platforms) {
       const platformSlugs = {
-        14: "xbox",
-        15: "playstation",
-        16: "playstation",
         1: "xbox",
         4: "pc",
         7: "nintendo switch",
@@ -174,10 +126,7 @@ export default {
     };
   },
   details: (slug) => {
-    const found = featuredGames.find((x) => x.slug === slug) ||
-      topNightmareGames.find((x) => x.slug === slug) ||
-      games.find((x) => x.slug === slug) ||
-      games[0];
+    const found = featuredGames.find((x) => x.slug === slug) || games.find((x) => x.slug === slug) || games[0];
     return {
       ...found,
       description_raw: found.description_raw || "Explore a memorable journey through a world of terror, mystery, and survival.",
@@ -219,27 +168,18 @@ export default {
   genres: () =>
     listResp([
       { id: "horror", slug: "horror", name: "Horror" },
-      { id: "shooter", slug: "shooter", name: "Shooter" },
-      { id: "survival", slug: "survival", name: "Survival" },
       { id: "adventure", slug: "adventure", name: "Adventure" },
       { id: "action", slug: "action", name: "Action" },
       { id: "indie", slug: "indie", name: "Indie" },
-      { id: "platform", slug: "platform", name: "Platform" },
-      { id: "puzzle", slug: "puzzle", name: "Puzzle" },
       { id: "rpg", slug: "role-playing-games-rpg", name: "RPG" },
-      { id: "strategy", slug: "strategy", name: "Strategy" },
     ]),
   platforms: () =>
     listResp([
       { id: 4, slug: "pc", name: "PC" },
       { id: 187, slug: "playstation5", name: "PlayStation 5" },
-      { id: 186, slug: "xbox-series-x", name: "Xbox Series X|S" },
-      { id: "switch-2", slug: "switch-2", name: "Nintendo Switch 2" },
       { id: 18, slug: "playstation4", name: "PlayStation 4" },
       { id: 1, slug: "xbox-one", name: "Xbox One" },
+      { id: 186, slug: "xbox-series-x", name: "Xbox Series S/X" },
       { id: 7, slug: "nintendo-switch", name: "Nintendo Switch" },
-      { id: 16, slug: "playstation3", name: "PlayStation 3" },
-      { id: 14, slug: "xbox360", name: "Xbox 360" },
-      { id: 15, slug: "playstation2", name: "PlayStation 2" },
     ]),
 };

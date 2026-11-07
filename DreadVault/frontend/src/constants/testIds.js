@@ -68,4 +68,5 @@ export const TID = {
   scrollTop: "scroll-top-btn",
   toaster: "sonner-toaster",
   offlineBanner: "offline-banner",
+  missingKeyBanner: "missing-key-banner",
 };

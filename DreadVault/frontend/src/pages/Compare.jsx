@@ -179,7 +179,7 @@ export default function Compare() {
             a={a ? <Link to={`/game/${a.slug}`} className="font-display text-xl">{a.name}</Link> : "—"}
             b={b ? <Link to={`/game/${b.slug}`} className="font-display text-xl">{b.name}</Link> : "—"}
           />
-          <Row label="Rating" a={a ? <RatingBadge value={a.rating} metacritic={a.metacritic} criticRating={a.critic_rating} provider={a.provider} compact /> : "—"} b={b ? <RatingBadge value={b.rating} metacritic={b.metacritic} criticRating={b.critic_rating} provider={b.provider} compact /> : "—"} />
+          <Row label="Rating" a={a ? <RatingBadge value={a.rating} metacritic={a.metacritic} compact /> : "—"} b={b ? <RatingBadge value={b.rating} metacritic={b.metacritic} compact /> : "—"} />
           <Row label="Released" a={a?.released || "—"} b={b?.released || "—"} />
           <Row label="Rating Count" a={ratingCount(a)} b={ratingCount(b)} />
           <Row label="Average Playtime" a={playtime(a)} b={playtime(b)} />
