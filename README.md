@@ -4,13 +4,13 @@ A collection of browser-based projects. Each project folder contains its own REA
 
 ## Projects
 
-### [DreadVault](./DreadVault/)
+### [DreadVault (RAWG)](./DreadVault%28RAWG%29/)
 
 A cinematic horror game discovery library powered by the RAWG Video Games API. Browse, search, compare, and organize horror games, explore trailers and screenshots, and personalize the experience with Fog, Blood, and Eldritch themes.
 
 - **Stack:** React, React Router, Tailwind CSS, Framer Motion, Axios
 - **Live site:** [dreadvault.vercel.app](https://dreadvault.vercel.app)
-- **Project guide:** [DreadVault README](./DreadVault/README.md)
+- **Project guide:** [DreadVault (RAWG) README](./DreadVault%28RAWG%29/README.md)
 
 ### [FretLab](./FretLab/)
 
@@ -32,6 +32,6 @@ A personal finance dashboard for tracking income and expenses, managing monthly 
 
 Each project manages its own dependencies and run scripts. Follow the setup instructions in its README:
 
-- [Set up DreadVault](./DreadVault/README.md#getting-started)
+- [Set up DreadVault (RAWG)](./DreadVault%28RAWG%29/README.md#getting-started)
 - [Set up FretLab](./FretLab/README.md#getting-started)
 - [Set up SpendWise](./SpendWise/README.md#getting-started)
