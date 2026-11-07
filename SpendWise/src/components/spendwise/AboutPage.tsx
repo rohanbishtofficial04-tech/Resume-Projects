@@ -1,4 +1,4 @@
-import { BarChart3, Layers, ShieldCheck, Wallet, Zap } from "lucide-react";
+import { BarChart3, Code2, ExternalLink, Layers, ShieldCheck, Wallet, Zap } from "lucide-react";
 
 const principles = [
   {
@@ -71,6 +71,16 @@ export default function AboutPage() {
             <BarChart3 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
             <p className="text-sm leading-relaxed text-muted-foreground">Made to help make daily spending and longer-term trends easier to understand.</p>
           </div>
+          <a
+            href="https://github.com/rohanbishtofficial04-tech/SpendWise"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-primary"
+          >
+            <Code2 className="size-4" aria-hidden="true" />
+            GitHub repository
+            <ExternalLink className="size-3.5" aria-hidden="true" />
+          </a>
         </section>
       </aside>
     </div>

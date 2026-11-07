@@ -73,7 +73,7 @@ export default function About() {
             <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Project links</h2>
             <div className="mt-4 flex flex-col gap-3 text-sm">
               <a
-                href="https://github.com/rohanbishtofficial04-tech/Resume-Projects/tree/main/FretLab"
+                href="https://github.com/rohanbishtofficial04-tech/FretLab"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 text-foreground transition-colors hover:text-primary"
